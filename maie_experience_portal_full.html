@@ -916,6 +916,45 @@ body {
 .scene-dot:hover { background: var(--text-3); transform: scale(1.3); }
 .scene-dot.active { background: var(--primary-light); transform: scale(1.2); }
 
+/* ── Renderer-generated grid classes (overridable by media queries) ── */
+.card-grid {
+  display: grid;
+  gap: 1rem;
+}
+.card-grid--1 { grid-template-columns: 1fr; }
+.card-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+.raw-grid {
+  display: grid;
+  gap: 1rem;
+}
+.raw-grid--gap-sm { gap: 0.625rem; }
+.raw-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.raw-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.raw-grid--4 { grid-template-columns: repeat(4, 1fr); }
+
+/* flow-steps: N steps + (N-1) arrow dividers in alternating columns */
+[class^="flow-steps"] {
+  display: grid;
+  gap: 0.5rem;
+  align-items: start;
+}
+.flow-steps--3 { grid-template-columns: repeat(5, 1fr); } /* 3 steps + 2 arrows */
+.flow-steps--5 { grid-template-columns: repeat(9, 1fr); } /* 5 steps + 4 arrows */
+
+/* NLE callout — auto + content two-col on desktop */
+.raw-callout-nle {
+  margin-top: 1.5rem;
+  background: rgba(255,255,255,0.018);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
 /* ═══════════════════════════════════════════════════════
    COMING SOON MODULE STUBS
    ═══════════════════════════════════════════════════════ */
@@ -941,47 +980,177 @@ body {
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   MOBILE — ≤ 900px
+   All desktop layout is preserved above this breakpoint.
+   Below it the sidenav collapses, headers hide, grids
+   stack, and padding compacts. Every override here is
+   additive — the desktop experience is untouched.
+   ═══════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .shell { grid-template-columns: 1fr; }
+
+  /* ── Shell ─────────────────────────────────────────── */
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
+
+  /* ── Topbar ─────────────────────────────────────────── */
+  .topbar { padding: 0 1rem; gap: 0.75rem; }
+  .topbar-divider { display: none; }
+  /* Static "Product Experience" label wastes space — hide it */
+  .topbar > .topbar-label { display: none; }
+  .topbar-progress { max-width: 120px; }
+  .topbar-wordmark { font-size: 1.1rem; }
+
+  /* ── Sidenav → horizontal chip strip ───────────────── */
   .sidenav {
+    grid-column: 1 / -1;
     display: flex;
     flex-direction: row;
     height: auto;
     position: static;
     overflow-x: auto;
-    padding: 0.5rem;
+    overflow-y: hidden;
+    padding: 0.375rem 0.75rem;
+    gap: 0;
     border-right: none;
     border-bottom: 1px solid var(--border);
+    /* Hide scrollbar visually — still scrollable */
+    scrollbar-width: none;
   }
+  .sidenav::-webkit-scrollbar { display: none; }
   .sidenav-section { display: none; }
-  .nav-item { padding: 0.5rem 0.75rem; border-left: none; border-bottom: 2px solid transparent; }
-  .nav-item.active { border-bottom-color: var(--primary); background: none; }
-  .sidenav-footer { display: none; }
+  .sidenav-footer  { display: none; }
 
-  /* Hide module headers on mobile — topbar chapter label takes over */
+  .nav-item {
+    padding: 0.375rem 0.75rem;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav-item.active {
+    border-bottom-color: var(--primary);
+    background: none;
+  }
+  .nav-item-dot { display: none; }
+
+  /* ── Content stage ──────────────────────────────────── */
+  .content { height: calc(100vh - 52px - 44px); } /* topbar + sidenav strip */
+  .module  { height: calc(100vh - 52px - 44px); }
+
+  /* ── Module headers: topbar label takes over ────────── */
   .mod-header { display: none; }
 
-  /* Tighter body gap and padding */
-  .mod-body { gap: 0.75rem; padding-top: 0.75rem; }
+  /* ── Module body ────────────────────────────────────── */
+  .mod-body {
+    gap: 0.625rem;
+    padding: 0.75rem 1rem 0.75rem;
+  }
 
-  /* Vision */
-  .vision-hero { grid-template-columns: 1fr; }
+  /* ── Chapter nav ────────────────────────────────────── */
+  .chapter-nav {
+    padding: 0.5rem 1rem;
+  }
+  .chapter-nav-btn {
+    padding: 0.45rem 0.875rem;
+    font-size: 0.75rem;
+  }
+
+  /* ── Cards ──────────────────────────────────────────── */
+  .card { padding: 0.875rem; }
+  .card-title { font-size: 0.85rem; }
+  .card-body  { font-size: 0.75rem; }
+
+  /* ── Card grids: all collapse to 1 col on mobile ───── */
+  .card-grid--1,
+  .card-grid--2,
+  .card-grid--3 {
+    grid-template-columns: 1fr !important;
+  }
+  /* 2-col is acceptable on large phones in landscape */
+  @media (min-width: 600px) {
+    .card-grid--2 { grid-template-columns: 1fr 1fr !important; }
+    .card-grid--3 { grid-template-columns: 1fr 1fr !important; }
+  }
+
+  /* ── Raw grids: same collapsing rules ───────────────── */
+  .raw-grid--2,
+  .raw-grid--3,
+  .raw-grid--4 {
+    grid-template-columns: 1fr !important;
+  }
+  @media (min-width: 600px) {
+    .raw-grid--2 { grid-template-columns: 1fr 1fr !important; }
+    .raw-grid--3 { grid-template-columns: 1fr 1fr !important; }
+    .raw-grid--4 { grid-template-columns: 1fr 1fr !important; }
+  }
+
+  /* ── Flow steps: vertical stack ────────────────────── */
+  [class^="flow-steps"] {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  /* Hide the arrow dividers between steps on mobile */
+  [class^="flow-steps"] > div:nth-child(even) { display: none; }
+
+  /* ── Vision ─────────────────────────────────────────── */
+  .vision-hero {
+    grid-template-columns: 1fr;
+    padding: 1rem 1rem 0;
+    gap: 0.75rem;
+  }
   .vision-pixie-wrap { display: none; }
-  .vision-pillars { grid-template-columns: 1fr; }
+  .vision-tagline    { font-size: clamp(1.6rem, 6vw, 2.4rem); }
+  .vision-statement  { font-size: 0.82rem; }
+  .vision-pillars    { grid-template-columns: 1fr; gap: 0.5rem; }
+  .pillar            { padding: 0.875rem; }
+  .pillar-num        { font-size: 1.2rem; margin-bottom: 0.35rem; }
+  .pillar-title      { font-size: 0.9rem; }
+  .pillar-body       { font-size: 0.75rem; }
+  .vision-problem    {
+    grid-template-columns: 1fr;
+    padding: 0.75rem;
+    margin: 0;
+  }
+  .vision-problem-label { display: none; }
 
-  /* Platform */
-  .platform-hero { grid-template-columns: 1fr; }
+  /* ── Platform ───────────────────────────────────────── */
+  .platform-hero         { grid-template-columns: 1fr; }
   .platform-pixie-center { display: none; }
+  .platform-pillar       { padding: 0.875rem; }
 
-  /* Differentiator table — drop middle columns, tighten rows */
-  .diff-row { grid-template-columns: 1fr 1fr; }
+  /* ── Differentiator table ───────────────────────────── */
+  .diff-table           { font-size: 0.72rem; }
+  .diff-row             { grid-template-columns: 1fr 1fr; }
   .diff-row .diff-cell:nth-child(n+3) { display: none; }
   .diff-row.header .diff-cell:nth-child(n+3) { display: none; }
-  .diff-cell { padding: 0.35rem 0.5rem; font-size: 0.7rem; }
+  .diff-cell            { padding: 0.35rem 0.5rem; }
 
-  /* Thesis block */
-  .platform-thesis { padding: 0.75rem 1rem; }
-  .platform-thesis-quote { font-size: 0.82rem; }
+  /* ── Thesis block ───────────────────────────────────── */
+  .platform-thesis       { padding: 0.75rem 1rem; gap: 0.5rem; }
+  .platform-thesis-quote { font-size: 0.8rem; }
+
+  /* ── Stack chips ────────────────────────────────────── */
+  .stack-chip { font-size: 0.62rem; padding: 3px 7px; }
+
+  /* ── Audience pills ─────────────────────────────────── */
+  .audience-pill { font-size: 0.5rem; padding: 2px 6px; }
+
+  /* ── Tier stack ─────────────────────────────────────── */
+  .tier-stack > div { padding: 0.75rem 1rem; }
+
+  /* ── Timeline ───────────────────────────────────────── */
+  .timeline-row { gap: 0.75rem; }
+
+  /* ── Closing block ──────────────────────────────────── */
+  .closing-block { padding: 1.25rem; }
+
+  /* ── Scene dots ─────────────────────────────────────── */
+  #scene-dots { margin-left: 0.5rem; }
+  .scene-dot  { width: 5px; height: 5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

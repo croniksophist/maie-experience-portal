@@ -101,7 +101,7 @@ window.MAIE_CHAPTERS = [
       { eyebrow: 'Live activity feed', title: 'Always know what\'s happening',
         body: 'A persistent panel surfaces uploads completing, agent plans finishing, and assets publishing in real time. In a platform where the agent does multi-step work that takes minutes, the user should never have to wonder if something is happening.' },
     ]},
-    { type: 'raw', html: `<div style="margin-top:1.5rem;background:rgba(255,255,255,0.018);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:start;">
+    { type: 'raw', html: `<div class="raw-callout-nle">
       <div style="font-family:var(--font-display);font-size:2rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--border-strong);line-height:1;padding-top:2px;">NLE</div>
       <div>
         <div style="font-size:0.82rem;font-weight:600;color:var(--text-1);margin-bottom:0.35rem;">Built like production software</div>
@@ -165,7 +165,7 @@ window.MAIE_CHAPTERS = [
         ]},
         { type: 'raw', html: `<div>
           <div class="card-eyebrow" style="margin-bottom:0.75rem;">The tool suite — every agent capability, also standalone</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+          <div class="raw-grid raw-grid--3">
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Scene Detection</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">Automatic scene boundary detection, keyframe extraction, proportional visual timeline, captioning, and visual similarity clustering.</div></div>
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Metadata Enrichment</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">AI vision analysis — captions, object tags, color palettes, brightness signals, people-presence detection — powering every search and filter surface.</div></div>
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Transcription</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">Audio and video to structured, searchable text. Foundation for captioning, content repurposing, and agent steps that reason about what was said.</div></div>
@@ -222,7 +222,7 @@ window.MAIE_CHAPTERS = [
     {
       // Scene B — The experience layer: customization, echoes, retention value
       body: [
-        { type: 'raw', html: `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        { type: 'raw', html: `<div class="raw-grid raw-grid--2">
           <div class="card">
             <div class="card-eyebrow">Customization — free tier</div>
             <div style="display:flex;flex-direction:column;gap:0;margin-top:0.75rem;">
@@ -244,7 +244,7 @@ window.MAIE_CHAPTERS = [
           </div>
         </div>` },
         { type: 'calloutBox', tone: 'brand', label: 'Why identity is infrastructure, not a feature',
-          body: `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          body: `<div class="raw-grid raw-grid--2">
             <div><strong style="color:var(--text-1);">Creator retention.</strong> A Pixie that grows richer over time — more echoes, higher resonance, earned marketplace identity — gives creators a structural reason to return. Their identity is on the platform, not just their files.</div>
             <div><strong style="color:var(--text-1);">Earned lock-in.</strong> No competing production platform builds persistent creative identity into the infrastructure layer. The provenance stamp, the echo orbit, the archetype — these are things a creator would lose by leaving. That is the right kind of retention.</div>
           </div>` },
@@ -280,7 +280,7 @@ window.MAIE_CHAPTERS = [
     ]},
     { type: 'raw', html: `<div style="margin-top:1.5rem;">
       <div class="card-eyebrow" style="margin-bottom:0.75rem;">What's for sale</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.625rem;">
+      <div class="raw-grid raw-grid--3 raw-grid--gap-sm">
         <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">⬡</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Workflow blueprints</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">Reusable agent plan sequences tuned for specific kinds of footage.</div></div>
         <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">◎</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Identity themes</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">Full animation + shape + palette bundles for the Pixie companion.</div></div>
         <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">◈</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Agent skins</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">AGENT_SKIN images composited onto the Pixie canvas, validated server-side.</div></div>
@@ -332,7 +332,7 @@ window.MAIE_CHAPTERS = [
       { eyebrow: 'Continuity across login', title: 'Intent survives authentication',
         body: 'A visitor who clicks a specific capability before signing in lands directly inside that exact tool after authenticating — not a generic post-login landing page. Friction between expressing intent and acting on it is absorbed by the platform, not passed to the user.' },
     ]},
-    { type: 'raw', html: `<div style="margin-top:1.5rem;display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;">
+    { type: 'raw', html: `<div class="raw-grid raw-grid--4" style="margin-top:1.5rem;">
       <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;text-align:center;"><div style="font-family:var(--font-display);font-size:1.4rem;color:var(--primary-light);margin-bottom:0.25rem;">Tenant</div><div style="font-size:0.7rem;color:var(--text-3);">Scoped isolation on every record</div></div>
       <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;text-align:center;"><div style="font-family:var(--font-display);font-size:1.4rem;color:var(--primary-light);margin-bottom:0.25rem;">Project</div><div style="font-size:0.7rem;color:var(--text-3);">Verified access on every endpoint</div></div>
       <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;text-align:center;"><div style="font-family:var(--font-display);font-size:1.4rem;color:var(--primary-light);margin-bottom:0.25rem;">Role</div><div style="font-size:0.7rem;color:var(--text-3);">Auditable elevation, never silent</div></div>
