@@ -77,13 +77,10 @@
         <div class="card-title">${c.title}</div>
         <div class="card-body">${c.body}</div>
       </div>`).join('');
-    const mt = b.marginTop    ? `margin-top:${b.marginTop};`    : '';
-    const mb = b.marginBottom ? `margin-bottom:${b.marginBottom};` : '';
     return `${b.label ? `<div class="card-eyebrow" style="margin-bottom:0.75rem;">${b.label}</div>` : ''}
-      <div class="card-grid card-grid--${cols}" style="${mt}${mb}">
+      <div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:1rem;${b.marginTop ? 'margin-top:'+b.marginTop+';' : ''}${b.marginBottom ? 'margin-bottom:'+b.marginBottom+';' : ''}">
         ${cards}
       </div>`;
-  }
   }
 
   function blockDiffTable(b) {
@@ -124,7 +121,7 @@
       ${i < b.steps.length - 1 ? `<div style="display:flex;align-items:center;justify-content:center;padding-top:0.5rem;color:var(--border-strong);font-size:1.2rem;">→</div>` : ''}
     `).join('');
     return `${b.label ? `<div class="card-eyebrow" style="margin-bottom:0.75rem;">${b.label}</div>` : ''}
-      <div class="flow-steps flow-steps--${b.steps.length}">${steps}</div>`;
+      <div style="display:grid;grid-template-columns:repeat(${b.steps.length * 2 - 1},1fr);gap:0.5rem;align-items:start;">${steps}</div>`;
   }
 
   function blockTierStack(b) {
