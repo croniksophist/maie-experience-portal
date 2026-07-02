@@ -22,7 +22,12 @@
 
     --du-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
   }
-
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--du-bg); /* Bleeds the dark theme across the entire viewport */
+    min-height: 100vh;
+  }
   .sr-only {
     position: absolute; width: 1px; height: 1px;
     padding: 0; margin: -1px; overflow: hidden;
