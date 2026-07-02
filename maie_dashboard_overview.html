@@ -11,6 +11,11 @@
     --du-amber: #d6a13c;
     --du-blue: #4d7ea8;
     --du-green: #5b9a6f;
+
+    /* Broadcast-grade asymmetric easing for the interactive detail panel —
+       fast attack, long settle. Kept separate from the plainer .15s/.2s
+       transitions used on hover/toggle states elsewhere in this file. */
+    --du-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .du-root { font-family: var(--font-sans); color: var(--text-primary); }
@@ -140,32 +145,28 @@
   .du-module-name { font-size:12.5px; font-weight:500; color: var(--text-primary); margin: 0 0 .15rem; }
   .du-module-role { font-size:10.5px; color: var(--text-muted); line-height:1.4; }
 
-  /* ── Three-view structure ─────────────────────────────────────────────── */
-  .du-views {
-    display:grid; grid-template-columns:1fr 1fr 1fr;
-    gap:10px; margin-bottom:1.5rem;
+  /* ── View tabs (hero) ─────────────────────────────────────────────────
+     Replaces the old standalone "Three Dashboard Views" text grid. Same
+     content, folded into a subtle tab strip right where the user is
+     already looking, with a one-line description that swaps on click
+     instead of three permanently-expanded paragraphs. */
+  .du-view-tabs {
+    display: flex; gap: 4px; margin-top: .85rem;
+    border: 0.5px solid var(--border); border-radius: 8px; padding: 3px;
+    width: max-content;
   }
-  .du-view {
-    border-radius:12px; padding:1rem;
-    border: 0.5px solid var(--border);
+  .du-view-tab {
+    font-size: 10.5px; font-weight: 500; letter-spacing: .04em;
+    padding: 5px 11px; border-radius: 6px; cursor: pointer;
+    color: var(--text-muted); background: transparent;
+    transition: background .2s var(--du-ease-cinematic), color .2s var(--du-ease-cinematic);
   }
-  .du-view-num { font-size:11px; font-weight:500; letter-spacing:.06em; margin-bottom:.35rem; }
-  .du-view-title { font-size:14px; font-weight:500; color: var(--text-primary); margin-bottom:.3rem; }
-  .du-view-desc { font-size:12px; color: var(--text-secondary); line-height:1.55; }
-  .du-view-attrs { margin-top:.6rem; display:flex; flex-wrap:wrap; gap:4px; }
-  .du-vattr {
-    font-size:10px; border-radius:4px; padding:2px 6px;
-    border: 0.5px solid var(--border); color: var(--text-secondary);
+  .du-view-tab.active { background: var(--bg-accent); color: var(--text-accent); }
+  .du-view-tab-desc {
+    font-size: 11.5px; color: var(--text-secondary); line-height: 1.55;
+    margin-top: .55rem; max-width: 480px; min-height: 32px;
+    transition: opacity .3s var(--du-ease-cinematic);
   }
-
-  /* ── Plan / Review / Approve strip ───────────────────────────────────── */
-  .du-runtime {
-    background: var(--surface-1);
-    border-radius:12px; padding:1rem 1.25rem;
-    margin-bottom:1.5rem;
-    border: 0.5px solid var(--border);
-  }
-  .du-rt-row {
     display:grid; grid-template-columns: repeat(5, 1fr);
     gap:6px; margin-top:.6rem;
   }
@@ -193,31 +194,45 @@
   }
   .du-risk-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
 
-  /* ── Two column infoboxes ─────────────────────────────────────────────── */
-  .du-two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1.5rem; }
-  .du-infobox {
-    background: var(--surface-1); border-radius:12px;
-    padding:1rem 1.1rem; border:0.5px solid var(--border);
-  }
-  .du-infobox-title { font-size:13px; font-weight:500; margin-bottom:.5rem; color: var(--text-primary); }
-  .du-infobox-row { display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:0.5px solid var(--border); gap: 10px; }
-  .du-infobox-row:last-child { border-bottom:none; }
-  .du-infobox-key { font-size:12px; color: var(--text-secondary); }
-  .du-infobox-val { font-size:12px; font-weight:500; color: var(--text-primary); text-align:right; }
-
-  /* ── Differentiator row ───────────────────────────────────────────────── */
-  .du-diff-row {
-    display:grid; grid-template-columns: repeat(3, 1fr);
-    gap:8px; margin-bottom:0.5rem;
-  }
-  .du-diff-card {
-    border-radius:10px; padding:.85rem;
+  /* ── Interactive Module Detail — cinematic panel ──────────────────────
+     Replaces the old static two-column infoboxes and differentiator row.
+     One surface, content-swapped per module selection instead of
+     permanently-stacked reading material. Exit/enter choreography:
+     current panel gets .exit-out, is removed after 240ms, replacement
+     mounts with .enter-in and its .stagger-child elements settle in on
+     a staggered delay. */
+  .du-detail-panel {
+    background: var(--surface-1); border-radius: 14px;
     border: 0.5px solid var(--border);
-    background: var(--surface-1);
+    padding: 1.15rem 1.25rem;
+    display: flex; flex-direction: column; gap: 1rem;
+    opacity: 1; transform: translateY(0); filter: blur(0);
+    transition: opacity .45s var(--du-ease-cinematic), transform .45s var(--du-ease-cinematic), filter .45s var(--du-ease-cinematic);
   }
-  .du-diff-icon { font-size:17px; margin-bottom:.35rem; color: var(--text-secondary); }
-  .du-diff-title { font-size:12.5px; font-weight:500; color: var(--text-primary); margin-bottom:.25rem; }
-  .du-diff-desc { font-size:11px; color: var(--text-muted); line-height:1.45; }
+  .du-detail-panel.exit-out { opacity: 0; transform: translateY(-6px); filter: blur(3px); }
+  .du-detail-panel.enter-in { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  .du-detail-panel.enter-in .stagger-child { opacity: 0; transform: translateY(8px); }
+  .du-detail-panel .stagger-child {
+    opacity: 1; transform: translateY(0);
+    transition: opacity .4s var(--du-ease-cinematic), transform .4s var(--du-ease-cinematic);
+  }
+  .stagger-1 { transition-delay: .03s !important; }
+  .stagger-2 { transition-delay: .07s !important; }
+  .stagger-3 { transition-delay: .11s !important; }
+
+  .du-detail-head { display:flex; align-items:center; gap:.55rem; }
+  .du-detail-icon { font-size:16px; }
+  .du-detail-name { font-size:13.5px; font-weight:500; color: var(--text-primary); }
+  .du-detail-body { font-size:12.5px; color: var(--text-secondary); line-height:1.6; }
+  .du-detail-attrs { display:flex; flex-wrap:wrap; gap:5px; }
+  .du-detail-attr { font-size:10.5px; border-radius:4px; padding:2px 7px; border:0.5px solid var(--border); color: var(--text-secondary); }
+
+  /* Agent-only sub-panel: the Plan → Review → Approve → Execute lifecycle,
+     now revealed only when the Agent Workflow module is the active
+     selection, instead of living permanently at the page bottom. */
+  .du-detail-divider {
+    border-top: 0.5px solid var(--border); padding-top: .85rem; margin-top: .1rem;
+  }
 
   .du-foot-note {
     font-size: 11px; color: var(--text-muted); line-height: 1.6;
@@ -228,10 +243,7 @@
     .du-hero-top { flex-direction: column; }
     .du-cockpit { width: 100%; }
     .du-module-grid { grid-template-columns: repeat(2, 1fr); }
-    .du-views { grid-template-columns: 1fr; }
     .du-rt-row { grid-template-columns: repeat(2, 1fr); }
-    .du-two-col { grid-template-columns: 1fr; }
-    .du-diff-row { grid-template-columns: 1fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -255,6 +267,12 @@
           <div class="du-section-label" style="margin-bottom:.4rem">Click any module to see it in the cockpit →</div>
           <div style="font-size:11px; color:var(--du-muted);">Live replica of the actual interface chrome • <span style="color:var(--du-brand-light);">■</span> Active module</div>
         </div>
+        <div class="du-view-tabs" id="du-view-tabs">
+          <div class="du-view-tab active" data-view="workspace">Workspace</div>
+          <div class="du-view-tab" data-view="tools">Tools</div>
+          <div class="du-view-tab" data-view="analytics">Analytics</div>
+        </div>
+        <div class="du-view-tab-desc" id="du-view-tab-desc"></div>
       </div>
       <div class="du-cockpit-wrap">
         <!-- Live miniature cockpit replica -->
@@ -373,135 +391,14 @@
 
   <!-- ── ACTIVE MODULE DETAIL ─────────────────────────────────────────── -->
   <div id="du-module-detail" style="margin-bottom:1.5rem;">
-    <!-- populated by JS -->
-  </div>
-
-  <!-- ── THREE-VIEW STRUCTURE ─────────────────────────────────────────── -->
-  <div class="du-section-label">The Three Dashboard Views</div>
-  <div class="du-views">
-    <div class="du-view" style="background:rgba(138,46,34,0.08); border-color:rgba(138,46,34,0.28);">
-      <div class="du-view-num" style="color:var(--du-brand-light);">VIEW 01 · WORKSPACE</div>
-      <div class="du-view-title">What am I working on, and what's new?</div>
-      <div class="du-view-desc">Recent projects, upload surface, marketplace assets, quick-launch AI tools. Where most sessions begin and most work gets initiated.</div>
-      <div class="du-view-attrs">
-        <span class="du-vattr">Project carousel</span>
-        <span class="du-vattr">Drag-and-drop upload</span>
-        <span class="du-vattr">Quick Launch grid</span>
-        <span class="du-vattr">AI recommendations</span>
-        <span class="du-vattr">Marketplace feed</span>
-      </div>
-    </div>
-    <div class="du-view" style="background:rgba(77,126,168,0.08); border-color:rgba(77,126,168,0.25);">
-      <div class="du-view-num" style="color:var(--du-blue);">VIEW 02 · TOOLS</div>
-      <div class="du-view-title">I know what I want to do — let me do it.</div>
-      <div class="du-view-desc">The full AI suite, accessed directly. Agent, Scene Detection, Metadata, Transcription, Image Analysis, Recommendations, Asset Management — each a dedicated tab, not a menu detour.</div>
-      <div class="du-view-attrs">
-        <span class="du-vattr">Agent Workflow</span>
-        <span class="du-vattr">Scene Detection</span>
-        <span class="du-vattr">Metadata</span>
-        <span class="du-vattr">Transcription</span>
-        <span class="du-vattr">Image Analysis</span>
-        <span class="du-vattr">Asset Management</span>
-      </div>
-    </div>
-    <div class="du-view" style="background:rgba(91,154,111,0.08); border-color:rgba(91,154,111,0.25);">
-      <div class="du-view-num" style="color:var(--du-green);">VIEW 03 · ANALYTICS</div>
-      <div class="du-view-title">How is my work distributed, and is anything stuck?</div>
-      <div class="du-view-desc">Project-type distribution and processing-status counts rendered as a live operational summary. Not a vanity chart — an answer to an operational question.</div>
-      <div class="du-view-attrs">
-        <span class="du-vattr">Project-type split</span>
-        <span class="du-vattr">Processing counts</span>
-        <span class="du-vattr">Failed-file drill-down</span>
-        <span class="du-vattr">Live refresh</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── PLAN / REVIEW / APPROVE STRIP ─────────────────────────────────── -->
-  <div class="du-runtime">
-    <div class="du-section-label" style="margin:0 0 .25rem;">Agent Execution Model — Plan → Review → Approve → Execute</div>
-    <div style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin-bottom:.2rem;">
-      Every agent task moves through a transparent, risk-gated lifecycle. Click a stage to see what it means.
-    </div>
-    <div class="du-rt-row" id="du-stage-row">
-      <div class="du-stage du-active" data-stage="goal">
-        <div>Goal Submitted</div>
-        <div class="du-stage-sub">plain language</div>
-      </div>
-      <div class="du-stage" data-stage="plan">
-        <div>Plan Generated</div>
-        <div class="du-stage-sub">step-by-step</div>
-      </div>
-      <div class="du-stage" data-stage="review">
-        <div>Human Review</div>
-        <div class="du-stage-sub">inspect every step</div>
-      </div>
-      <div class="du-stage" data-stage="execute">
-        <div>Live Execution</div>
-        <div class="du-stage-sub">streaming results</div>
-      </div>
-      <div class="du-stage" data-stage="export">
-        <div>Export as Asset</div>
-        <div class="du-stage-sub">publish to market</div>
-      </div>
-    </div>
-    <div id="du-stage-detail" style="margin-top:.85rem; min-height:36px; font-size:12px; color:var(--text-secondary); line-height:1.55; border-top:0.5px solid var(--border); padding-top:.6rem;"></div>
-    <div style="margin-top:.75rem;">
-      <div class="du-section-label" style="margin:0 0 .35rem;">Risk gating — what requires explicit approval</div>
-      <div class="du-risk-row">
-        <div class="du-risk-chip"><div class="du-risk-dot" style="background:var(--du-green);"></div>Low — auto-approved</div>
-        <div class="du-risk-chip"><div class="du-risk-dot" style="background:var(--du-amber);"></div>Medium — review required</div>
-        <div class="du-risk-chip"><div class="du-risk-dot" style="background:#b05c3a;"></div>High — step-by-step sign-off</div>
-        <div class="du-risk-chip"><div class="du-risk-dot" style="background:#8a2e22;"></div>Critical — full halt</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── TWO-COLUMN INFOBOXES ──────────────────────────────────────────── -->
-  <div class="du-two-col">
-    <div class="du-infobox">
-      <div class="du-infobox-title">Utility Panel — Six Built-In Pages</div>
-      <div class="du-infobox-row"><span class="du-infobox-key">🏠 About MAIE</span><span class="du-infobox-val">Mission & positioning</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">⭐ Features</span><span class="du-infobox-val">Full capability catalogue</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">❓ Help & Support</span><span class="du-infobox-val">Live-fetch system status + FAQs</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">📊 Dashboard Guide</span><span class="du-infobox-val">Contextual walkthrough</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">🪙 Token History</span><span class="du-infobox-val">Full paginated ledger</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">🔴 System Status</span><span class="du-infobox-val">Live backend health meters</span></div>
-    </div>
-    <div class="du-infobox">
-      <div class="du-infobox-title">Platform Architecture — Surface Layer</div>
-      <div class="du-infobox-row"><span class="du-infobox-key">Theme system</span><span class="du-infobox-val">CSS token — instant, no-flash</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">Design namespace</span><span class="du-infobox-val">—mu-* unified tokens</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">Type scale</span><span class="du-infobox-val">Bebas Neue · DM Sans · JetBrains Mono</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">Panel collapse</span><span class="du-infobox-val">64px rail → 80vh expanded</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">Sidebar</span><span class="du-infobox-val">Collapsed → expanded, animated</span></div>
-      <div class="du-infobox-row"><span class="du-infobox-key">Bfcache guard</span><span class="du-infobox-val">Hard-reload on Back nav restore</span></div>
-    </div>
-  </div>
-
-  <!-- ── DIFFERENTIATORS ───────────────────────────────────────────────── -->
-  <div class="du-section-label">The Compounding Advantage</div>
-  <div class="du-diff-row">
-    <div class="du-diff-card">
-      <div class="du-diff-icon">🎛️</div>
-      <div class="du-diff-title">Orchestration as the Product</div>
-      <div class="du-diff-desc">The Dashboard is not a launcher for AI point-tools. It is the interface through which one agent coordinates all of them — goal stated once, multi-step plan executed transparently, partial results preserved if any step fails.</div>
-    </div>
-    <div class="du-diff-card">
-      <div class="du-diff-icon">📈</div>
-      <div class="du-diff-title">Infrastructure That Compounds</div>
-      <div class="du-diff-desc">Every surface — project model, token ledger, agent plan history, utility panel pages, design token system — is built to grow more valuable with each new workflow, connector, and marketplace asset added on top of it.</div>
-    </div>
-    <div class="du-diff-card">
-      <div class="du-diff-icon">🏗️</div>
-      <div class="du-diff-title">Built Like Production Software</div>
-      <div class="du-diff-desc">Precision-chrome visual language, monospace data readouts, a cinema-grade display typeface, a multi-tenant data layer, and a token-driven theme system designed to sit open for hours — not to survive a 10-minute demo.</div>
-    </div>
+    <!-- populated by JS: cinematic detail panel, module description +
+         (for Agent Workflow only) the Plan/Review/Approve/Execute
+         lifecycle and risk-gating dots, folded in on selection instead
+         of living as permanent page furniture. -->
   </div>
 
   <div class="du-foot-note">
-    MAIE Framework 2.0 · Midwest Media Alliance · Official Product Literature — Standalone Component of the MAIE Presentation Package<br>
-    Dashboard & Utility Panel Overview · Prepared for Investors · Strategic Partners · Enterprise Clients · Advisory Board
+    MAIE Framework 2.0 · Midwest Media Alliance · Dashboard &amp; Utility Panel Overview
   </div>
 
 </div>
@@ -609,6 +506,21 @@
     export: 'A completed plan can be exported directly as a marketplace asset in one step. The system infers the asset type from the tools used. A workflow built once becomes a purchasable product for every other user on the platform.',
   };
 
+  const RISKS = [
+    { label: 'Low — auto-approved',          color: 'var(--du-green)' },
+    { label: 'Medium — review required',     color: 'var(--du-amber)' },
+    { label: 'High — step-by-step sign-off', color: '#b05c3a' },
+    { label: 'Critical — full halt',         color: '#8a2e22' },
+  ];
+
+  // Compact tab content for the hero's view-tab strip — replaces the old
+  // three-paragraph "Three Dashboard Views" block at the page bottom.
+  const VIEW_TABS = {
+    workspace: 'What am I working on, and what\'s new? Recent projects, upload surface, marketplace assets, quick-launch AI tools — where most sessions begin.',
+    tools: 'I know what I want to do — let me do it. The full AI suite direct: Agent, Scene Detection, Metadata, Transcription, Image Analysis, Asset Management.',
+    analytics: 'How is my work distributed, and is anything stuck? Project-type distribution and processing-status counts as a live operational summary.',
+  };
+
   // ── Cockpit state machine ─────────────────────────────────────────────
 
   // Init once; makePixie returns null if the canvas isn't in the DOM yet,
@@ -666,26 +578,146 @@
     if (sheet) sheet.classList.toggle('on', m.sheet);
   }
 
-  // ── Module detail card ──────────────────────────────────────────────────
+  // ── Module detail panel — cinematic, DOM-built, choreographed ──────────
+  //
+  // Structural DOM assembly rather than template-literal HTML strings, per
+  // the "strict architectural cleanliness" direction: this function maps
+  // data to nodes; layout/visual rules live in the .du-detail-* classes
+  // above. Only truly per-module colors (d.color/d.border) stay inline,
+  // since they vary per config entry.
+  //
+  // Choreography: outgoing panel gets .exit-out, is swapped for the new
+  // one after the exit transition settles, and the new panel mounts with
+  // .enter-in — removed on the next frame so the browser animates from
+  // that state, giving the staggered .stagger-child elements something
+  // to animate out of.
+
+  const DETAIL_EXIT_MS = 240;
+
+  function buildAgentLifecycle() {
+    const wrap = document.createElement('div');
+    wrap.className = 'stagger-child stagger-3 du-detail-divider';
+
+    const label = document.createElement('div');
+    label.className = 'du-section-label';
+    label.style.margin = '0 0 .35rem';
+    label.textContent = 'Execution model — Plan → Review → Approve → Execute';
+    wrap.appendChild(label);
+
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:11.5px; color:var(--text-secondary); line-height:1.5; margin-bottom:.5rem;';
+    hint.textContent = 'Every agent task moves through a transparent, risk-gated lifecycle. Click a stage to see what it means.';
+    wrap.appendChild(hint);
+
+    const row = document.createElement('div');
+    row.className = 'du-rt-row';
+    row.id = 'du-stage-row';
+    const STAGE_META = [
+      { key: 'goal',    title: 'Goal Submitted', sub: 'plain language' },
+      { key: 'plan',    title: 'Plan Generated', sub: 'step-by-step' },
+      { key: 'review',  title: 'Human Review',   sub: 'inspect every step' },
+      { key: 'execute', title: 'Live Execution', sub: 'streaming results' },
+      { key: 'export',  title: 'Export as Asset', sub: 'publish to market' },
+    ];
+    STAGE_META.forEach(s => {
+      const stage = document.createElement('div');
+      stage.className = 'du-stage' + (s.key === activeStage ? ' du-active' : '');
+      stage.dataset.stage = s.key;
+      stage.innerHTML = `<div>${s.title}</div><div class="du-stage-sub">${s.sub}</div>`;
+      stage.addEventListener('click', () => activateStage(s.key));
+      row.appendChild(stage);
+    });
+    wrap.appendChild(row);
+
+    const stageDetail = document.createElement('div');
+    stageDetail.id = 'du-stage-detail';
+    stageDetail.style.cssText = 'margin-top:.75rem; min-height:32px; font-size:11.5px; color:var(--text-secondary); line-height:1.55; border-top:0.5px solid var(--border); padding-top:.55rem;';
+    stageDetail.textContent = STAGES[activeStage] || '';
+    wrap.appendChild(stageDetail);
+
+    const riskLabel = document.createElement('div');
+    riskLabel.className = 'du-section-label';
+    riskLabel.style.cssText = 'margin:.75rem 0 .35rem;';
+    riskLabel.textContent = 'Risk gating — what requires explicit approval';
+    wrap.appendChild(riskLabel);
+
+    const riskRow = document.createElement('div');
+    riskRow.className = 'du-risk-row';
+    RISKS.forEach(r => {
+      const chip = document.createElement('div');
+      chip.className = 'du-risk-chip';
+      chip.innerHTML = `<div class="du-risk-dot" style="background:${r.color};"></div>${r.label}`;
+      riskRow.appendChild(chip);
+    });
+    wrap.appendChild(riskRow);
+
+    return wrap;
+  }
+
+  function buildDetailPanel(moduleKey) {
+    const m = MODULES[moduleKey];
+    const d = m.detail;
+    const panel = document.createElement('div');
+    panel.className = 'du-detail-panel enter-in';
+
+    const head = document.createElement('div');
+    head.className = 'stagger-child stagger-1 du-detail-head';
+    head.innerHTML = `<span class="du-detail-icon">${m.icon}</span><span class="du-detail-name">${m.name} — ${d.headline}</span>`;
+    panel.style.borderColor = d.border;
+    panel.style.background = d.color;
+    panel.appendChild(head);
+
+    const body = document.createElement('p');
+    body.className = 'stagger-child stagger-1 du-detail-body';
+    body.textContent = d.body;
+    panel.appendChild(body);
+
+    const attrs = document.createElement('div');
+    attrs.className = 'stagger-child stagger-2 du-detail-attrs';
+    d.attrs.forEach(a => {
+      const chip = document.createElement('span');
+      chip.className = 'du-detail-attr';
+      chip.style.borderColor = d.border;
+      chip.textContent = a;
+      attrs.appendChild(chip);
+    });
+    panel.appendChild(attrs);
+
+    // The Plan/Review/Approve/Execute lifecycle only earns space on
+    // screen when the user has actually selected the module it belongs
+    // to — everywhere else it would just be reading material nobody
+    // asked for.
+    if (moduleKey === 'agent') {
+      panel.appendChild(buildAgentLifecycle());
+    }
+
+    return panel;
+  }
 
   function renderDetail(moduleKey) {
-    const m = MODULES[moduleKey];
-    if (!m) return;
-    const d = m.detail;
-    const detail = document.getElementById('du-module-detail');
-    if (!detail) return;
+    if (!MODULES[moduleKey]) return;
+    const mount = document.getElementById('du-module-detail');
+    if (!mount) return;
 
-    detail.innerHTML = `
-      <div style="background:${d.color}; border:0.5px solid ${d.border}; border-radius:12px; padding:1rem 1.1rem;">
-        <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem;">
-          <span style="font-size:15px;">${m.icon}</span>
-          <span style="font-size:13px; font-weight:500; color:var(--text-primary);">${m.name} — ${d.headline}</span>
-        </div>
-        <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.6; margin:0 0 .65rem;">${d.body}</p>
-        <div style="display:flex; flex-wrap:wrap; gap:5px;">
-          ${d.attrs.map(a => `<span style="font-size:10.5px; border-radius:4px; padding:2px 7px; border:0.5px solid ${d.border}; color:var(--text-secondary);">${a}</span>`).join('')}
-        </div>
-      </div>`;
+    const current = mount.querySelector('.du-detail-panel');
+    const mountNext = () => {
+      mount.innerHTML = '';
+      const panel = buildDetailPanel(moduleKey);
+      mount.appendChild(panel);
+      // rAF + micro-delay so the browser paints the .enter-in state
+      // before it's removed — otherwise the transition has nothing to
+      // animate from and the panel just snaps into place.
+      requestAnimationFrame(() => {
+        setTimeout(() => panel.classList.remove('enter-in'), 20);
+      });
+    };
+
+    if (current) {
+      current.classList.add('exit-out');
+      setTimeout(mountNext, DETAIL_EXIT_MS);
+    } else {
+      mountNext();
+    }
   }
 
   // ── Wire module grid ────────────────────────────────────────────────────
@@ -705,7 +737,10 @@
     card.addEventListener('click', () => activateModule(card.dataset.module));
   });
 
-  // ── Wire stage strip ────────────────────────────────────────────────────
+  // ── Stage state ──────────────────────────────────────────────────────
+  // Click handlers for individual .du-stage elements are attached in
+  // buildAgentLifecycle() at render time, since that markup only exists
+  // while the Agent Workflow module is selected.
 
   let activeStage = 'goal';
 
@@ -717,10 +752,6 @@
     const detail = document.getElementById('du-stage-detail');
     if (detail) detail.textContent = STAGES[key] || '';
   }
-
-  document.querySelectorAll('.du-stage').forEach(stage => {
-    stage.addEventListener('click', () => activateStage(stage.dataset.stage));
-  });
 
   // ── Rail pulse animation ────────────────────────────────────────────────
   // Gently cycles the lit rail items to show the feed is "live"
@@ -745,6 +776,20 @@
     if (activeModule === 'activity') pulseRail();
   }, 700);
 
+  // ── Wire view tabs (hero) ───────────────────────────────────────────────
+
+  function activateViewTab(key) {
+    document.querySelectorAll('.du-view-tab').forEach(el => {
+      el.classList.toggle('active', el.dataset.view === key);
+    });
+    const desc = document.getElementById('du-view-tab-desc');
+    if (desc) desc.textContent = VIEW_TABS[key] || '';
+  }
+
+  document.querySelectorAll('.du-view-tab').forEach(tab => {
+    tab.addEventListener('click', () => activateViewTab(tab.dataset.view));
+  });
+
   // ── Keyboard navigation ────────────────────────────────────────────────
 
   const MODULE_KEYS = Object.keys(MODULES);
@@ -763,6 +808,7 @@
 
   activateModule('agent');
   activateStage('goal');
+  activateViewTab('workspace');
 
 })();
 </script>
