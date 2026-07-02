@@ -41,8 +41,19 @@
   --radius-lg: 16px;
   --ease:      cubic-bezier(0.4,0,0.2,1);
   --spring:    cubic-bezier(0.34,1.56,0.64,1);
+  /* Broadcast-grade asymmetric curve: fast attack, long settle. Reserved
+     for scene-level cinematic moments (curtain, module enter, staggered
+     reveals) — NOT for micro-interactions like buttons/hovers, which
+     should stay on --ease so they feel immediate rather than floaty. */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
   --z-curtain: 50;
   --z-topbar:  100;
+
+  /* Letterbox bounds — keeps dense module content (timelines, tier
+     stacks, diff tables) from over-expanding into an unfocused sprawl
+     on ultra-wide boardroom displays. Applied via the aspect-ratio
+     media query below, not unconditionally. */
+  --stage-max-width: 1680px;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -264,7 +275,7 @@ body {
 }
 .module.active {
   display: flex;
-  animation: mod-enter 0.6s var(--ease) both;
+  animation: mod-enter 0.6s var(--ease-cinematic) both;
   will-change: transform, opacity, filter;
 }
 .module.leaving {
@@ -272,6 +283,25 @@ body {
   animation: mod-leave 0.32s var(--ease) both;
   pointer-events: none;
   will-change: transform, opacity, filter;
+}
+
+/*
+  Staggered reveal — a flat single fade reads as a slide deck; a beat
+  between header and body reads as a directed shot. Header settles
+  first, body follows close behind. Deliberately subtle (6px, short
+  delays) so it supports the mod-enter blur/scale rather than
+  competing with it. Respects prefers-reduced-motion via the existing
+  global override further down this file.
+*/
+.module.active .mod-header {
+  animation: mod-stagger-in 0.5s var(--ease-cinematic) 0.05s both;
+}
+.module.active .mod-body {
+  animation: mod-stagger-in 0.5s var(--ease-cinematic) 0.14s both;
+}
+@keyframes mod-stagger-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /*
@@ -310,7 +340,7 @@ body {
   opacity: 0;
 }
 .stage-curtain.flash {
-  animation: curtain-flash 0.62s var(--ease) both;
+  animation: curtain-flash 0.62s var(--ease-cinematic) both;
 }
 @keyframes curtain-flash {
   0%   { opacity: 0; }
@@ -425,6 +455,200 @@ body {
 .chapter-nav-btn:disabled {
   opacity: 0.3;
   pointer-events: none;
+}
+
+/*
+  Letterbox containment — on ultra-wide boardroom displays (21:9+)
+  the .module already fills the viewport edge-to-edge via inset:0,
+  which is correct for the background/atmosphere but wrong for
+  content: cards, timelines, and tier stacks stretch past their
+  intentional focal width and the composition loses its center.
+  This caps the three content bands at --stage-max-width and
+  centers them, so the *frame* stays full-bleed while the *shot*
+  stays composed. Narrower/standard displays are unaffected.
+*/
+@media (min-aspect-ratio: 21/9) {
+  .mod-header, .mod-body, .chapter-nav {
+    max-width: var(--stage-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   BLOCK VOCABULARY — flowSteps / tierStack / timeline /
+   calloutBox / closingBlock
+   Layout lives here, not as inline styles in the renderer.
+   maie-chapter-renderer.js writes only structural classes +
+   per-instance data-driven colors (theme/tier colors, echo
+   colors) — those genuinely vary per config and have no home
+   in a shared stylesheet, so they stay inline by design.
+   ═══════════════════════════════════════════════════════ */
+
+/* Flow steps */
+.mod-flow-step { text-align: center; }
+.mod-flow-step-box {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.mod-flow-step-box:hover {
+  box-shadow: 0 0 16px var(--primary-glow);
+}
+.mod-flow-step-label {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.mod-flow-step-desc {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  line-height: 1.4;
+}
+.mod-flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.5rem;
+  color: var(--border-strong);
+  font-size: 1.2rem;
+}
+
+/* Tier stack */
+.mod-tier-stack {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.mod-tier {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.mod-tier:last-child { border-bottom: none; }
+.mod-tier-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.mod-tier-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 0.25rem;
+}
+.mod-tier-body {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.mod-tier-tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+}
+
+/* Timeline */
+.mod-timeline { display: flex; flex-direction: column; }
+.mod-timeline-row {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0.875rem 0;
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+}
+.mod-timeline-row:last-child { border-bottom: none; }
+.mod-timeline-horizon {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--primary-light);
+  width: 80px;
+  flex-shrink: 0;
+}
+.mod-timeline-title {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: 0.15rem;
+}
+.mod-timeline-desc {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+/* Callout box */
+.mod-callout {
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.018);
+}
+.mod-callout--brand { background: rgba(165,42,42,0.06);  border-color: var(--border-brand); }
+.mod-callout--warn   { background: rgba(255,180,0,0.06);  border-color: rgba(255,180,0,0.2); }
+.mod-callout--ok     { background: rgba(34,197,94,0.06);  border-color: rgba(34,197,94,0.2); }
+.mod-callout-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 0.6rem;
+}
+.mod-callout-body {
+  font-size: 0.82rem;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+/* Closing block */
+.mod-closing {
+  background: rgba(165,42,42,0.07);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+}
+.mod-closing-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary-light);
+  margin-bottom: 1rem;
+}
+.mod-closing-headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-1);
+  line-height: 1.1;
+  max-width: 640px;
+  margin: 0 auto 1.25rem;
+}
+.mod-closing-body {
+  font-size: 0.85rem;
+  color: var(--text-2);
+  line-height: 1.7;
+  max-width: 560px;
+  margin: 0 auto 1.5rem;
+}
+.mod-closing-pills {
+  display: flex;
+  gap: 0.625rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* ═══════════════════════════════════════════════════════

@@ -112,59 +112,66 @@
       <div class="stack-row">${chips}</div>`;
   }
 
+  // Layout (spacing, borders, radius, typography scale) lives in the
+  // mod-* classes defined in the portal stylesheet. Only genuinely
+  // per-instance, data-driven values — a tier's brand color, a step's
+  // override color, an echo's hue — stay inline here, because those
+  // vary per config entry and have no fixed home in a shared stylesheet.
+
   function blockFlowSteps(b) {
-    const steps = b.steps.map((s, i) => `
-      <div style="text-align:center;">
-        <div style="background:${s.color || 'var(--surface-card)'};border:1px solid ${s.border || 'var(--border)'};border-radius:var(--radius);padding:0.875rem 0.5rem;margin-bottom:0.5rem;">
-          <div style="font-family:var(--font-display);font-size:1rem;letter-spacing:0.06em;text-transform:uppercase;color:${s.textColor || 'var(--text-1)'};">${s.label}</div>
+    const steps = b.steps.map((s, i) => {
+      const boxStyle = (s.color || s.border)
+        ? ` style="${s.color ? `background:${s.color};` : ''}${s.border ? `border-color:${s.border};` : ''}"`
+        : '';
+      const labelStyle = s.textColor ? ` style="color:${s.textColor};"` : ' style="color:var(--text-1);"';
+      return `
+      <div class="mod-flow-step">
+        <div class="mod-flow-step-box"${boxStyle}>
+          <div class="mod-flow-step-label"${labelStyle}>${s.label}</div>
         </div>
-        <div style="font-size:0.7rem;color:var(--text-3);line-height:1.4;">${s.desc}</div>
+        <div class="mod-flow-step-desc">${s.desc}</div>
       </div>
-      ${i < b.steps.length - 1 ? `<div style="display:flex;align-items:center;justify-content:center;padding-top:0.5rem;color:var(--border-strong);font-size:1.2rem;">→</div>` : ''}
-    `).join('');
+      ${i < b.steps.length - 1 ? `<div class="mod-flow-arrow">→</div>` : ''}
+    `;
+    }).join('');
     return `${b.label ? `<div class="card-eyebrow" style="margin-bottom:0.75rem;">${b.label}</div>` : ''}
       <div class="flow-steps flow-steps--${b.steps.length}">${steps}</div>`;
   }
 
   function blockTierStack(b) {
     const tiers = b.tiers.map(t => `
-      <div style="background:${t.bg};border-bottom:1px solid ${t.border};padding:1rem 1.25rem;">
-        <div style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:${t.labelColor};margin-bottom:0.25rem;">${t.tierLabel}</div>
-        <div style="font-size:0.9rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">${t.title}</div>
-        <div style="font-size:0.8rem;color:var(--text-2);line-height:1.6;">${t.body}</div>
-        ${t.tags ? `<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.6rem;">
+      <div class="mod-tier" style="background:${t.bg};border-bottom-color:${t.border};">
+        <div class="mod-tier-label" style="color:${t.labelColor};">${t.tierLabel}</div>
+        <div class="mod-tier-title">${t.title}</div>
+        <div class="mod-tier-body">${t.body}</div>
+        ${t.tags ? `<div class="mod-tier-tags">
           ${t.tags.map(tag => `<span class="pill" style="background:${t.tagBg};border-color:${t.border};color:${t.labelColor};">${tag}</span>`).join('')}
         </div>` : ''}
       </div>`).join('');
     return `${b.label ? `<div class="card-eyebrow" style="margin-bottom:0.75rem;">${b.label}</div>` : ''}
-      <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">${tiers}</div>`;
+      <div class="mod-tier-stack">${tiers}</div>`;
   }
 
   function blockTimeline(b) {
-    const rows = b.items.map((item, i) => `
-      <div style="display:flex;gap:1.25rem;padding:0.875rem 0;${i < b.items.length - 1 ? 'border-bottom:1px solid var(--border);' : ''}align-items:baseline;">
-        <div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.08em;color:${item.horizonColor || 'var(--primary-light)'};width:80px;flex-shrink:0;">${item.horizon}</div>
+    const rows = b.items.map(item => `
+      <div class="mod-timeline-row">
+        <div class="mod-timeline-horizon"${item.horizonColor ? ` style="color:${item.horizonColor};"` : ''}>${item.horizon}</div>
         <div>
-          <div style="font-size:0.82rem;font-weight:500;color:var(--text-1);margin-bottom:0.15rem;">${item.title}</div>
-          <div style="font-size:0.75rem;color:var(--text-3);line-height:1.5;">${item.desc}</div>
+          <div class="mod-timeline-title">${item.title}</div>
+          <div class="mod-timeline-desc">${item.desc}</div>
         </div>
       </div>`).join('');
     return `${b.label ? `<div class="card-eyebrow" style="margin-bottom:0.75rem;">${b.label}</div>` : ''}
-      <div style="display:flex;flex-direction:column;gap:0;">${rows}</div>`;
+      <div class="mod-timeline">${rows}</div>`;
   }
 
   function blockCalloutBox(b) {
     const tone = b.tone || 'neutral'; // 'neutral' | 'brand' | 'warn' | 'ok'
-    const TONES = {
-      neutral: { bg: 'rgba(255,255,255,0.018)', border: 'var(--border)' },
-      brand:   { bg: 'rgba(165,42,42,0.06)',     border: 'var(--border-brand)' },
-      warn:    { bg: 'rgba(255,180,0,0.06)',      border: 'rgba(255,180,0,0.2)' },
-      ok:      { bg: 'rgba(34,197,94,0.06)',       border: 'rgba(34,197,94,0.2)' },
-    };
-    const t = TONES[tone];
-    return `<div style="background:${t.bg};border:1px solid ${t.border};border-radius:var(--radius);padding:1.25rem 1.5rem;${b.marginTop ? 'margin-top:'+b.marginTop+';' : ''}${b.marginBottom ? 'margin-bottom:'+b.marginBottom+';' : ''}">
-      ${b.label ? `<div style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.6rem;">${b.label}</div>` : ''}
-      <div style="font-size:0.82rem;color:var(--text-2);line-height:1.7;">${b.body}</div>
+    const toneClass = tone === 'neutral' ? '' : ` mod-callout--${tone}`;
+    const margins = `${b.marginTop ? 'margin-top:'+b.marginTop+';' : ''}${b.marginBottom ? 'margin-bottom:'+b.marginBottom+';' : ''}`;
+    return `<div class="mod-callout${toneClass}"${margins ? ` style="${margins}"` : ''}>
+      ${b.label ? `<div class="mod-callout-label">${b.label}</div>` : ''}
+      <div class="mod-callout-body">${b.body}</div>
     </div>`;
   }
 
@@ -172,11 +179,11 @@
     const pills = (b.pills || []).map(p =>
       `<span class="pill ${p.variant || 'pill-muted'}">${p.text}</span>`
     ).join('');
-    return `<div style="background:rgba(165,42,42,0.07);border:1px solid var(--border-brand);border-radius:var(--radius);padding:2rem;text-align:center;">
-      ${b.eyebrow ? `<div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--primary-light);margin-bottom:1rem;">${b.eyebrow}</div>` : ''}
-      <div style="font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);letter-spacing:0.04em;text-transform:uppercase;color:var(--text-1);line-height:1.1;max-width:640px;margin:0 auto 1.25rem;">${b.headline}</div>
-      ${b.body ? `<div style="font-size:0.85rem;color:var(--text-2);line-height:1.7;max-width:560px;margin:0 auto 1.5rem;">${b.body}</div>` : ''}
-      ${pills ? `<div style="display:flex;gap:0.625rem;justify-content:center;flex-wrap:wrap;">${pills}</div>` : ''}
+    return `<div class="mod-closing">
+      ${b.eyebrow ? `<div class="mod-closing-eyebrow">${b.eyebrow}</div>` : ''}
+      <div class="mod-closing-headline">${b.headline}</div>
+      ${b.body ? `<div class="mod-closing-body">${b.body}</div>` : ''}
+      ${pills ? `<div class="mod-closing-pills">${pills}</div>` : ''}
     </div>`;
   }
 
