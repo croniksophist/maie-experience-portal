@@ -157,6 +157,12 @@
     border: 0.5px solid var(--pc-border);
     color: var(--pc-text-secondary);
     background: var(--pc-surface-0);
+    cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s;
+  }
+  .pc-phase:hover { 
+    background: var(--pc-surface-1); 
+    border-color: var(--pc-border-strong); 
   }
   .pc-phase.pc-active {
     background: var(--pc-bg-accent); border-color: var(--pc-border-accent);
@@ -241,7 +247,6 @@
 <div class="pc-root" role="main">
   <h2 class="sr-only">Pixie Companion Framework — Product Overview for MAIE</h2>
 
-  <!-- ── HERO ── -->
   <div class="pc-hero">
     <div class="pc-canvas-wrap">
       <canvas id="live-pixie-canvas" width="200" height="200" aria-label="Live Pixie companion animation" role="img"></canvas>
@@ -267,7 +272,6 @@
     </div>
   </div>
 
-  <!-- ── THREE-TIER ARCHITECTURE ── -->
   <div class="pc-section-label">Three-tier identity architecture</div>
   <div class="pc-tiers">
     <div class="pc-tier" style="background: var(--pc-bg-pro); border-color: var(--pc-border-pro);">
@@ -305,12 +309,10 @@
     </div>
   </div>
 
-  <!-- ── ARCHETYPES ── -->
   <div class="pc-section-label">The five archetypes</div>
   <div class="pc-arch-grid" id="arch-grid">
   </div>
 
-  <!-- ── RUNTIME PHASES ── -->
   <div class="pc-runtime">
     <div class="pc-section-label" style="margin:0">Workflow phase → animation mode mapping</div>
     <div class="pc-rt-row">
@@ -323,7 +325,6 @@
     </div>
   </div>
 
-  <!-- ── TWO-COL INFO ── -->
   <div class="pc-two-col">
     <div class="pc-infobox">
       <div class="pc-infobox-title">Persistence model</div>
@@ -345,7 +346,6 @@
     </div>
   </div>
 
-  <!-- ── REPUTATION ECHOES ── -->
   <div class="pc-infobox" style="margin-bottom:1.5rem;">
     <div class="pc-infobox-title">Living reputation echoes</div>
     <p style="font-size:13px; color:var(--pc-text-secondary); margin:0 0 .6rem; line-height:1.55;">
@@ -358,7 +358,6 @@
     </div>
   </div>
 
-  <!-- ── EXPORT CAPABILITIES ── -->
   <div class="pc-section-label">Export and portability</div>
   <div class="pc-export-row">
     <div class="pc-export-card">
@@ -383,7 +382,6 @@
     </div>
   </div>
 
-  <!-- ── MARKETPLACE + MIGRATION NOTE ── -->
   <div class="pc-two-col" style="margin-bottom:.5rem;">
     <div class="pc-infobox">
       <div class="pc-infobox-title">Marketplace integration</div>
@@ -480,15 +478,24 @@
     themeRow.appendChild(dot);
   });
 
-  /* ── PHASE BUTTONS ─────────────────────────────── */
-  document.getElementById('phase-sel').addEventListener('click', e => {
-    const btn = e.target.closest('.pc-phase-btn');
-    if (!btn) return;
-    document.querySelectorAll('.pc-phase-btn').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    currentPhase = btn.dataset.phase;
+  /* ── PHASE BUTTONS & RUNTIME GRID ─────────────────────────────── */
+  
+  // Centralized state manager for phase changes
+  function setPhase(phase) {
+    if (!phase) return;
+    
+    currentPhase = phase;
     progressVal = 0;
-    highlightPhase(currentPhase);
+
+    // 1. Sync the Hero Buttons
+    document.querySelectorAll('.pc-phase-btn').forEach(b => {
+      b.classList.toggle('on', b.dataset.phase === phase);
+    });
+
+    // 2. Sync the Runtime Grid highlights
+    highlightPhase(phase);
+
+    // 3. Trigger execution progress if needed
     if (currentPhase === 'executing') {
       let p = 0;
       const tick = setInterval(() => {
@@ -496,7 +503,26 @@
         if (p >= 100) clearInterval(tick);
       }, 80);
     }
+  }
+
+  // Listener for the Hero buttons
+  document.getElementById('phase-sel').addEventListener('click', e => {
+    const btn = e.target.closest('.pc-phase-btn');
+    if (btn) setPhase(btn.dataset.phase);
   });
+
+  // Listener for the Runtime Grid cards
+  const rtRow = document.querySelector('.pc-rt-row');
+  if (rtRow) {
+    rtRow.addEventListener('click', e => {
+      const phaseCard = e.target.closest('.pc-phase');
+      if (phaseCard) {
+        // Extract the phase name from the ID (e.g., "rt-planning" -> "planning")
+        const phase = phaseCard.id.replace('rt-', '');
+        setPhase(phase);
+      }
+    });
+  }
 
   function highlightPhase(phase) {
     ['idle','planning','review','executing','completed','failed'].forEach(ph => {
@@ -504,6 +530,8 @@
       if (el) el.classList.toggle('pc-active', ph === phase);
     });
   }
+  
+  // Initialize default state
   highlightPhase('idle');
 
   /* ── CANVAS SETUP ─────────────────────────────── */
