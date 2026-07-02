@@ -212,11 +212,26 @@
   .du-risk-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
 
   /* ── Interactive Module Detail — cinematic panel ────────────────────── */
+  
+  /* Add this wrapper styling to prevent the layout from jumping */
+  #du-module-detail {
+    margin-bottom: 1.5rem;
+    min-height: 480px; /* Reserves space for the tallest module */
+  }
+
+  /* Increase min-height on smaller screens where text wraps more */
+  @media (max-width: 760px) {
+    #du-module-detail {
+      min-height: 640px; 
+    }
+  }
+
+  /* Replaced existing .du-detail-panel */
   .du-detail-panel {
     background: var(--du-surface-1); border-radius: 16px;
     border: 0.5px solid var(--du-border);
-    /* Fluid padding scales beautifully inside the max-width bounds */
-    padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1.5rem, 3.5vw, 2.5rem);
+    /* Upgraded fluid padding: more generous minimums and broader scaling */
+    padding: clamp(2.25rem, 4vw, 3.5rem) clamp(2.25rem, 5vw, 4.5rem);
     display: flex; flex-direction: column; gap: 1.25rem; 
     opacity: 1; transform: translateY(0); filter: blur(0);
     transition: opacity .45s var(--du-ease-cinematic), transform .45s var(--du-ease-cinematic), filter .45s var(--du-ease-cinematic);
@@ -409,7 +424,7 @@
   </div>
 
   <!-- ── ACTIVE MODULE DETAIL ─────────────────────────────────────────── -->
-  <div id="du-module-detail" style="margin-bottom:1.5rem;">
+  <div id="du-module-detail">
     <!-- populated by JS: cinematic detail panel, module description +
          (for Agent Workflow only) the Plan/Review/Approve/Execute
          lifecycle and risk-gating dots, folded in on selection instead
