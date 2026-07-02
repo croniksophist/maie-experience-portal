@@ -1,4 +1,3 @@
-
 <style>
   :root {
     --pc-bg: #0d0d10;
@@ -6,9 +5,57 @@
     --pc-border: rgba(255,255,255,0.08);
     --pc-text: #e8e6f0;
     --pc-muted: #8a879a;
+
+    /* This file owns its own theme, unconditionally — same call made on
+       the dashboard overview file, for the same reason: the host tokens
+       it was written against (--text-primary, --surface-1, --bg-accent,
+       --border-accent, --font-sans, and, only here, the completely
+       undefined --bg-pro/--border-pro/--text-pro/--bg-success/
+       --border-success/--text-success used by the tier cards) don't
+       exist in the real global.css, so those calls were always
+       resolving to nothing rather than a live theme. Locked to --pc-*
+       directly rather than chained, since there's no real host to
+       chain to and this is presentation collateral, not an in-app
+       fragment. */
+    --pc-text-secondary: rgba(232,230,240,0.65);
+    --pc-text-accent:    #c084fc;
+    --pc-surface-1:      rgba(255,255,255,0.025);
+    --pc-surface-0:      rgba(255,255,255,0.015);
+    --pc-bg-accent:      rgba(168,85,247,0.10);
+    --pc-border-accent:  rgba(168,85,247,0.35);
+    --pc-border-strong:  rgba(255,255,255,0.16);
+    --pc-font-sans:      'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Tier-card accents — Tier 1 (UserIdentity) reads as steady/settled
+       infrastructure, so it gets the same cool blue used for "review"-
+       type states elsewhere in the package. Tier 3 (Runtime State) is
+       explicitly ephemeral/live, so it gets the same green used for
+       "active/now" states in the dashboard overview. Tier 2 reuses the
+       purple --pc-bg-accent/--pc-border-accent/--pc-text-accent above,
+       matching the Pixie brand tag color in the hero. */
+    --pc-bg-pro:      rgba(56,189,248,0.08);
+    --pc-border-pro:  rgba(56,189,248,0.28);
+    --pc-text-pro:    #7dd3fc;
+    --pc-bg-success:     rgba(34,197,94,0.08);
+    --pc-border-success: rgba(34,197,94,0.28);
+    --pc-text-success:   #4ade80;
   }
 
-  .pc-root { font-family: var(--font-sans); color: var(--text-primary); }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  .pc-root {
+    font-family: var(--pc-font-sans);
+    color: var(--pc-text);
+    /* Anchors the dark canvas under the transparent card/tier overlays
+       below (rgba(255,255,255,0.02–0.08) surfaces) — without this the
+       browser's white default shows through everywhere outside the
+       hero's own hardcoded background. */
+    background: var(--pc-bg);
+  }
 
   /* Hero */
   .pc-hero {
@@ -44,7 +91,7 @@
   /* Archetype grid */
   .pc-section-label {
     font-size:11px; letter-spacing:.1em; text-transform:uppercase;
-    color: var(--text-muted); margin: 0 0 .75rem; font-weight:500;
+    color: var(--pc-muted); margin: 0 0 .75rem; font-weight:500;
   }
   .pc-arch-grid {
     display:grid;
@@ -53,8 +100,8 @@
     margin-bottom:1.5rem;
   }
   .pc-arch-card {
-    background: var(--surface-1);
-    border: 0.5px solid var(--border);
+    background: var(--pc-surface-1);
+    border: 0.5px solid var(--pc-border);
     border-radius:10px;
     padding:.75rem .5rem;
     text-align:center;
@@ -62,13 +109,13 @@
     transition: border-color .15s, background .15s;
   }
   .pc-arch-card:hover, .pc-arch-card.active {
-    border-color: var(--border-accent);
-    background: var(--bg-accent);
+    border-color: var(--pc-border-accent);
+    background: var(--pc-bg-accent);
   }
   .pc-arch-card.active { border-width: 1px; }
-  .pc-arch-name { font-size:13px; font-weight:500; color: var(--text-primary); margin: .4rem 0 .1rem; }
-  .pc-arch-role { font-size:11px; color: var(--text-muted); }
-  .pc-arch-anim { font-size:10px; color: var(--text-secondary); margin-top:.2rem; }
+  .pc-arch-name { font-size:13px; font-weight:500; color: var(--pc-text); margin: .4rem 0 .1rem; }
+  .pc-arch-role { font-size:11px; color: var(--pc-muted); }
+  .pc-arch-anim { font-size:10px; color: var(--pc-text-secondary); margin-top:.2rem; }
   .pc-arch-dot {
     width:28px; height:28px; border-radius:50%; margin:0 auto .3rem;
     display:flex; align-items:center; justify-content:center;
@@ -82,23 +129,23 @@
   }
   .pc-tier {
     border-radius:12px; padding:1rem;
-    border: 0.5px solid var(--border);
+    border: 0.5px solid var(--pc-border);
   }
   .pc-tier-num { font-size:11px; font-weight:500; letter-spacing:.06em; margin-bottom:.35rem; }
-  .pc-tier-title { font-size:14px; font-weight:500; color: var(--text-primary); margin-bottom:.3rem; }
-  .pc-tier-desc { font-size:12px; color: var(--text-secondary); line-height:1.55; }
+  .pc-tier-title { font-size:14px; font-weight:500; color: var(--pc-text); margin-bottom:.3rem; }
+  .pc-tier-desc { font-size:12px; color: var(--pc-text-secondary); line-height:1.55; }
   .pc-tier-attrs { margin-top:.6rem; display:flex; flex-wrap:wrap; gap:4px; }
   .pc-attr {
     font-size:10px; border-radius:4px; padding:2px 6px;
-    border: 0.5px solid var(--border); color: var(--text-secondary);
+    border: 0.5px solid var(--pc-border); color: var(--pc-text-secondary);
   }
 
   /* Runtime state strip */
   .pc-runtime {
-    background: var(--surface-1);
+    background: var(--pc-surface-1);
     border-radius:12px; padding:1rem 1.25rem;
     margin-bottom:1.5rem;
-    border: 0.5px solid var(--border);
+    border: 0.5px solid var(--pc-border);
   }
   .pc-rt-row {
     display:grid; grid-template-columns: repeat(6, 1fr);
@@ -107,15 +154,15 @@
   .pc-phase {
     border-radius:8px; padding:.5rem .25rem;
     text-align:center; font-size:11px;
-    border: 0.5px solid var(--border);
-    color: var(--text-secondary);
-    background: var(--surface-0);
+    border: 0.5px solid var(--pc-border);
+    color: var(--pc-text-secondary);
+    background: var(--pc-surface-0);
   }
   .pc-phase.pc-active {
-    background: var(--bg-accent); border-color: var(--border-accent);
-    color: var(--text-accent); font-weight:500;
+    background: var(--pc-bg-accent); border-color: var(--pc-border-accent);
+    color: var(--pc-text-accent); font-weight:500;
   }
-  .pc-phase-mode { font-size:9px; color: var(--text-muted); margin-top:2px; }
+  .pc-phase-mode { font-size:9px; color: var(--pc-muted); margin-top:2px; }
 
   /* Export capabilities */
   .pc-export-row {
@@ -124,15 +171,35 @@
   }
   .pc-export-card {
     border-radius:10px; padding:.75rem;
-    border: 0.5px solid var(--border);
-    background: var(--surface-1);
+    border: 0.5px solid var(--pc-border);
+    background: var(--pc-surface-1);
   }
-  .pc-export-icon { font-size:18px; margin-bottom:.35rem; color: var(--text-secondary); }
-  .pc-export-title { font-size:12px; font-weight:500; color: var(--text-primary); margin-bottom:.2rem; }
-  .pc-export-desc { font-size:11px; color: var(--text-muted); line-height:1.4; }
+  .pc-export-icon { font-size:18px; margin-bottom:.35rem; color: var(--pc-text-secondary); }
+  .pc-export-title { font-size:12px; font-weight:500; color: var(--pc-text); margin-bottom:.2rem; }
+  .pc-export-desc { font-size:11px; color: var(--pc-muted); line-height:1.4; }
 
   /* Canvas for live pixie */
-  #live-pixie-canvas { display:block; }
+  #live-pixie-canvas {
+    display: block;
+    /*
+      This canvas duplicates maie-pixie.js's renderer independently
+      rather than calling MAIE.makePixie() (kept separate because the
+      per-archetype animation modes — wave/pulse/neural/static — and
+      the neural particle-connection lines aren't in the shared
+      engine's API; migrating would mean extending that API first,
+      which is a real follow-up worth doing, not a drop-in swap).
+      Because it's a duplicate, it never inherited v2.1's "stage bigger
+      than performer" fix: the glow gradient's radius can reach ~90px
+      at peak "executing" energy against a 130px-diameter bitmap,
+      hard-clipping ~25px of falloff into a visible square edge. Fixed
+      the same way v2.1 did — bitmap (SZ/CX/CY in the script below) is
+      now 200px, giving the glow room to fade to fully transparent
+      before the edge, while this rule holds the *display* size at the
+      original 130px so the hero layout doesn't shift.
+    */
+    width: 130px;
+    height: 130px;
+  }
 
   /* Sticky phase selector */
   .pc-phase-sel {
@@ -140,12 +207,12 @@
   }
   .pc-phase-btn {
     font-size:11px; padding:4px 10px; border-radius:6px;
-    border: 0.5px solid var(--border); background:transparent;
-    color: var(--text-secondary); cursor:pointer; font-family:var(--font-sans);
+    border: 0.5px solid var(--pc-border); background:transparent;
+    color: var(--pc-text-secondary); cursor:pointer; font-family:var(--pc-font-sans);
     transition: background .12s, border-color .12s, color .12s;
   }
-  .pc-phase-btn:hover { background: var(--surface-1); border-color: var(--border-strong); }
-  .pc-phase-btn.on { background: var(--bg-accent); border-color: var(--border-accent); color: var(--text-accent); }
+  .pc-phase-btn:hover { background: var(--pc-surface-1); border-color: var(--pc-border-strong); }
+  .pc-phase-btn.on { background: var(--pc-bg-accent); border-color: var(--pc-border-accent); color: var(--pc-text-accent); }
 
   .pc-theme-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:.5rem; }
   .pc-theme-dot {
@@ -153,21 +220,21 @@
     border:2px solid transparent; transition:border-color .12s;
     flex-shrink:0;
   }
-  .pc-theme-dot.on { border-color: var(--border-accent); }
+  .pc-theme-dot.on { border-color: var(--pc-border-accent); }
 
   .pc-two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1.5rem; }
   .pc-infobox {
-    background: var(--surface-1); border-radius:12px;
-    padding:1rem 1.1rem; border:0.5px solid var(--border);
+    background: var(--pc-surface-1); border-radius:12px;
+    padding:1rem 1.1rem; border:0.5px solid var(--pc-border);
   }
-  .pc-infobox-title { font-size:13px; font-weight:500; margin-bottom:.5rem; color: var(--text-primary); }
-  .pc-infobox-row { display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:0.5px solid var(--border); }
+  .pc-infobox-title { font-size:13px; font-weight:500; margin-bottom:.5rem; color: var(--pc-text); }
+  .pc-infobox-row { display:flex; justify-content:space-between; align-items:baseline; padding:4px 0; border-bottom:0.5px solid var(--pc-border); }
   .pc-infobox-row:last-child { border-bottom:none; }
-  .pc-infobox-key { font-size:12px; color: var(--text-secondary); }
-  .pc-infobox-val { font-size:12px; font-weight:500; color: var(--text-primary); }
+  .pc-infobox-key { font-size:12px; color: var(--pc-text-secondary); }
+  .pc-infobox-val { font-size:12px; font-weight:500; color: var(--pc-text); }
 
   .pc-echo-legend { display:flex; gap:10px; flex-wrap:wrap; margin-top:.5rem; }
-  .pc-echo-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-secondary); }
+  .pc-echo-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--pc-text-secondary); }
   .pc-echo-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 </style>
 
@@ -177,7 +244,7 @@
   <!-- ── HERO ── -->
   <div class="pc-hero">
     <div class="pc-canvas-wrap">
-      <canvas id="live-pixie-canvas" width="130" height="130" aria-label="Live Pixie companion animation" role="img"></canvas>
+      <canvas id="live-pixie-canvas" width="200" height="200" aria-label="Live Pixie companion animation" role="img"></canvas>
     </div>
     <div class="pc-hero-text">
       <div class="pc-tag">MAIE · Identity Framework · Tier 2</div>
@@ -203,8 +270,8 @@
   <!-- ── THREE-TIER ARCHITECTURE ── -->
   <div class="pc-section-label">Three-tier identity architecture</div>
   <div class="pc-tiers">
-    <div class="pc-tier" style="background: var(--bg-pro); border-color: var(--border-pro);">
-      <div class="pc-tier-num" style="color:var(--text-pro)">Tier 1</div>
+    <div class="pc-tier" style="background: var(--pc-bg-pro); border-color: var(--pc-border-pro);">
+      <div class="pc-tier-num" style="color:var(--pc-text-pro)">Tier 1</div>
       <div class="pc-tier-title">UserIdentity</div>
       <div class="pc-tier-desc">Immutable provenance layer. Owns the identity glyph and stamps all creator assets. Never altered by cosmetic changes.</div>
       <div class="pc-tier-attrs">
@@ -213,8 +280,8 @@
         <span class="pc-attr">provenance</span>
       </div>
     </div>
-    <div class="pc-tier" style="background: var(--bg-accent); border-color: var(--border-accent);">
-      <div class="pc-tier-num" style="color:var(--text-accent)">Tier 2</div>
+    <div class="pc-tier" style="background: var(--pc-bg-accent); border-color: var(--pc-border-accent);">
+      <div class="pc-tier-num" style="color:var(--pc-text-accent)">Tier 2</div>
       <div class="pc-tier-title">PixieCompanion ← you are here</div>
       <div class="pc-tier-desc">Visual and behavioral companion. Carries the identity glyph but is fully replaceable. Changing archetype, theme, or skin never touches Tier 1.</div>
       <div class="pc-tier-attrs">
@@ -225,8 +292,8 @@
         <span class="pc-attr">asset_id</span>
       </div>
     </div>
-    <div class="pc-tier" style="background: var(--bg-success); border-color: var(--border-success);">
-      <div class="pc-tier-num" style="color:var(--text-success)">Tier 3</div>
+    <div class="pc-tier" style="background: var(--pc-bg-success); border-color: var(--pc-border-success);">
+      <div class="pc-tier-num" style="color:var(--pc-text-success)">Tier 3</div>
       <div class="pc-tier-title">Runtime State</div>
       <div class="pc-tier-desc">Ephemeral phase layer. Never persisted. Driven live from AgentWorkflowPanel callbacks — phase, mode, progress, and temperament.</div>
       <div class="pc-tier-attrs">
@@ -281,13 +348,13 @@
   <!-- ── REPUTATION ECHOES ── -->
   <div class="pc-infobox" style="margin-bottom:1.5rem;">
     <div class="pc-infobox-title">Living reputation echoes</div>
-    <p style="font-size:13px; color:var(--text-secondary); margin:0 0 .6rem; line-height:1.55;">
+    <p style="font-size:13px; color:var(--pc-text-secondary); margin:0 0 .6rem; line-height:1.55;">
       Achievement and milestone events mint permanent satellite marks that orbit the Pixie canvas. Each echo carries physics: fresher echoes pulse faster and sit closer in; older ones drift outward and slow. More significant events render larger and brighter. These are memory nodes — stable against wake distortion and mouse magnetism — so they read as a permanent, legible record of the user's history on the platform.
     </p>
     <div class="pc-echo-legend">
       <div class="pc-echo-item"><div class="pc-echo-dot" style="background:#38BDF8"></div>ACHIEVEMENT_ARTIFACT</div>
       <div class="pc-echo-item"><div class="pc-echo-dot" style="background:#A855F7"></div>LEGACY_ECHO</div>
-      <div class="pc-echo-item" style="font-style:italic; color:var(--text-muted)">resonance: drives glow · createdAt: drives orbit radius + pulse speed</div>
+      <div class="pc-echo-item" style="font-style:italic; color:var(--pc-muted)">resonance: drives glow · createdAt: drives orbit radius + pulse speed</div>
     </div>
   </div>
 
@@ -295,22 +362,22 @@
   <div class="pc-section-label">Export and portability</div>
   <div class="pc-export-row">
     <div class="pc-export-card">
-      <div class="pc-export-icon"><i class="ti ti-photo" aria-hidden="true"></i></div>
+      <div class="pc-export-icon" aria-hidden="true">🖼️</div>
       <div class="pc-export-title">PNG snapshot</div>
       <div class="pc-export-desc">Lossless canvas capture at any scale via toDataURL()</div>
     </div>
     <div class="pc-export-card">
-      <div class="pc-export-icon"><i class="ti ti-code" aria-hidden="true"></i></div>
+      <div class="pc-export-icon" aria-hidden="true">🌀</div>
       <div class="pc-export-title">Animated SVG</div>
       <div class="pc-export-desc">Procedural SVG with CSS keyframes for embedding anywhere</div>
     </div>
     <div class="pc-export-card">
-      <div class="pc-export-icon"><i class="ti ti-drag-drop" aria-hidden="true"></i></div>
+      <div class="pc-export-icon" aria-hidden="true">✋</div>
       <div class="pc-export-title">Drag-and-drop</div>
       <div class="pc-export-desc">Native HTML drag events pipe a PNG blob to any drop target</div>
     </div>
     <div class="pc-export-card">
-      <div class="pc-export-icon"><i class="ti ti-shopping-bag" aria-hidden="true"></i></div>
+      <div class="pc-export-icon" aria-hidden="true">🛍️</div>
       <div class="pc-export-title">Marketplace skins</div>
       <div class="pc-export-desc">AGENT_SKIN assets composite onto canvas, clipped to core shape</div>
     </div>
@@ -372,7 +439,7 @@
   let animId = null;
   let particles = [];
   let t = 0;
-  let mouseX = 65, mouseY = 65;
+  let mouseX = 100, mouseY = 100;
 
   /* ── ARCH GRID ─────────────────────────────────── */
   const archColors = ['#8B5CF6','#F59E0B','#0EA5E9','#10B981','#F97316'];
@@ -442,7 +509,13 @@
   /* ── CANVAS SETUP ─────────────────────────────── */
   const canvas = document.getElementById('live-pixie-canvas');
   const ctx = canvas.getContext('2d');
-  const SZ = 130, CX = 65, CY = 65;
+  // SZ/CX/CY define the bitmap "stage" (200px, up from 130px) — bigger
+  // than the "performer" (core/particles/glow, whose absolute pixel
+  // sizes are unchanged below) so the glow gradient has room to fall
+  // off to transparent before the canvas edge, instead of hard-clipping.
+  // #live-pixie-canvas's CSS width/height hold the on-screen size at
+  // the original 130px, so this is invisible except as fixed clipping.
+  const SZ = 200, CX = 100, CY = 100;
 
   canvas.addEventListener('mousemove', e => {
     const r = canvas.getBoundingClientRect();
