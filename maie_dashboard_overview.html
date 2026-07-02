@@ -6,8 +6,8 @@
     --du-border: rgba(255,255,255,0.08);
     --du-text: #f0e9e4;
     --du-muted: #9a8f88;
-    --du-brand: #8a2e22;
-    --du-brand-light: #c24e4e;
+    --du-brand: #8a2e22;       
+    --du-brand-light: #c24e4e; 
     --du-amber: #d6a13c;
     --du-blue: #4d7ea8;
     --du-green: #5b9a6f;
@@ -29,30 +29,33 @@
     clip: rect(0,0,0,0); white-space: nowrap; border: 0;
   }
 
-  /* ── Structural Cushioning Added Here ── */
+  /* ── Professional Fluid Framework Integration ── */
+  .du-root * {
+    box-sizing: border-box;
+  }
+
   .du-root {
     font-family: var(--du-font-sans);
     color: var(--du-text);
     background: var(--du-bg);
-    /* Prevents inner elements from touching the outer walls */
-    padding: 2.5rem 3rem; 
-    box-sizing: border-box;
-    /* Optional: constrain width so it doesn't stretch infinitely on ultrawides */
-    max-width: 1280px; 
+    /* Fluid Padding: 
+       Y-Axis: min 1.5rem, scales at 3vw, caps at 3rem.
+       X-Axis: min 1.5rem, scales at 4vw, caps at 4rem. 
+    */
+    padding: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 4vw, 4rem);
+    /* Constrains ultra-wides to a readable maximum width */
+    max-width: 1440px;
     margin: 0 auto;
-  }
-  
-  /* Ensure padding doesn't blow out widths */
-  .du-root * {
-    box-sizing: border-box;
+    min-height: 100vh;
   }
 
   /* ── Hero ───────────────────────────────────────────────────────────── */
   .du-hero {
     background: var(--du-bg);
-    border-radius: 18px;
-    padding: 2.5rem; /* Softened from 2rem */
-    margin-bottom: 2rem; /* Increased from 1.5rem */
+    border-radius: 16px;
+    /* Fluid inner cushioning */
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    margin-bottom: clamp(1.5rem, 2.5vw, 2rem);
     position: relative;
     overflow: hidden;
   }
@@ -75,9 +78,9 @@
   .du-hero-sub { font-size:14px; color: #b3a8a0; line-height:1.6; margin:0; max-width:480px; }
 
   /* ── Live cockpit replica ──────────────────────────────────────────── */
-  .du-cockpit-wrap { flex-shrink:0; position:relative; z-index:1; }
+  .du-cockpit-wrap { flex-shrink:0; position:relative; z-index:1; width: 100%; max-width: 380px; }
   .du-cockpit {
-    width: 380px;
+    width: 100%;
     background: #0c0d10;
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
@@ -140,14 +143,15 @@
   .du-module-grid {
     display:grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px; /* Increased from 8px for uncrowded look */
-    margin-bottom: 2rem; /* Increased from 1.5rem */
+    /* Fluid gap scaling */
+    gap: clamp(10px, 1.5vw, 16px);
+    margin-bottom: clamp(1.5rem, 2.5vw, 2.5rem);
   }
   .du-module-card {
     background: var(--du-surface-1);
     border: 0.5px solid var(--du-border);
     border-radius:12px;
-    padding: 1.25rem 1.15rem; /* Pushed out for softer cushioning */
+    padding: 1.25rem 1.15rem;
     cursor:pointer;
     transition: border-color .15s, background .15s, transform .15s;
   }
@@ -211,8 +215,9 @@
   .du-detail-panel {
     background: var(--du-surface-1); border-radius: 16px;
     border: 0.5px solid var(--du-border);
-    padding: 2rem 2.25rem; /* Generous padding replaces the tight box */
-    display: flex; flex-direction: column; gap: 1.25rem; /* Larger gap between internal elements */
+    /* Fluid padding scales beautifully inside the max-width bounds */
+    padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1.5rem, 3.5vw, 2.5rem);
+    display: flex; flex-direction: column; gap: 1.25rem; 
     opacity: 1; transform: translateY(0); filter: blur(0);
     transition: opacity .45s var(--du-ease-cinematic), transform .45s var(--du-ease-cinematic), filter .45s var(--du-ease-cinematic);
   }
@@ -242,19 +247,22 @@
     font-size: 11.5px; color: var(--du-muted); line-height: 1.6;
     border-top: 0.5px solid var(--du-border); 
     padding-top: 1.25rem; margin-top: 1rem;
-    padding-bottom: 1rem; /* Keeps text off the very bottom */
+    padding-bottom: 2rem; 
   }
 
-  @media (max-width: 900px) {
-    .du-root { padding: 1.5rem; }
+  /* ── Responsive breakpoints adjust the flow, not just the padding ── */
+  @media (max-width: 1024px) {
     .du-module-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 760px) {
     .du-hero-top { flex-direction: column; }
-    .du-cockpit { width: 100%; }
+    .du-cockpit-wrap { max-width: 100%; }
     .du-rt-row { grid-template-columns: repeat(2, 1fr); }
-    .du-detail-panel { padding: 1.5rem; }
+  }
+
+  @media (max-width: 480px) {
+    .du-module-grid { grid-template-columns: 1fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,15 +1,76 @@
+<!--
+  maie_pixie_product_experience_module.html  —  v3 (fluid / cinematic)
 
+  Upgrade notes (from the v2 hand-authored module):
+    1. ENGINE — the duplicated, drifted local Pixie renderer (~370 lines of
+       hand-copied canvas code) is gone. This module now calls the single
+       source of truth, window.MAIE.makePixie (maie-pixie.js v2.1), the same
+       engine the dashboard cockpit and every other module use. That also
+       means it inherits the v2.1 glow-clipping fix for free — canvases are
+       sized as "stage" (bigger than the performer needs) with performerScale
+       turned down and glowReach turned up, so the aura has room to fall off
+       before the bitmap edge instead of getting hard-clipped.
+    2. FLUIDITY — every fixed-column grid (pm-two, pm-three, agent-grid,
+       market-grid) is now auto-fit/minmax, and the workflow layout, canvas
+       sizing, type scale, and section padding respond to the component's
+       own width via container queries (with a viewport-media-query fallback
+       for browsers without container query support), not just the page
+       viewport. This module is designed to be dropped into a narrow rail,
+       a full-bleed page, or a phone screen and stay legible in all three.
+    3. CINEMATIC PRESENTATION — section switches, workflow stage changes,
+       and on-scroll card reveals now use the same choreographed
+       exit → enter + staggered-child pattern as the dashboard's detail
+       panel, built on one shared easing curve. Everything respects
+       prefers-reduced-motion: reveals resolve instantly and the canvases
+       fall back to a static glyph rather than spinning up a perpetual
+       rAF loop nobody asked for.
+
+  Requires window.MAIE.makePixie to be loaded on the host page
+  (maie-pixie.js). If it isn't present, canvases degrade to the same
+  static-glyph fallback used for prefers-reduced-motion, so the module
+  never renders broken/blank.
+-->
 <style>
 * { box-sizing: border-box; }
 
-.pm { font-family: var(--font-sans); color: var(--text-primary); }
+.pm {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  max-width: 1180px;
+  margin: 0 auto;
+  /* Lets every rule below key off the module's own rendered width
+     rather than the page viewport — the module stays fluid whether
+     it's dropped into a full page or a narrow side rail. */
+  container-type: inline-size;
+  container-name: pm;
+
+  /* Fallback-aliased tokens: the module still reads var(--text-primary)
+     etc. everywhere (so it keeps inheriting the live portal theme), but
+     if it's ever previewed standalone before the theme stylesheet loads,
+     these keep it from rendering blank/invisible. */
+  --pm-text-primary:   var(--text-primary, #f1ede8);
+  --pm-text-secondary: var(--text-secondary, rgba(241,237,232,0.66));
+  --pm-text-muted:     var(--text-muted, rgba(241,237,232,0.42));
+  --pm-border:         var(--border, rgba(255,255,255,0.08));
+  --pm-border-strong:  var(--border-strong, rgba(255,255,255,0.18));
+  --pm-surface-0:      var(--surface-0, rgba(255,255,255,0.02));
+  --pm-surface-1:      var(--surface-1, rgba(255,255,255,0.035));
+  --pm-surface-2:      var(--surface-2, rgba(255,255,255,0.055));
+  --pm-fill-accent:    var(--fill-accent, #A855F7);
+  --pm-fill-success:   var(--fill-success, #22C55E);
+
+  --pm-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pm * { box-sizing: border-box; }
 
 .pm-section {
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem;
+  padding: clamp(1.15rem, 4.5cqi, 2rem);
   margin-bottom: 1.5rem;
-  border: 0.5px solid var(--border);
-  background: var(--surface-1);
+  border: 0.5px solid var(--border, var(--pm-border));
+  background: var(--surface-1, var(--pm-surface-1));
   position: relative;
   overflow: hidden;
 }
@@ -23,16 +84,17 @@
   font-size: 10px;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-muted, var(--pm-text-muted));
   font-weight: 500;
   margin-bottom: .5rem;
 }
 
 .pm-title {
   font-size: 20px;
+  font-size: clamp(17px, 3.6cqi, 20px);
   font-weight: 500;
   margin: 0 0 .4rem;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .pm-dark .pm-title { color: #ede9ff; }
@@ -41,7 +103,7 @@
 
 .pm-body {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-secondary, var(--pm-text-secondary));
   line-height: 1.65;
   margin: 0;
 }
@@ -50,8 +112,8 @@
   font-family: var(--font-voice);
   font-size: 15px;
   font-style: italic;
-  color: var(--text-secondary);
-  border-left: 2px solid var(--border-strong);
+  color: var(--text-secondary, var(--pm-text-secondary));
+  border-left: 2px solid var(--border-strong, var(--pm-border-strong));
   padding-left: 1rem;
   margin: 1rem 0 0;
   line-height: 1.6;
@@ -62,35 +124,50 @@
   border-left-color: rgba(255,255,255,0.12);
 }
 
+/* ── Section nav — horizontally scrollable so it never wraps into a
+   jagged multi-row pill mess on a phone; snaps for a tidy swipe feel. ── */
+.pm-nav-scroll {
+  margin: 0 -0.25rem;
+  padding: 0 0.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
 .step-nav {
   display: flex;
   gap: 6px;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  width: max-content;
+  min-width: 100%;
 }
 
 .step-pill {
   font-size: 11px;
   padding: 4px 12px;
   border-radius: 20px;
-  border: 0.5px solid var(--border);
+  border: 0.5px solid var(--border, var(--pm-border));
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-muted, var(--pm-text-muted));
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: all .15s;
+  transition: border-color .15s, color .15s, background .15s;
   white-space: nowrap;
+  scroll-snap-align: start;
 }
 
-.step-pill:hover { border-color: var(--border-strong); color: var(--text-secondary); }
-.step-pill.active { background: var(--bg-pro); border-color: var(--border-pro); color: var(--text-pro); }
+.step-pill:hover { border-color: var(--border-strong, var(--pm-border-strong)); color: var(--text-secondary, var(--pm-text-secondary)); }
+.step-pill.active { background: var(--bg-pro, rgba(194,78,78,0.14)); border-color: var(--border-pro, rgba(194,78,78,0.4)); color: var(--text-pro, #C24E4E); }
 
-.pm-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1rem; }
-.pm-three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 1rem; }
+/* ── Fluid grids — auto-fit/minmax replaces fixed column counts, so
+   these reflow continuously with container width instead of snapping
+   at a couple of hardcoded breakpoints. ── */
+.pm-two   { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 1rem; }
+.pm-three { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 1rem; }
 
 .pm-card {
-  background: var(--surface-2);
-  border: 0.5px solid var(--border);
+  background: var(--surface-2, var(--pm-surface-2));
+  border: 0.5px solid var(--border, var(--pm-border));
   border-radius: 12px;
   padding: .875rem 1rem;
 }
@@ -100,12 +177,12 @@
   border-color: rgba(255,255,255,0.08);
 }
 
-.pm-card-label { font-size: 11px; color: var(--text-muted); margin-bottom: .25rem; font-weight: 500; }
-.pm-card-value { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.pm-card-label { font-size: 11px; color: var(--text-muted, var(--pm-text-muted)); margin-bottom: .25rem; font-weight: 500; }
+.pm-card-value { font-size: 14px; font-weight: 500; color: var(--text-primary, var(--pm-text-primary)); }
 .pm-dark .pm-card-label { color: #5a576e; }
 .pm-dark .pm-card-value { color: #dbd8f5; }
 
-.pm-row { display: flex; align-items: center; gap: 12px; }
+.pm-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
 .pm-badge {
   display: inline-flex; align-items: center;
@@ -115,22 +192,46 @@
 
 canvas { display: block; }
 
+/* ── Pixie canvas — the bitmap ("stage") is sized bigger than the
+   performer needs, per the v2.1 glow fix. CSS then lets the rendered
+   box shrink fluidly, so the same crisp backing resolution holds up
+   from hero size down to a phone-width rail. ── */
+.pm-orb-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pm-orb { width: 100%; height: auto; aspect-ratio: 1 / 1; display: block; }
+.pm-orb--hero     { max-width: 120px; }
+.pm-orb--workflow { max-width: 104px; }
+.pm-orb--agents   { max-width: 104px; }
+
+/* Static fallback glyph — shown instead of a live canvas when the
+   engine isn't loaded or prefers-reduced-motion is set. Same footprint
+   as the canvas so layout never jumps. */
+.pm-orb-static {
+  width: 100%; aspect-ratio: 1 / 1; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 40% 35%, var(--pm-static-core, #A855F7) 0%, transparent 72%);
+  opacity: .8;
+}
+.pm-orb-static::after {
+  content: ''; width: 30%; height: 30%; border-radius: 50%;
+  background: var(--pm-static-core, #A855F7);
+}
+
 .wf-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(96px, 130px) minmax(150px, 220px) minmax(220px, 1.6fr);
   gap: 1.5rem;
-  align-items: flex-start;
+  align-items: start;
   margin-top: 1rem;
 }
 
 .wf-left {
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
 }
 
-.wf-right { flex: 1; min-width: 0; }
+.wf-right { min-width: 0; }
 
 .wf-stage {
   display: flex;
@@ -138,77 +239,80 @@ canvas { display: block; }
   gap: 10px;
   padding: .6rem .875rem;
   border-radius: 10px;
-  border: 0.5px solid var(--border);
+  border: 0.5px solid var(--border, var(--pm-border));
   cursor: pointer;
-  transition: border-color .15s, background .15s;
-  background: var(--surface-2);
+  transition: border-color .15s, background .15s, transform .15s var(--pm-ease-cinematic);
+  background: var(--surface-2, var(--pm-surface-2));
 }
 
-.wf-stage:hover { border-color: var(--border-strong); }
-.wf-stage.wf-active { border-color: var(--border-accent); background: var(--bg-accent); }
+.wf-stage:hover { border-color: var(--border-strong, var(--pm-border-strong)); }
+.wf-stage.wf-active { border-color: var(--border-accent); background: var(--bg-accent); transform: translateX(2px); }
 .wf-stage.wf-done { border-color: var(--border-success); background: var(--bg-success); }
 
 .wf-stage-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--border-strong); flex-shrink: 0;
+  background: var(--border-strong, var(--pm-border-strong)); flex-shrink: 0;
   transition: background .2s;
 }
-.wf-stage.wf-active .wf-stage-dot { background: var(--fill-accent); }
-.wf-stage.wf-done .wf-stage-dot { background: var(--fill-success); }
+.wf-stage.wf-active .wf-stage-dot { background: var(--fill-accent, var(--pm-fill-accent)); }
+.wf-stage.wf-done .wf-stage-dot { background: var(--fill-success, var(--pm-fill-success)); }
 
-.wf-stage-name { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+.wf-stage-name { font-size: 12px; font-weight: 500; color: var(--text-secondary, var(--pm-text-secondary)); }
 .wf-stage.wf-active .wf-stage-name { color: var(--text-accent); }
 .wf-stage.wf-done .wf-stage-name { color: var(--text-success); }
 
-.wf-connector { width: 1px; height: 12px; background: var(--border); margin: 0 auto; }
+.wf-connector { width: 1px; height: 12px; background: var(--border, var(--pm-border)); margin: 0 auto; }
 
 .wf-detail {
-  background: var(--surface-2);
-  border: 0.5px solid var(--border);
+  background: var(--surface-2, var(--pm-surface-2));
+  border: 0.5px solid var(--border, var(--pm-border));
   border-radius: 12px;
   padding: 1rem;
   min-height: 140px;
+  opacity: 1; transform: translateY(0); filter: blur(0);
+  transition: opacity .35s var(--pm-ease-cinematic), transform .35s var(--pm-ease-cinematic), filter .35s var(--pm-ease-cinematic);
 }
+.wf-detail.pm-swap { opacity: 0; transform: translateY(6px); filter: blur(3px); }
 
 .wf-detail-title { font-size: 14px; font-weight: 500; margin: 0 0 .3rem; }
-.wf-detail-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 .75rem; }
+.wf-detail-body { font-size: 13px; color: var(--text-secondary, var(--pm-text-secondary)); line-height: 1.6; margin: 0 0 .75rem; }
 
 .wf-tasks { display: flex; flex-direction: column; gap: 5px; }
 .wf-task {
   display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: var(--text-secondary);
+  font-size: 12px; color: var(--text-secondary, var(--pm-text-secondary));
 }
 .wf-task-icon { font-size: 14px; flex-shrink: 0; }
 .wf-task.done { color: var(--text-success); }
 .wf-task.active { color: var(--text-accent); }
 
 .wf-progress-wrap {
-  height: 4px; background: var(--border); border-radius: 2px;
+  height: 4px; background: var(--border, var(--pm-border)); border-radius: 2px;
   margin-top: .75rem; overflow: hidden;
 }
 .wf-progress-fill {
   height: 100%; border-radius: 2px;
-  background: var(--fill-accent);
+  background: var(--fill-accent, var(--pm-fill-accent));
   transition: width .4s ease;
 }
 
 .wf-auto-btn {
   margin-top: .75rem;
   font-size: 12px; padding: 6px 14px;
-  border-radius: var(--radius);
-  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius, 8px);
+  border: 0.5px solid var(--border-strong, var(--pm-border-strong));
   background: transparent;
-  color: var(--text-primary);
+  color: var(--text-primary, var(--pm-text-primary));
   cursor: pointer;
   font-family: var(--font-sans);
   display: inline-flex; align-items: center; gap: 6px;
   transition: background .12s;
 }
-.wf-auto-btn:hover { background: var(--surface-1); }
+.wf-auto-btn:hover { background: var(--surface-1, var(--pm-surface-1)); }
 
 .agent-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 8px;
   margin-top: 1rem;
 }
@@ -228,35 +332,36 @@ canvas { display: block; }
 .echo-timeline { display: flex; flex-direction: column; gap: 10px; margin-top: 1rem; }
 .echo-item {
   display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap;
   padding: .6rem .875rem;
   border-radius: 10px;
-  border: 0.5px solid var(--border);
-  background: var(--surface-2);
+  border: 0.5px solid var(--border, var(--pm-border));
+  background: var(--surface-2, var(--pm-surface-2));
   transition: border-color .2s;
 }
 .echo-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.echo-label { font-size: 13px; font-weight: 500; flex: 1; }
-.echo-meta { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.echo-label { font-size: 13px; font-weight: 500; flex: 1 1 160px; }
+.echo-meta { font-size: 11px; color: var(--text-muted, var(--pm-text-muted)); white-space: nowrap; }
 .echo-resonance {
   height: 4px; width: 60px; border-radius: 2px;
-  background: var(--border); overflow: hidden;
+  background: var(--border, var(--pm-border)); overflow: hidden;
 }
 .echo-res-fill { height: 100%; border-radius: 2px; }
 
 .market-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 8px; margin-top: 1rem;
 }
 .market-item {
   display: flex; align-items: center; gap: 10px;
   padding: .75rem 1rem;
   border-radius: 10px;
-  border: 0.5px solid var(--border);
-  background: var(--surface-2);
+  border: 0.5px solid var(--border, var(--pm-border));
+  background: var(--surface-2, var(--pm-surface-2));
 }
-.market-icon { font-size: 20px; flex-shrink: 0; color: var(--text-secondary); }
+.market-icon { font-size: 20px; flex-shrink: 0; color: var(--text-secondary, var(--pm-text-secondary)); }
 .market-name { font-size: 13px; font-weight: 500; }
-.market-desc { font-size: 11px; color: var(--text-muted); }
+.market-desc { font-size: 11px; color: var(--text-muted, var(--pm-text-muted)); }
 
 .tier-visual {
   display: flex; flex-direction: column; gap: 0;
@@ -278,16 +383,87 @@ canvas { display: block; }
   border: 0.5px solid; font-family: var(--font-mono);
 }
 
-.pm-divider { height: 0.5px; background: var(--border); margin: 1.5rem 0; }
+.pm-divider { height: 0.5px; background: var(--border, var(--pm-border)); margin: 1.5rem 0; }
+
+/* ── Cinematic section swap ──────────────────────────────────────
+   Replaces the old instant display:none/'' toggle. The outgoing
+   section fades/blurs down, the incoming one starts in the same
+   state and settles in — same choreography language as the
+   dashboard's detail panel. ── */
+.pm-view {
+  opacity: 1; transform: translateY(0); filter: blur(0);
+  transition: opacity .38s var(--pm-ease-cinematic), transform .38s var(--pm-ease-cinematic), filter .38s var(--pm-ease-cinematic);
+}
+.pm-view[hidden] { display: none; }
+.pm-view.pm-exit { opacity: 0; transform: translateY(-6px); filter: blur(3px); }
+.pm-view.pm-enter { opacity: 0; transform: translateY(10px); filter: blur(5px); }
+
+/* ── Scroll reveal ── */
+.pm-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .55s var(--pm-ease-cinematic), transform .55s var(--pm-ease-cinematic);
+  transition-delay: calc(var(--i, 0) * 55ms);
+}
+.pm-reveal.pm-visible { opacity: 1; transform: none; }
+
+/* ═══════════════════ Container-fluid layout ═══════════════════
+   Primary responsiveness lives here, keyed to the module's own
+   rendered width via @container — correct whether the module sits
+   in a full-bleed page or a narrow rail. A @media fallback below
+   covers browsers without container query support. ═══════════════ */
+@container pm (max-width: 820px) {
+  .wf-container { grid-template-columns: 1fr; }
+  .wf-left { flex-direction: row; justify-content: center; }
+  .wf-detail { min-height: 0; }
+}
+@container pm (max-width: 560px) {
+  .pm-section { padding: 1rem; }
+  .pm-title { font-size: 16px; }
+  .wf-left { flex-direction: column; }
+  .agent-grid { grid-template-columns: repeat(2, 1fr); }
+  .pm-orb--hero { max-width: 84px; }
+}
+@container pm (max-width: 380px) {
+  .agent-grid { grid-template-columns: 1fr 1fr; }
+  .market-grid { grid-template-columns: 1fr; }
+}
+
+/* Fallback for browsers without container query support (source order
+   matters: these come first so @container rules above win when
+   supported, since both carry equal specificity). */
+@media (max-width: 820px) {
+  .wf-container { grid-template-columns: 1fr; }
+  .wf-left { flex-direction: row; justify-content: center; }
+}
+@media (max-width: 560px) {
+  .pm-section { padding: 1rem; }
+  .pm-title { font-size: 16px; }
+  .wf-left { flex-direction: column; }
+  .agent-grid { grid-template-columns: repeat(2, 1fr); }
+  .pm-orb--hero { max-width: 84px; }
+}
+@media (max-width: 380px) {
+  .agent-grid { grid-template-columns: 1fr 1fr; }
+  .market-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-view, .wf-detail, .wf-stage, .pm-reveal {
+    transition-duration: .01ms !important;
+  }
+}
 </style>
 
 <div class="pm" role="main">
 <h2 class="sr-only">MAIE Pixie Companion — interactive product experience module for stakeholder presentation</h2>
 
 <div id="section-intro" class="pm-section pm-dark">
-  <div style="display:flex;gap:1.5rem;align-items:center;">
-    <canvas id="c-hero" width="120" height="120" style="flex-shrink:0;" aria-label="Live Pixie companion" role="img"></canvas>
-    <div>
+  <div class="pm-row" style="align-items:center;">
+    <div class="pm-orb-wrap pm-orb--hero" style="max-width:120px;">
+      <canvas id="c-hero" class="pm-orb pm-orb--hero" width="144" height="144" aria-label="Live Pixie companion" role="img"></canvas>
+    </div>
+    <div style="flex:1;min-width:220px;">
       <div class="pm-eyebrow">MAIE · Product Experience Module</div>
       <h3 class="pm-title">The intelligence has a face.</h3>
       <p class="pm-body">Most AI platforms expose their work through progress bars, logs, and status codes. MAIE does something different. Every agent plan, every reasoning step, every achievement — all of it flows through a single living presence the user will come to know as their own.</p>
@@ -295,27 +471,29 @@ canvas { display: block; }
     </div>
   </div>
   <div style="margin-top:1.25rem;">
-    <div class="step-nav" id="section-nav">
-      <button class="step-pill active" data-sec="intro">Introduction</button>
-      <button class="step-pill" data-sec="workflow">Live workflow</button>
-      <button class="step-pill" data-sec="tiers">Identity layers</button>
-      <button class="step-pill" data-sec="agents">Agent constellation</button>
-      <button class="step-pill" data-sec="reputation">Reputation</button>
-      <button class="step-pill" data-sec="market">Marketplace</button>
+    <div class="pm-nav-scroll">
+      <div class="step-nav" id="section-nav">
+        <button class="step-pill active" data-sec="intro">Introduction</button>
+        <button class="step-pill" data-sec="workflow">Live workflow</button>
+        <button class="step-pill" data-sec="tiers">Identity layers</button>
+        <button class="step-pill" data-sec="agents">Agent constellation</button>
+        <button class="step-pill" data-sec="reputation">Reputation</button>
+        <button class="step-pill" data-sec="market">Marketplace</button>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="sec-intro">
+<div id="sec-intro" class="pm-view">
   <div class="pm-section">
     <div class="pm-eyebrow">The premise</div>
     <h3 class="pm-title" style="font-size:16px;">What the Pixie is not</h3>
     <div class="pm-two">
-      <div class="pm-card">
+      <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">Not a chatbot avatar</div>
         <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--text-secondary);">It does not represent a conversational agent. It represents the user's entire MAIE collaboration — their identity, their work, their history.</div>
       </div>
-      <div class="pm-card">
+      <div class="pm-card pm-reveal" style="--i:1;">
         <div class="pm-card-label">Not a mascot</div>
         <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--text-secondary);">The Pixie is a real-time data visualization. Every animation, every echo, every particle response encodes live information from the agent pipeline.</div>
       </div>
@@ -323,15 +501,15 @@ canvas { display: block; }
     <div class="pm-divider"></div>
     <div class="pm-eyebrow">What it actually is</div>
     <div class="pm-three">
-      <div class="pm-card">
+      <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">A workflow mirror</div>
         <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Energy, animation speed, and ring behavior change in real time as agent plans move through planning → execution → completion.</div>
       </div>
-      <div class="pm-card">
+      <div class="pm-card pm-reveal" style="--i:1;">
         <div class="pm-card-label">A reputation record</div>
         <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Achievement echoes orbit the canvas permanently. The longer a creator works on MAIE, the richer their Pixie's constellation becomes.</div>
       </div>
-      <div class="pm-card">
+      <div class="pm-card pm-reveal" style="--i:2;">
         <div class="pm-card-label">A personal identity</div>
         <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Archetype, theme, name, and marketplace skins make every Pixie distinct. No two users see the same companion.</div>
       </div>
@@ -339,14 +517,14 @@ canvas { display: block; }
   </div>
 </div>
 
-<div id="sec-workflow" style="display:none;">
+<div id="sec-workflow" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Scenario · "Generate a documentary trailer"</div>
     <h3 class="pm-title" style="font-size:16px;">Watch a complete agent lifecycle</h3>
     <p class="pm-body" style="margin-bottom:1rem;">Step through each phase of the workflow. The Pixie canvas on the left mirrors every state change — the same connection your users will experience live in MAIE.</p>
 
     <div style="display:flex;justify-content:flex-start;margin-bottom:.75rem;">
-      <button class="wf-auto-btn" id="wf-auto-btn" onclick="toggleAutoPlay()">
+      <button class="wf-auto-btn" id="wf-auto-btn" onclick="MAIEPixieModule.toggleAutoPlay()">
         <i class="ti ti-player-play" aria-hidden="true" style="font-size:14px;" id="wf-play-icon"></i>
         <span id="wf-auto-label">Run full demo</span>
       </button>
@@ -354,7 +532,9 @@ canvas { display: block; }
 
     <div class="wf-container">
       <div class="wf-left">
-        <canvas id="c-wf" width="110" height="110" aria-label="Pixie reflecting workflow phase" role="img"></canvas>
+        <div class="pm-orb-wrap pm-orb--workflow" style="max-width:104px;">
+          <canvas id="c-wf" class="pm-orb pm-orb--workflow" width="128" height="128" aria-label="Pixie reflecting workflow phase" role="img"></canvas>
+        </div>
         <div id="wf-phase-label" style="font-size:11px;color:var(--text-muted);margin-top:4px;text-align:center;">idle</div>
         <div id="wf-progress-outer" style="width:90px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;display:none;">
           <div id="wf-progress-inner" style="height:100%;background:var(--fill-accent);border-radius:2px;width:0%;transition:width .3s;"></div>
@@ -363,34 +543,34 @@ canvas { display: block; }
 
       <div class="wf-right">
         <div style="display:flex;flex-direction:column;gap:4px;" id="wf-stages">
-          <div class="wf-stage" data-stage="0" onclick="selectStage(0)">
+          <div class="wf-stage" data-stage="0" onclick="MAIEPixieModule.selectStage(0)">
             <div class="wf-stage-dot"></div>
             <span class="wf-stage-name">Planning</span>
           </div>
           <div class="wf-connector"></div>
-          <div class="wf-stage" data-stage="1" onclick="selectStage(1)">
+          <div class="wf-stage" data-stage="1" onclick="MAIEPixieModule.selectStage(1)">
             <div class="wf-stage-dot"></div>
             <span class="wf-stage-name">Approval</span>
           </div>
           <div class="wf-connector"></div>
-          <div class="wf-stage" data-stage="2" onclick="selectStage(2)">
+          <div class="wf-stage" data-stage="2" onclick="MAIEPixieModule.selectStage(2)">
             <div class="wf-stage-dot"></div>
             <span class="wf-stage-name">Execution</span>
           </div>
           <div class="wf-connector"></div>
-          <div class="wf-stage" data-stage="3" onclick="selectStage(3)">
+          <div class="wf-stage" data-stage="3" onclick="MAIEPixieModule.selectStage(3)">
             <div class="wf-stage-dot"></div>
             <span class="wf-stage-name">Monitoring</span>
           </div>
           <div class="wf-connector"></div>
-          <div class="wf-stage" data-stage="4" onclick="selectStage(4)">
+          <div class="wf-stage" data-stage="4" onclick="MAIEPixieModule.selectStage(4)">
             <div class="wf-stage-dot"></div>
             <span class="wf-stage-name">Completion</span>
           </div>
         </div>
       </div>
 
-      <div class="wf-detail" id="wf-detail" style="flex:1.6;">
+      <div class="wf-detail" id="wf-detail">
         <div class="wf-detail-title" id="wfd-title">Select a stage</div>
         <div class="wf-detail-body" id="wfd-body">Click any workflow stage to see how the Pixie responds and what the agent pipeline is doing.</div>
         <div class="wf-tasks" id="wfd-tasks"></div>
@@ -402,14 +582,14 @@ canvas { display: block; }
   </div>
 </div>
 
-<div id="sec-tiers" style="display:none;">
+<div id="sec-tiers" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Identity architecture</div>
     <h3 class="pm-title" style="font-size:16px;">Three layers. One presence.</h3>
     <p class="pm-body">The architecture separates permanence from expression. The innermost layer never changes. Everything outward can be customized, upgraded, or replaced — without touching what matters.</p>
 
     <div class="tier-visual">
-      <div class="tier-block" style="background:var(--bg-pro);border:0.5px solid var(--border-pro);">
+      <div class="tier-block pm-reveal" style="--i:0;background:var(--bg-pro);border:0.5px solid var(--border-pro);">
         <div class="tier-num" style="color:var(--text-pro);">Tier 1 · permanent</div>
         <div class="tier-name">UserIdentity</div>
         <div class="tier-desc" style="color:var(--text-secondary);">Immutable provenance. The glyph seed that stamps every asset the creator publishes. Changing archetype or theme never touches this layer. This is what other creators see when they encounter your work.</div>
@@ -419,7 +599,7 @@ canvas { display: block; }
           <span class="tier-attr" style="background:var(--bg-pro);border-color:var(--border-pro);color:var(--text-pro);">provenance stamp</span>
         </div>
       </div>
-      <div class="tier-block" style="background:var(--bg-accent);border:0.5px solid var(--border-accent);border-top:none;">
+      <div class="tier-block pm-reveal" style="--i:1;background:var(--bg-accent);border:0.5px solid var(--border-accent);border-top:none;">
         <div class="tier-num" style="color:var(--text-accent);">Tier 2 · expressive</div>
         <div class="tier-name">Pixie Companion</div>
         <div class="tier-desc" style="color:var(--text-secondary);">Personality, appearance, and character. The archetype defines how the Pixie moves and what role it plays. Theme colors and marketplace skins layer on top. Fully replaceable — swapping archetype never affects creator provenance.</div>
@@ -430,7 +610,7 @@ canvas { display: block; }
           <span class="tier-attr" style="background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);">preferences</span>
         </div>
       </div>
-      <div class="tier-block" style="background:var(--bg-success);border:0.5px solid var(--border-success);border-top:none;">
+      <div class="tier-block pm-reveal" style="--i:2;background:var(--bg-success);border:0.5px solid var(--border-success);border-top:none;">
         <div class="tier-num" style="color:var(--text-success);">Tier 3 · live</div>
         <div class="tier-name">Runtime intelligence</div>
         <div class="tier-desc" style="color:var(--text-secondary);">The Pixie's current emotional and operational state. Phase, mode, progress, and temperament are driven directly by the Agent Workflow Panel in real time. Never persisted — this layer lives only while the agent runs.</div>
@@ -445,19 +625,19 @@ canvas { display: block; }
   </div>
 </div>
 
-<div id="sec-agents" style="display:none;">
+<div id="sec-agents" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Behind the canvas</div>
     <h3 class="pm-title" style="font-size:16px;">Six agents. One Pixie.</h3>
     <p class="pm-body">While the user sees one living companion, a constellation of specialized agents works beneath it. The Pixie is the single point of human contact for a coordinated multi-agent pipeline.</p>
 
-    <div style="display:flex;gap:1.5rem;align-items:flex-start;margin-top:1rem;">
-      <div style="flex-shrink:0;">
-        <canvas id="c-agents" width="110" height="110" aria-label="Pixie with multi-agent echoes" role="img"></canvas>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center;">user's view</div>
+    <div class="pm-row" style="align-items:flex-start;margin-top:1rem;">
+      <div class="pm-orb-wrap pm-orb--agents" style="max-width:104px;">
+        <canvas id="c-agents" class="pm-orb pm-orb--agents" width="128" height="128" aria-label="Pixie with multi-agent echoes" role="img"></canvas>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center;">user's view</div>
       </div>
 
-      <div class="agent-grid" style="flex:1;">
+      <div class="agent-grid" style="flex:1;min-width:220px;">
         <div class="agent-node" id="ag-0">
           <div class="agent-node-name">Coordinator</div>
           <div class="agent-node-role" style="font-size:11px;"></div>
@@ -495,16 +675,16 @@ canvas { display: block; }
   </div>
 </div>
 
-<div id="sec-reputation" style="display:none;">
+<div id="sec-reputation" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Persistent creative history</div>
     <h3 class="pm-title" style="font-size:16px;">Work that leaves a mark</h3>
     <p class="pm-body" style="margin-bottom:.5rem;">Every completed production, published asset, and creative milestone mints a permanent echo. These aren't badges in a drawer — they orbit the Pixie canvas every session, growing the visual record of what the creator has built.</p>
 
     <div class="echo-timeline" id="echo-timeline">
-      <div class="echo-item" id="ech-0">
+      <div class="echo-item pm-reveal" id="ech-0" style="--i:0;">
         <div class="echo-dot" style="background:#38BDF8;"></div>
-        <div>
+        <div style="flex:1 1 160px;">
           <div class="echo-label">Documentary trailer published</div>
           <div style="font-size:11px;color:var(--text-muted);">ACHIEVEMENT_ARTIFACT · 2 days ago</div>
         </div>
@@ -513,9 +693,9 @@ canvas { display: block; }
           <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.9</div>
         </div>
       </div>
-      <div class="echo-item" id="ech-1">
+      <div class="echo-item pm-reveal" id="ech-1" style="--i:1;">
         <div class="echo-dot" style="background:#A855F7;"></div>
-        <div>
+        <div style="flex:1 1 160px;">
           <div class="echo-label">First marketplace asset approved</div>
           <div style="font-size:11px;color:var(--text-muted);">LEGACY_ECHO · 14 days ago</div>
         </div>
@@ -524,9 +704,9 @@ canvas { display: block; }
           <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.75</div>
         </div>
       </div>
-      <div class="echo-item" id="ech-2">
+      <div class="echo-item pm-reveal" id="ech-2" style="--i:2;">
         <div class="echo-dot" style="background:#10B981;"></div>
-        <div>
+        <div style="flex:1 1 160px;">
           <div class="echo-label">50 productions completed</div>
           <div style="font-size:11px;color:var(--text-muted);">ACHIEVEMENT_ARTIFACT · 1 month ago</div>
         </div>
@@ -535,9 +715,9 @@ canvas { display: block; }
           <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.6</div>
         </div>
       </div>
-      <div class="echo-item" id="ech-3">
+      <div class="echo-item pm-reveal" id="ech-3" style="--i:3;">
         <div class="echo-dot" style="background:#F59E0B;"></div>
-        <div>
+        <div style="flex:1 1 160px;">
           <div class="echo-label">Mentorship milestone reached</div>
           <div style="font-size:11px;color:var(--text-muted);">LEGACY_ECHO · 3 months ago</div>
         </div>
@@ -556,35 +736,35 @@ canvas { display: block; }
   </div>
 </div>
 
-<div id="sec-market" style="display:none;">
+<div id="sec-market" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Extending creative identity</div>
     <h3 class="pm-title" style="font-size:16px;">The marketplace is the Pixie's wardrobe</h3>
     <p class="pm-body" style="margin-bottom:.25rem;">Creators can purchase asset packs that alter their companion's appearance, animation, and feel. This is not monetization for its own sake — it is the mechanism by which experienced creators express their platform identity.</p>
 
     <div class="market-grid">
-      <div class="market-item">
+      <div class="market-item pm-reveal" style="--i:0;">
         <i class="ti ti-sparkles market-icon" aria-hidden="true" style="color:#A855F7;"></i>
         <div>
           <div class="market-name">Identity themes</div>
           <div class="market-desc">Full animation + shape + palette bundles. One equip changes everything.</div>
         </div>
       </div>
-      <div class="market-item">
+      <div class="market-item pm-reveal" style="--i:1;">
         <i class="ti ti-photo market-icon" aria-hidden="true" style="color:#38BDF8;"></i>
         <div>
           <div class="market-name">Premium skins</div>
           <div class="market-desc">AGENT_SKIN images composited onto the canvas, clipped to the active core shape.</div>
         </div>
       </div>
-      <div class="market-item">
+      <div class="market-item pm-reveal" style="--i:2;">
         <i class="ti ti-windmill market-icon" aria-hidden="true" style="color:#10B981;"></i>
         <div>
           <div class="market-name">Animation packs</div>
           <div class="market-desc">New orbit, neural, and wave behaviors with custom particle physics.</div>
         </div>
       </div>
-      <div class="market-item">
+      <div class="market-item pm-reveal" style="--i:3;">
         <i class="ti ti-award market-icon" aria-hidden="true" style="color:#F59E0B;"></i>
         <div>
           <div class="market-name">Achievement collections</div>
@@ -593,12 +773,12 @@ canvas { display: block; }
       </div>
     </div>
 
-    <div style="margin-top:1rem;display:flex;gap:10px;">
-      <div class="pm-card" style="flex:1;">
+    <div class="pm-two" style="margin-top:1rem;">
+      <div class="pm-card">
         <div class="pm-card-label">Asset ownership gate</div>
         <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Every equippable asset is validated server-side before any DB write. Users can only equip items they own. The API returns 403 on unowned attempts — not a client-side check.</div>
       </div>
-      <div class="pm-card" style="flex:1;">
+      <div class="pm-card">
         <div class="pm-card-label">Skin compositing</div>
         <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Skin images fade in over ~40 frames, clipped to the user's chosen core shape. Procedural gradient layers render beneath, so the skin reads as texture rather than a flat overlay.</div>
       </div>
@@ -609,386 +789,342 @@ canvas { display: block; }
 </div>
 
 <script>
-(function() {
+(function () {
+  'use strict';
 
-const THEMES = {
-  prism:  { ring:'#A855F7', core:'#7E22CE', particle:'#22D3EE', accent:'#D946EF' },
-  arctic: { ring:'#38BDF8', core:'#0369A1', particle:'#BAE6FD', accent:'#7DD3FC' },
-  ember:  { ring:'#C24E4E', core:'#A52A2A', particle:'#FFB400', accent:'#FF8C42' },
-  forest: { ring:'#22C55E', core:'#14532D', particle:'#BBF7D0', accent:'#4ADE80' },
-};
+  var prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var engine = (window.MAIE && window.MAIE.makePixie) ? window.MAIE.makePixie : null;
 
-function hexToRgb(hex) {
-  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return r ? [parseInt(r[1],16), parseInt(r[2],16), parseInt(r[3],16)] : [180,120,255];
-}
-
-function makePixie(canvasId, themeKey, opts) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return null;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const CX = W/2, CY = H/2;
-  const theme = THEMES[themeKey] || THEMES.prism;
-  let t = 0;
-  let phase = opts.phase || 'idle';
-  let progress = 0;
-  let particles = [];
-  let echoes = opts.echoes || [];
-  let animId = null;
-
-  const densityCount = 8;
-  const ringCount = opts.rings || 2;
-
-  function init() {
-    particles = [];
-    for (let ri = 0; ri < ringCount; ri++) {
-      const baseR = (W * 0.18) + ri * (W * 0.085);
-      for (let pi = 0; pi < densityCount; pi++) {
-        particles.push({
-          angle: (pi / densityCount) * Math.PI * 2 + ri * 0.7,
-          radius: baseR, baseRadius: baseR,
-          speed: 0.009 + Math.random() * 0.005,
-          size: 1.1 + Math.random() * 0.7,
-          opacity: 0.5 + Math.random() * 0.45,
-          hueShift: (Math.random()-.5)*20,
-          phase: Math.random()*Math.PI*2,
-          wobble: 0.6 + Math.random()*1.2,
-        });
-      }
-    }
-  }
-  init();
-
-  function buildCorePath(shape, cx, cy, r) {
-    ctx.beginPath();
-    switch(shape) {
-      case 'hexagon':
-        for (let i=0;i<6;i++) {
-          const a=(i/6)*Math.PI*2-Math.PI/6;
-          i===0?ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r):ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);
-        }
-        ctx.closePath(); break;
-      case 'diamond':
-        ctx.moveTo(cx,cy-r);ctx.lineTo(cx+r*.8,cy);ctx.lineTo(cx,cy+r);ctx.lineTo(cx-r*.8,cy);ctx.closePath(); break;
-      default: ctx.arc(cx,cy,r,0,Math.PI*2);
-    }
+  /* ── Pixie instances ────────────────────────────────────────────
+     Canvases are backed at a higher resolution than their CSS box
+     (144/128 vs the ~104-120px they render at) and performerScale is
+     turned down while glowReach is turned up, so the aura has real
+     room before the bitmap edge — the v2.1 "stage vs performer" fix.
+     If the engine isn't loaded, or the visitor prefers reduced motion,
+     every canvas is swapped for a static, non-animated glyph instead
+     of silently rendering blank. ──────────────────────────────── */
+  function staticFallback(canvasId, color) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var wrap = canvas.closest('.pm-orb-wrap') || canvas.parentElement;
+    var glyph = document.createElement('div');
+    glyph.className = 'pm-orb-static';
+    glyph.style.setProperty('--pm-static-core', color);
+    glyph.setAttribute('role', 'img');
+    glyph.setAttribute('aria-label', canvas.getAttribute('aria-label') || 'Pixie companion');
+    canvas.replaceWith(glyph);
+    return glyph;
   }
 
-  function draw() {
-    t += 0.018;
-    const phaseEn = phase==='executing' ? 1.2+(progress/100)*.7
-                  : phase==='planning' ? 1.1
-                  : phase==='completed' ? 1.4
-                  : phase==='failed' ? 0.5
-                  : 0.85;
-    const modeEn = phase==='executing'||phase==='completed' ? 1.2 : phase==='idle' ? 0.8 : 1.0;
+  var pHero = null, pWf = null, pAgents = null;
 
-    ctx.clearRect(0,0,W,H);
-    const [cR,cG,cB] = hexToRgb(theme.ring);
+  if (engine && !prefersReducedMotion) {
+    var heroEchoes = [
+      { color: '#38BDF8', resonance: .8, createdAt: Date.now() - 172800000 },
+      { color: '#A855F7', resonance: .6, createdAt: Date.now() - 1296000000 },
+      { color: '#10B981', resonance: .5, createdAt: Date.now() - 2592000000 },
+    ];
 
-    const glowR = W*.22 + Math.sin(t*1.2)*W*.02 + phaseEn*W*.04;
-    const grd = ctx.createRadialGradient(CX,CY,0,CX,CY,glowR*2);
-    grd.addColorStop(0,`rgba(${cR},${cG},${cB},${.2*modeEn})`);
-    grd.addColorStop(0.5,`rgba(${cR},${cG},${cB},${.07*modeEn})`);
-    grd.addColorStop(1,`rgba(${cR},${cG},${cB},0)`);
-    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(CX,CY,glowR*2,0,Math.PI*2); ctx.fill();
-
-    const coreR = W*.1 + Math.sin(t*1.2)*W*.01*phaseEn;
-    buildCorePath(opts.shape||'circle', CX, CY, coreR);
-    const cg = ctx.createRadialGradient(CX,CY,0,CX,CY,coreR);
-    cg.addColorStop(0,`rgba(${cR},${cG},${cB},0.95)`);
-    cg.addColorStop(0.7,`rgba(${cR},${cG},${cB},0.65)`);
-    cg.addColorStop(1,`rgba(${cR},${cG},${cB},0.2)`);
-    ctx.fillStyle=cg; ctx.fill();
-
-    if (phase==='executing' && progress>0) {
-      const pr=coreR+W*.12, sa=-Math.PI/2, ea=sa+(progress/100)*Math.PI*2;
-      ctx.strokeStyle=`rgba(${cR},${cG},${cB},.55)`; ctx.lineWidth=1.5; ctx.lineCap='round';
-      ctx.beginPath(); ctx.arc(CX,CY,pr,sa,ea); ctx.stroke();
-      ctx.strokeStyle=`rgba(255,255,255,.05)`; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.arc(CX,CY,pr,0,Math.PI*2); ctx.stroke();
-    }
-
-    particles.forEach((p,i) => {
-      p.angle += p.speed*(1+phaseEn*.4);
-      const wo = Math.sin(t*p.wobble+p.phase)*4;
-      p.radius += (p.baseRadius+wo-p.radius)*.05;
-      const px=CX+Math.cos(p.angle)*p.radius, py=CY+Math.sin(p.angle)*p.radius;
-      ctx.save(); ctx.globalAlpha=p.opacity*.8*modeEn;
-      const pg=ctx.createRadialGradient(px,py,0,px,py,p.size*2.5);
-      pg.addColorStop(0,`rgba(${cR},${cG},${cB},.9)`);
-      pg.addColorStop(1,`rgba(${cR},${cG},${cB},0)`);
-      ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(px,py,p.size*2.5,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle=`rgba(${cR},${cG},${cB},.9)`;
-      ctx.beginPath(); ctx.arc(px,py,p.size*.5,0,Math.PI*2); ctx.fill();
-      ctx.restore();
+    pHero = engine('c-hero', 'prism', {
+      rings: 2, particles: 8, performerScale: 0.82, glowReach: 2.6, echoes: heroEchoes,
     });
 
-    const rPhase=(t*.9)%(Math.PI*2);
-    const rAlpha=Math.sin(rPhase)*.5+.5;
-    for (let r=0;r<ringCount;r++) {
-      const rSz=W*.3+r*W*.09+rAlpha*(W*.06)+phaseEn*(W*.07);
-      ctx.strokeStyle=`rgba(${cR},${cG},${cB},${.06*rAlpha*modeEn/(r+1)})`;
-      ctx.lineWidth=.8; ctx.beginPath(); ctx.arc(CX,CY,rSz,0,Math.PI*2); ctx.stroke();
-    }
+    pWf = engine('c-wf', 'arctic', {
+      rings: 2, particles: 8, performerScale: 0.8, glowReach: 2.7,
+    });
 
-    const baseEcho = W*.3+(ringCount-1)*W*.09+W*.2;
-    if (echoes.length > 0) {
-      const now = Date.now();
-      echoes.forEach((echo,i) => {
-        const angle=((i/echoes.length)*Math.PI*2)-Math.PI/2;
-        const ageMs = echo.createdAt ? Math.max(0, now-echo.createdAt) : 86400000;
-        const maturity = Math.min(ageMs/86400000, 1);
-        const recency = 1-maturity;
-        const resonance = echo.resonance||.5;
-        const orbitR = baseEcho + maturity*W*.12;
-        const pulse = Math.sin(t*(0.35+recency*.5)+i)*.3+.7;
-        const ex=CX+Math.cos(angle)*orbitR, ey=CY+Math.sin(angle)*orbitR;
-        try {
-          const [er,eg,eb]=hexToRgb(echo.color);
-          const dotR=2+resonance*1.5;
-          const eG=ctx.createRadialGradient(ex,ey,0,ex,ey,dotR*3);
-          eG.addColorStop(0,`rgba(${er},${eg},${eb},${(.3+resonance*.25)*pulse})`);
-          eG.addColorStop(1,`rgba(${er},${eg},${eb},0)`);
-          ctx.fillStyle=eG; ctx.beginPath(); ctx.arc(ex,ey,dotR*3,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle=`rgba(${er},${eg},${eb},${.85*pulse})`;
-          ctx.beginPath(); ctx.arc(ex,ey,dotR,0,Math.PI*2); ctx.fill();
-        } catch(e){}
+    pAgents = engine('c-agents', 'forest', {
+      rings: 3, particles: 8, performerScale: 0.78, glowReach: 2.8,
+      echoes: [
+        { color: '#6366F1', resonance: .7, createdAt: Date.now() - 3600000 },
+        { color: '#F59E0B', resonance: .6, createdAt: Date.now() - 7200000 },
+        { color: '#EF4444', resonance: .5, createdAt: Date.now() - 10800000 },
+        { color: '#10B981', resonance: .8, createdAt: Date.now() - 14400000 },
+        { color: '#8B5CF6', resonance: .55, createdAt: Date.now() - 18000000 },
+        { color: '#3B82F6', resonance: .65, createdAt: Date.now() - 21600000 },
+      ],
+    });
+  } else {
+    staticFallback('c-hero', '#A855F7');
+    staticFallback('c-wf', '#38BDF8');
+    staticFallback('c-agents', '#22C55E');
+  }
+
+  /* ── Cinematic section switch ──────────────────────────────────
+     Outgoing .pm-view fades/blurs out; once settled it's hidden and
+     the incoming one is un-hidden starting from the same exit-state
+     class, then released on the next frame so the browser has
+     something to transition *from*. Falls through to an instant swap
+     under prefers-reduced-motion. ──────────────────────────────── */
+  var SWAP_MS = 220;
+  var sectionIds = ['intro', 'workflow', 'tiers', 'agents', 'reputation', 'market'];
+  var activeSection = 'intro';
+
+  function switchSection(sec) {
+    if (sec === activeSection || sectionIds.indexOf(sec) === -1) return;
+    var current = document.getElementById('sec-' + activeSection);
+    var next = document.getElementById('sec-' + sec);
+    if (!next) return;
+    activeSection = sec;
+
+    if (prefersReducedMotion || !current) {
+      sectionIds.forEach(function (id) {
+        var el = document.getElementById('sec-' + id);
+        if (el) el.hidden = (id !== sec);
       });
+      return;
     }
 
-    animId = requestAnimationFrame(draw);
+    current.classList.add('pm-exit');
+    setTimeout(function () {
+      current.hidden = true;
+      current.classList.remove('pm-exit');
+      next.classList.add('pm-enter');
+      next.hidden = false;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { next.classList.remove('pm-enter'); });
+      });
+    }, SWAP_MS);
   }
 
-  draw();
-
-  return {
-    setPhase: function(p) { phase=p; },
-    setProgress: function(v) { progress=v; },
-    setEchoes: function(e) { echoes=e; },
-    stop: function() { if(animId) cancelAnimationFrame(animId); },
-  };
-}
-
-const heroEchoes = [
-  { color:'#38BDF8', resonance:.8, createdAt: Date.now()-172800000 },
-  { color:'#A855F7', resonance:.6, createdAt: Date.now()-1296000000 },
-  { color:'#10B981', resonance:.5, createdAt: Date.now()-2592000000 },
-];
-
-const pHero = makePixie('c-hero', 'prism', { rings:2, echoes: heroEchoes });
-const pWf   = makePixie('c-wf',   'arctic', { rings:2 });
-const pAgents = makePixie('c-agents', 'forest', {
-  rings: 3,
-  echoes: [
-    {color:'#6366F1',resonance:.7,createdAt:Date.now()-3600000},
-    {color:'#F59E0B',resonance:.6,createdAt:Date.now()-7200000},
-    {color:'#EF4444',resonance:.5,createdAt:Date.now()-10800000},
-    {color:'#10B981',resonance:.8,createdAt:Date.now()-14400000},
-    {color:'#8B5CF6',resonance:.55,createdAt:Date.now()-18000000},
-    {color:'#3B82F6',resonance:.65,createdAt:Date.now()-21600000},
-  ]
-});
-
-const WORKFLOW_STAGES = [
-  {
-    id:'planning', name:'Planning',
-    title:'The Pixie becomes attentive',
-    body:'The agent receives the goal and begins constructing a WorkflowPlan. Risk level is assessed. Steps are sequenced. The Pixie\'s animation energy rises — particles accelerate, rings pulse faster.',
-    tasks:[
-      {text:'Goal received: "Generate a documentary trailer"', state:'done'},
-      {text:'Analyzing available tools', state:'done'},
-      {text:'Assessing risk level', state:'done'},
-      {text:'Constructing step sequence', state:'active'},
-    ],
-    phase:'planning', progress:0,
-  },
-  {
-    id:'approval', name:'Approval',
-    title:'The Pixie waits, attentive',
-    body:'The plan requires human approval before execution. The Pixie enters a calm, attentive state — present but unhurried. The risk indicator and step summary surface for the user.',
-    tasks:[
-      {text:'Plan ready: 6 steps, medium risk', state:'done'},
-      {text:'Requires approval before execution', state:'active'},
-      {text:'Waiting for human confirmation', state:''},
-    ],
-    phase:'review', progress:0,
-  },
-  {
-    id:'executing', name:'Execution',
-    title:'Energy peaks — progress ring fills',
-    body:'Approval granted. The agent pipeline activates. Six specialized agents begin their work in coordinated sequence. The Pixie\'s progress ring expands frame by frame as work completes.',
-    tasks:[
-      {text:'analyze_image — scene detection running', state:'active'},
-      {text:'transcribe_audio — audio processing', state:'active'},
-      {text:'generate_caption — AI captioning', state:''},
-      {text:'extract_entities — NER extraction', state:''},
-      {text:'generate_output — trailer assembly', state:''},
-    ],
-    phase:'executing', progress:62, autoProgress: true,
-  },
-  {
-    id:'monitoring', name:'Monitoring',
-    title:'Watching the work land',
-    body:'Individual steps complete. Files are produced. The Pixie\'s energy holds steady — it knows more work is coming. Progress updates flow from the Celery task queue through the WebSocket to the canvas.',
-    tasks:[
-      {text:'Scene analysis complete', state:'done'},
-      {text:'Audio transcription complete', state:'done'},
-      {text:'Captions generated — 47 segments', state:'done'},
-      {text:'Entity extraction complete', state:'done'},
-      {text:'Assembling final output...', state:'active'},
-    ],
-    phase:'executing', progress:88, autoProgress: false,
-  },
-  {
-    id:'completion', name:'Completion',
-    title:'The Pixie celebrates — then rests',
-    body:'All steps completed. The Pixie bursts with energy for 2.2 seconds (celebrating temperament), then cools back to ambient. The achievement echo is minted and joins the permanent orbit — visible every future session.',
-    tasks:[
-      {text:'Documentary trailer produced', state:'done'},
-      {text:'ACHIEVEMENT_ARTIFACT minted', state:'done'},
-      {text:'Echo added to permanent orbit', state:'done'},
-      {text:'Session complete', state:'done'},
-    ],
-    phase:'completed', progress:100,
-  },
-];
-
-let currentStageIdx = -1;
-let autoPlayInterval = null;
-let autoPlaying = false;
-let wfProgress = 0;
-let wfProgressInterval = null;
-
-function selectStage(idx) {
-  const stage = WORKFLOW_STAGES[idx];
-  currentStageIdx = idx;
-
-  document.querySelectorAll('.wf-stage').forEach((el, i) => {
-    el.classList.remove('wf-active','wf-done');
-    if (i < idx) el.classList.add('wf-done');
-    if (i === idx) el.classList.add('wf-active');
+  document.getElementById('section-nav').addEventListener('click', function (e) {
+    var btn = e.target.closest('.step-pill');
+    if (!btn) return;
+    var sec = btn.dataset.sec;
+    document.querySelectorAll('.step-pill').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    btn.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    switchSection(sec);
   });
 
-  document.getElementById('wfd-title').textContent = stage.title;
-  document.getElementById('wfd-body').textContent = stage.body;
+  /* ── Workflow lifecycle demo ──────────────────────────────────── */
+  var WORKFLOW_STAGES = [
+    {
+      id: 'planning', name: 'Planning',
+      title: 'The Pixie becomes attentive',
+      body: 'The agent receives the goal and begins constructing a WorkflowPlan. Risk level is assessed. Steps are sequenced. The Pixie\'s animation energy rises — particles accelerate, rings pulse faster.',
+      tasks: [
+        { text: 'Goal received: "Generate a documentary trailer"', state: 'done' },
+        { text: 'Analyzing available tools', state: 'done' },
+        { text: 'Assessing risk level', state: 'done' },
+        { text: 'Constructing step sequence', state: 'active' },
+      ],
+      phase: 'planning', progress: 0,
+    },
+    {
+      id: 'approval', name: 'Approval',
+      title: 'The Pixie waits, attentive',
+      body: 'The plan requires human approval before execution. The Pixie enters a calm, attentive state — present but unhurried. The risk indicator and step summary surface for the user.',
+      tasks: [
+        { text: 'Plan ready: 6 steps, medium risk', state: 'done' },
+        { text: 'Requires approval before execution', state: 'active' },
+        { text: 'Waiting for human confirmation', state: '' },
+      ],
+      phase: 'review', progress: 0,
+    },
+    {
+      id: 'executing', name: 'Execution',
+      title: 'Energy peaks — progress ring fills',
+      body: 'Approval granted. The agent pipeline activates. Six specialized agents begin their work in coordinated sequence. The Pixie\'s progress ring expands frame by frame as work completes.',
+      tasks: [
+        { text: 'analyze_image — scene detection running', state: 'active' },
+        { text: 'transcribe_audio — audio processing', state: 'active' },
+        { text: 'generate_caption — AI captioning', state: '' },
+        { text: 'extract_entities — NER extraction', state: '' },
+        { text: 'generate_output — trailer assembly', state: '' },
+      ],
+      phase: 'executing', progress: 62, autoProgress: true,
+    },
+    {
+      id: 'monitoring', name: 'Monitoring',
+      title: 'Watching the work land',
+      body: 'Individual steps complete. Files are produced. The Pixie\'s energy holds steady — it knows more work is coming. Progress updates flow from the Celery task queue through the WebSocket to the canvas.',
+      tasks: [
+        { text: 'Scene analysis complete', state: 'done' },
+        { text: 'Audio transcription complete', state: 'done' },
+        { text: 'Captions generated — 47 segments', state: 'done' },
+        { text: 'Entity extraction complete', state: 'done' },
+        { text: 'Assembling final output...', state: 'active' },
+      ],
+      phase: 'executing', progress: 88, autoProgress: false,
+    },
+    {
+      id: 'completion', name: 'Completion',
+      title: 'The Pixie celebrates — then rests',
+      body: 'All steps completed. The Pixie bursts with energy for 2.2 seconds (celebrating temperament), then cools back to ambient. The achievement echo is minted and joins the permanent orbit — visible every future session.',
+      tasks: [
+        { text: 'Documentary trailer produced', state: 'done' },
+        { text: 'ACHIEVEMENT_ARTIFACT minted', state: 'done' },
+        { text: 'Echo added to permanent orbit', state: 'done' },
+        { text: 'Session complete', state: 'done' },
+      ],
+      phase: 'completed', progress: 100,
+    },
+  ];
 
-  const tasksEl = document.getElementById('wfd-tasks');
-  tasksEl.innerHTML = '';
-  stage.tasks.forEach(task => {
-    const el = document.createElement('div');
-    el.className = 'wf-task' + (task.state==='done'?' done':task.state==='active'?' active':'');
-    const icon = task.state==='done' ? 'ti-check' : task.state==='active' ? 'ti-loader-2' : 'ti-circle';
-    el.innerHTML = `<i class="ti ${icon} wf-task-icon" aria-hidden="true"></i><span>${task.text}</span>`;
-    tasksEl.appendChild(el);
-  });
+  var currentStageIdx = -1;
+  var autoPlayInterval = null;
+  var autoPlaying = false;
+  var STAGE_SWAP_MS = 180;
 
-  if (pWf) {
-    pWf.setPhase(stage.phase);
-    pWf.setProgress(stage.progress);
-  }
+  function paintStage(stage) {
+    document.getElementById('wfd-title').textContent = stage.title;
+    document.getElementById('wfd-body').textContent = stage.body;
 
-  document.getElementById('wf-phase-label').textContent = stage.phase;
+    var tasksEl = document.getElementById('wfd-tasks');
+    tasksEl.innerHTML = '';
+    stage.tasks.forEach(function (task) {
+      var el = document.createElement('div');
+      el.className = 'wf-task' + (task.state === 'done' ? ' done' : task.state === 'active' ? ' active' : '');
+      var icon = task.state === 'done' ? 'ti-check' : task.state === 'active' ? 'ti-loader-2' : 'ti-circle';
+      el.innerHTML = '<i class="ti ' + icon + ' wf-task-icon" aria-hidden="true"></i><span></span>';
+      el.querySelector('span').textContent = task.text;
+      tasksEl.appendChild(el);
+    });
 
-  const progOuter = document.getElementById('wf-progress-outer');
-  const progInner = document.getElementById('wf-progress-inner');
-  if (stage.phase === 'executing') {
-    progOuter.style.display = 'block';
-    progInner.style.width = Math.round(stage.progress) + '%';
-  } else {
-    progOuter.style.display = 'none';
-  }
+    if (pWf) {
+      pWf.setPhase(stage.phase);
+      pWf.setProgress(stage.progress);
+    }
 
-  const progEl = document.getElementById('wfd-prog');
-  const progFill = document.getElementById('wfd-prog-fill');
-  if (stage.progress > 0) {
-    progEl.style.display = 'block';
-    progFill.style.width = Math.round(stage.progress) + '%';
-  } else {
-    progEl.style.display = 'none';
-  }
+    document.getElementById('wf-phase-label').textContent = stage.phase;
 
-  if (stage.id==='completion' && pWf) {
-    pWf.setEchoes([{color:'#38BDF8',resonance:.9,createdAt:Date.now()}]);
-  } else if (pWf) {
-    pWf.setEchoes([]);
-  }
-}
-
-function toggleAutoPlay() {
-  autoPlaying = !autoPlaying;
-  const icon = document.getElementById('wf-play-icon');
-  const label = document.getElementById('wf-auto-label');
-  if (autoPlaying) {
-    icon.className = 'ti ti-player-pause';
-    label.textContent = 'Pause demo';
-    let si = 0;
-    selectStage(si);
-    autoPlayInterval = setInterval(() => {
-      si++;
-      if (si >= WORKFLOW_STAGES.length) {
-        si = 0;
-        document.querySelectorAll('.wf-stage').forEach(el => el.classList.remove('wf-active','wf-done'));
-      }
-      selectStage(si);
-    }, 2800);
-  } else {
-    icon.className = 'ti ti-player-play';
-    label.textContent = 'Run full demo';
-    if (autoPlayInterval) { clearInterval(autoPlayInterval); autoPlayInterval = null; }
-  }
-}
-
-const agentColors = [
-  { bg:'rgba(99,102,241,.12)', border:'rgba(99,102,241,.4)', text:'#6366F1' },
-  { bg:'rgba(245,158,11,.12)', border:'rgba(245,158,11,.4)', text:'#B45309' },
-  { bg:'rgba(239,68,68,.12)',  border:'rgba(239,68,68,.4)',  text:'#991B1B' },
-  { bg:'rgba(20,184,166,.12)', border:'rgba(20,184,166,.4)', text:'#0F766E' },
-  { bg:'rgba(139,92,246,.12)', border:'rgba(139,92,246,.4)', text:'#6D28D9' },
-  { bg:'rgba(59,130,246,.12)', border:'rgba(59,130,246,.4)', text:'#1D4ED8' },
-];
-
-agentColors.forEach((c, i) => {
-  const el = document.getElementById('ag-'+i);
-  if (el) {
-    el.style.background = c.bg;
-    el.style.borderColor = c.border;
-    el.querySelector('.agent-node-name').style.color = c.text;
-    el.querySelector('.agent-node-status').style.color = c.text;
-  }
-});
-
-let agentPulseIdx = 0;
-setInterval(() => {
-  agentColors.forEach((_,i) => {
-    const el = document.getElementById('ag-'+i);
-    if (!el) return;
-    const c = agentColors[i];
-    if (i === agentPulseIdx) {
-      el.style.background = c.bg.replace('.12', '.28');
-      el.style.borderColor = c.border.replace('.4', '.9');
+    var progOuter = document.getElementById('wf-progress-outer');
+    var progInner = document.getElementById('wf-progress-inner');
+    if (stage.phase === 'executing') {
+      progOuter.style.display = 'block';
+      progInner.style.width = Math.round(stage.progress) + '%';
     } else {
+      progOuter.style.display = 'none';
+    }
+
+    var progEl = document.getElementById('wfd-prog');
+    var progFill = document.getElementById('wfd-prog-fill');
+    if (stage.progress > 0) {
+      progEl.style.display = 'block';
+      progFill.style.width = Math.round(stage.progress) + '%';
+    } else {
+      progEl.style.display = 'none';
+    }
+
+    if (stage.id === 'completion' && pWf) {
+      pWf.setEchoes([{ color: '#38BDF8', resonance: .9, createdAt: Date.now() }]);
+    } else if (pWf) {
+      pWf.setEchoes([]);
+    }
+  }
+
+  function selectStage(idx) {
+    var stage = WORKFLOW_STAGES[idx];
+    if (!stage) return;
+    currentStageIdx = idx;
+
+    document.querySelectorAll('.wf-stage').forEach(function (el, i) {
+      el.classList.remove('wf-active', 'wf-done');
+      if (i < idx) el.classList.add('wf-done');
+      if (i === idx) el.classList.add('wf-active');
+    });
+
+    var detail = document.getElementById('wf-detail');
+    if (prefersReducedMotion) {
+      paintStage(stage);
+      return;
+    }
+    detail.classList.add('pm-swap');
+    setTimeout(function () {
+      paintStage(stage);
+      requestAnimationFrame(function () { detail.classList.remove('pm-swap'); });
+    }, STAGE_SWAP_MS);
+  }
+
+  function toggleAutoPlay() {
+    autoPlaying = !autoPlaying;
+    var icon = document.getElementById('wf-play-icon');
+    var label = document.getElementById('wf-auto-label');
+    if (autoPlaying) {
+      icon.className = 'ti ti-player-pause';
+      label.textContent = 'Pause demo';
+      var si = 0;
+      selectStage(si);
+      autoPlayInterval = setInterval(function () {
+        si++;
+        if (si >= WORKFLOW_STAGES.length) {
+          si = 0;
+          document.querySelectorAll('.wf-stage').forEach(function (el) { el.classList.remove('wf-active', 'wf-done'); });
+        }
+        selectStage(si);
+      }, 2800);
+    } else {
+      icon.className = 'ti ti-player-play';
+      label.textContent = 'Run full demo';
+      if (autoPlayInterval) { clearInterval(autoPlayInterval); autoPlayInterval = null; }
+    }
+  }
+
+  /* ── Agent constellation pulse ──────────────────────────────────── */
+  var agentColors = [
+    { bg: 'rgba(99,102,241,.12)', border: 'rgba(99,102,241,.4)', text: '#6366F1' },
+    { bg: 'rgba(245,158,11,.12)', border: 'rgba(245,158,11,.4)', text: '#B45309' },
+    { bg: 'rgba(239,68,68,.12)', border: 'rgba(239,68,68,.4)', text: '#991B1B' },
+    { bg: 'rgba(20,184,166,.12)', border: 'rgba(20,184,166,.4)', text: '#0F766E' },
+    { bg: 'rgba(139,92,246,.12)', border: 'rgba(139,92,246,.4)', text: '#6D28D9' },
+    { bg: 'rgba(59,130,246,.12)', border: 'rgba(59,130,246,.4)', text: '#1D4ED8' },
+  ];
+
+  agentColors.forEach(function (c, i) {
+    var el = document.getElementById('ag-' + i);
+    if (el) {
       el.style.background = c.bg;
       el.style.borderColor = c.border;
+      el.querySelector('.agent-node-name').style.color = c.text;
+      el.querySelector('.agent-node-status').style.color = c.text;
     }
   });
-  agentPulseIdx = (agentPulseIdx + 1) % 6;
-}, 700);
 
-document.getElementById('section-nav').addEventListener('click', function(e) {
-  const btn = e.target.closest('.step-pill');
-  if (!btn) return;
-  const sec = btn.dataset.sec;
+  if (!prefersReducedMotion) {
+    var agentPulseIdx = 0;
+    setInterval(function () {
+      agentColors.forEach(function (_, i) {
+        var el = document.getElementById('ag-' + i);
+        if (!el) return;
+        var c = agentColors[i];
+        if (i === agentPulseIdx) {
+          el.style.background = c.bg.replace('.12', '.28');
+          el.style.borderColor = c.border.replace('.4', '.9');
+        } else {
+          el.style.background = c.bg;
+          el.style.borderColor = c.border;
+        }
+      });
+      agentPulseIdx = (agentPulseIdx + 1) % 6;
+    }, 700);
+  }
 
-  document.querySelectorAll('.step-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  /* ── Scroll reveal ────────────────────────────────────────────────
+     .pm-reveal elements fade/lift in as they enter view, staggered by
+     their --i custom property. Resolves immediately under reduced
+     motion or if IntersectionObserver isn't available, rather than
+     leaving content permanently at opacity:0. ──────────────────── */
+  var revealTargets = document.querySelectorAll('.pm-reveal');
+  if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+    revealTargets.forEach(function (el) { el.classList.add('pm-visible'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('pm-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    revealTargets.forEach(function (el) { io.observe(el); });
+  }
 
-  ['intro','workflow','tiers','agents','reputation','market'].forEach(id => {
-    const el = document.getElementById('sec-'+id);
-    if (el) el.style.display = id===sec ? '' : 'none';
-  });
-});
+  /* ── Public surface (used by inline onclick handlers above) ─────── */
+  window.MAIEPixieModule = {
+    selectStage: selectStage,
+    toggleAutoPlay: toggleAutoPlay,
+  };
 
 })();
 </script>
