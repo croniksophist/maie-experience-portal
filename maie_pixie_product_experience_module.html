@@ -34,43 +34,81 @@
 * { box-sizing: border-box; }
 
 .pm {
-  font-family: var(--font-sans);
-  color: var(--text-primary);
+  font-family: var(--pm-font-sans);
+  color: var(--pm-text-primary);
   max-width: 1180px;
   margin: 0 auto;
+  /* Anchors the dark canvas under the transparent card overlays below —
+     without it the browser's white default shows through wherever a
+     .pm-section doesn't set its own background (most of them don't;
+     they rely on --pm-surface-* tints over a dark page underneath). */
+  background: var(--pm-bg);
   /* Lets every rule below key off the module's own rendered width
      rather than the page viewport — the module stays fluid whether
      it's dropped into a full page or a narrow side rail. */
   container-type: inline-size;
   container-name: pm;
 
-  /* Fallback-aliased tokens: the module still reads var(--text-primary)
-     etc. everywhere (so it keeps inheriting the live portal theme), but
-     if it's ever previewed standalone before the theme stylesheet loads,
-     these keep it from rendering blank/invisible. */
-  --pm-text-primary:   var(--text-primary, #f1ede8);
-  --pm-text-secondary: var(--text-secondary, rgba(241,237,232,0.66));
-  --pm-text-muted:     var(--text-muted, rgba(241,237,232,0.42));
-  --pm-border:         var(--border, rgba(255,255,255,0.08));
-  --pm-border-strong:  var(--border-strong, rgba(255,255,255,0.18));
-  --pm-surface-0:      var(--surface-0, rgba(255,255,255,0.02));
-  --pm-surface-1:      var(--surface-1, rgba(255,255,255,0.035));
-  --pm-surface-2:      var(--surface-2, rgba(255,255,255,0.055));
-  --pm-fill-accent:    var(--fill-accent, #A855F7);
-  --pm-fill-success:   var(--fill-success, #22C55E);
+  /* This module owns its own theme, unconditionally — same call made
+     on the dashboard overview and companion gallery files, for the
+     same reason: every one of these was written against host tokens
+     (--text-primary, --surface-1, --bg-accent, --border-accent,
+     --font-sans, --font-voice, and — only here, same as the tier cards
+     on the companion file — the completely undefined --bg-pro/
+     --border-pro/--text-pro/--bg-success/--border-success/
+     --text-success) that don't exist anywhere in the real global.css.
+     Locked to --pm-* directly rather than chained: there's no real
+     host to chain to, and this is presentation collateral, not an
+     in-app fragment. */
+  --pm-bg:             #0b0b10;
+  --pm-text-primary:   #f1ede8;
+  --pm-text-secondary: rgba(241,237,232,0.66);
+  --pm-text-muted:     rgba(241,237,232,0.42);
+  --pm-border:         rgba(255,255,255,0.08);
+  --pm-border-strong:  rgba(255,255,255,0.18);
+  --pm-surface-0:      rgba(255,255,255,0.02);
+  --pm-surface-1:      rgba(255,255,255,0.035);
+  --pm-surface-2:      rgba(255,255,255,0.055);
+  --pm-fill-accent:    #A855F7;
+  --pm-fill-success:   #22C55E;
+  --pm-font-sans:      'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --pm-font-voice:     'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Tier-card accents — same semantics and same values as the
+     companion gallery's Three-Tier Architecture cards, so the two
+     read as one system rather than two that happen to agree by
+     coincidence. Tier 1 (UserIdentity, permanent) = blue. Tier 2
+     (Pixie Companion, expressive) = purple, matches the brand tag
+     color. Tier 3 (Runtime intelligence, live) = green. */
+  --pm-bg-pro:         rgba(56,189,248,0.08);
+  --pm-border-pro:     rgba(56,189,248,0.28);
+  --pm-text-pro:       #7dd3fc;
+  --pm-bg-accent:      rgba(168,85,247,0.10);
+  --pm-border-accent:  rgba(168,85,247,0.35);
+  --pm-text-accent:    #c084fc;
+  --pm-bg-success:     rgba(34,197,94,0.08);
+  --pm-border-success: rgba(34,197,94,0.28);
+  --pm-text-success:   #4ade80;
 
   --pm-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
 .pm * { box-sizing: border-box; }
+
 
 .pm-section {
   border-radius: 16px;
   padding: 1.5rem;
   padding: clamp(1.15rem, 4.5cqi, 2rem);
   margin-bottom: 1.5rem;
-  border: 0.5px solid var(--border, var(--pm-border));
-  background: var(--surface-1, var(--pm-surface-1));
+  border: 0.5px solid var(--pm-border);
+  background: var(--pm-surface-1);
   position: relative;
   overflow: hidden;
 }
@@ -84,7 +122,7 @@
   font-size: 10px;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--text-muted, var(--pm-text-muted));
+  color: var(--pm-text-muted);
   font-weight: 500;
   margin-bottom: .5rem;
 }
@@ -103,17 +141,17 @@
 
 .pm-body {
   font-size: 13px;
-  color: var(--text-secondary, var(--pm-text-secondary));
+  color: var(--pm-text-secondary);
   line-height: 1.65;
   margin: 0;
 }
 
 .pm-quote {
-  font-family: var(--font-voice);
+  font-family: var(--pm-font-voice);
   font-size: 15px;
   font-style: italic;
-  color: var(--text-secondary, var(--pm-text-secondary));
-  border-left: 2px solid var(--border-strong, var(--pm-border-strong));
+  color: var(--pm-text-secondary);
+  border-left: 2px solid var(--pm-border-strong);
   padding-left: 1rem;
   margin: 1rem 0 0;
   line-height: 1.6;
@@ -146,17 +184,17 @@
   font-size: 11px;
   padding: 4px 12px;
   border-radius: 20px;
-  border: 0.5px solid var(--border, var(--pm-border));
+  border: 0.5px solid var(--pm-border);
   background: transparent;
-  color: var(--text-muted, var(--pm-text-muted));
+  color: var(--pm-text-muted);
   cursor: pointer;
-  font-family: var(--font-sans);
+  font-family: var(--pm-font-sans);
   transition: border-color .15s, color .15s, background .15s;
   white-space: nowrap;
   scroll-snap-align: start;
 }
 
-.step-pill:hover { border-color: var(--border-strong, var(--pm-border-strong)); color: var(--text-secondary, var(--pm-text-secondary)); }
+.step-pill:hover { border-color: var(--pm-border-strong); color: var(--pm-text-secondary); }
 .step-pill.active { background: var(--bg-pro, rgba(194,78,78,0.14)); border-color: var(--border-pro, rgba(194,78,78,0.4)); color: var(--text-pro, #C24E4E); }
 
 /* ── Fluid grids — auto-fit/minmax replaces fixed column counts, so
@@ -166,8 +204,8 @@
 .pm-three { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 1rem; }
 
 .pm-card {
-  background: var(--surface-2, var(--pm-surface-2));
-  border: 0.5px solid var(--border, var(--pm-border));
+  background: var(--pm-surface-2);
+  border: 0.5px solid var(--pm-border);
   border-radius: 12px;
   padding: .875rem 1rem;
 }
@@ -177,8 +215,8 @@
   border-color: rgba(255,255,255,0.08);
 }
 
-.pm-card-label { font-size: 11px; color: var(--text-muted, var(--pm-text-muted)); margin-bottom: .25rem; font-weight: 500; }
-.pm-card-value { font-size: 14px; font-weight: 500; color: var(--text-primary, var(--pm-text-primary)); }
+.pm-card-label { font-size: 11px; color: var(--pm-text-muted); margin-bottom: .25rem; font-weight: 500; }
+.pm-card-value { font-size: 14px; font-weight: 500; color: var(--pm-text-primary); }
 .pm-dark .pm-card-label { color: #5a576e; }
 .pm-dark .pm-card-value { color: #dbd8f5; }
 
@@ -239,33 +277,33 @@ canvas { display: block; }
   gap: 10px;
   padding: .6rem .875rem;
   border-radius: 10px;
-  border: 0.5px solid var(--border, var(--pm-border));
+  border: 0.5px solid var(--pm-border);
   cursor: pointer;
   transition: border-color .15s, background .15s, transform .15s var(--pm-ease-cinematic);
-  background: var(--surface-2, var(--pm-surface-2));
+  background: var(--pm-surface-2);
 }
 
-.wf-stage:hover { border-color: var(--border-strong, var(--pm-border-strong)); }
-.wf-stage.wf-active { border-color: var(--border-accent); background: var(--bg-accent); transform: translateX(2px); }
-.wf-stage.wf-done { border-color: var(--border-success); background: var(--bg-success); }
+.wf-stage:hover { border-color: var(--pm-border-strong); }
+.wf-stage.wf-active { border-color: var(--pm-border-accent); background: var(--pm-bg-accent); transform: translateX(2px); }
+.wf-stage.wf-done { border-color: var(--pm-border-success); background: var(--pm-bg-success); }
 
 .wf-stage-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--border-strong, var(--pm-border-strong)); flex-shrink: 0;
+  background: var(--pm-border-strong); flex-shrink: 0;
   transition: background .2s;
 }
-.wf-stage.wf-active .wf-stage-dot { background: var(--fill-accent, var(--pm-fill-accent)); }
-.wf-stage.wf-done .wf-stage-dot { background: var(--fill-success, var(--pm-fill-success)); }
+.wf-stage.wf-active .wf-stage-dot { background: var(--pm-fill-accent); }
+.wf-stage.wf-done .wf-stage-dot { background: var(--pm-fill-success); }
 
-.wf-stage-name { font-size: 12px; font-weight: 500; color: var(--text-secondary, var(--pm-text-secondary)); }
-.wf-stage.wf-active .wf-stage-name { color: var(--text-accent); }
-.wf-stage.wf-done .wf-stage-name { color: var(--text-success); }
+.wf-stage-name { font-size: 12px; font-weight: 500; color: var(--pm-text-secondary); }
+.wf-stage.wf-active .wf-stage-name { color: var(--pm-text-accent); }
+.wf-stage.wf-done .wf-stage-name { color: var(--pm-text-success); }
 
-.wf-connector { width: 1px; height: 12px; background: var(--border, var(--pm-border)); margin: 0 auto; }
+.wf-connector { width: 1px; height: 12px; background: var(--pm-border); margin: 0 auto; }
 
 .wf-detail {
-  background: var(--surface-2, var(--pm-surface-2));
-  border: 0.5px solid var(--border, var(--pm-border));
+  background: var(--pm-surface-2);
+  border: 0.5px solid var(--pm-border);
   border-radius: 12px;
   padding: 1rem;
   min-height: 140px;
@@ -275,24 +313,24 @@ canvas { display: block; }
 .wf-detail.pm-swap { opacity: 0; transform: translateY(6px); filter: blur(3px); }
 
 .wf-detail-title { font-size: 14px; font-weight: 500; margin: 0 0 .3rem; }
-.wf-detail-body { font-size: 13px; color: var(--text-secondary, var(--pm-text-secondary)); line-height: 1.6; margin: 0 0 .75rem; }
+.wf-detail-body { font-size: 13px; color: var(--pm-text-secondary); line-height: 1.6; margin: 0 0 .75rem; }
 
 .wf-tasks { display: flex; flex-direction: column; gap: 5px; }
 .wf-task {
   display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: var(--text-secondary, var(--pm-text-secondary));
+  font-size: 12px; color: var(--pm-text-secondary);
 }
 .wf-task-icon { font-size: 14px; flex-shrink: 0; }
-.wf-task.done { color: var(--text-success); }
-.wf-task.active { color: var(--text-accent); }
+.wf-task.done { color: var(--pm-text-success); }
+.wf-task.active { color: var(--pm-text-accent); }
 
 .wf-progress-wrap {
-  height: 4px; background: var(--border, var(--pm-border)); border-radius: 2px;
+  height: 4px; background: var(--pm-border); border-radius: 2px;
   margin-top: .75rem; overflow: hidden;
 }
 .wf-progress-fill {
   height: 100%; border-radius: 2px;
-  background: var(--fill-accent, var(--pm-fill-accent));
+  background: var(--pm-fill-accent);
   transition: width .4s ease;
 }
 
@@ -300,15 +338,15 @@ canvas { display: block; }
   margin-top: .75rem;
   font-size: 12px; padding: 6px 14px;
   border-radius: var(--radius, 8px);
-  border: 0.5px solid var(--border-strong, var(--pm-border-strong));
+  border: 0.5px solid var(--pm-border-strong);
   background: transparent;
-  color: var(--text-primary, var(--pm-text-primary));
+  color: var(--pm-text-primary);
   cursor: pointer;
-  font-family: var(--font-sans);
+  font-family: var(--pm-font-sans);
   display: inline-flex; align-items: center; gap: 6px;
   transition: background .12s;
 }
-.wf-auto-btn:hover { background: var(--surface-1, var(--pm-surface-1)); }
+.wf-auto-btn:hover { background: var(--pm-surface-1); }
 
 .agent-grid {
   display: grid;
@@ -335,16 +373,16 @@ canvas { display: block; }
   flex-wrap: wrap;
   padding: .6rem .875rem;
   border-radius: 10px;
-  border: 0.5px solid var(--border, var(--pm-border));
-  background: var(--surface-2, var(--pm-surface-2));
+  border: 0.5px solid var(--pm-border);
+  background: var(--pm-surface-2);
   transition: border-color .2s;
 }
 .echo-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .echo-label { font-size: 13px; font-weight: 500; flex: 1 1 160px; }
-.echo-meta { font-size: 11px; color: var(--text-muted, var(--pm-text-muted)); white-space: nowrap; }
+.echo-meta { font-size: 11px; color: var(--pm-text-muted); white-space: nowrap; }
 .echo-resonance {
   height: 4px; width: 60px; border-radius: 2px;
-  background: var(--border, var(--pm-border)); overflow: hidden;
+  background: var(--pm-border); overflow: hidden;
 }
 .echo-res-fill { height: 100%; border-radius: 2px; }
 
@@ -356,12 +394,12 @@ canvas { display: block; }
   display: flex; align-items: center; gap: 10px;
   padding: .75rem 1rem;
   border-radius: 10px;
-  border: 0.5px solid var(--border, var(--pm-border));
-  background: var(--surface-2, var(--pm-surface-2));
+  border: 0.5px solid var(--pm-border);
+  background: var(--pm-surface-2);
 }
-.market-icon { font-size: 20px; flex-shrink: 0; color: var(--text-secondary, var(--pm-text-secondary)); }
+.market-icon { font-size: 20px; flex-shrink: 0; color: var(--pm-text-secondary); }
 .market-name { font-size: 13px; font-weight: 500; }
-.market-desc { font-size: 11px; color: var(--text-muted, var(--pm-text-muted)); }
+.market-desc { font-size: 11px; color: var(--pm-text-muted); }
 
 .tier-visual {
   display: flex; flex-direction: column; gap: 0;
@@ -383,7 +421,7 @@ canvas { display: block; }
   border: 0.5px solid; font-family: var(--font-mono);
 }
 
-.pm-divider { height: 0.5px; background: var(--border, var(--pm-border)); margin: 1.5rem 0; }
+.pm-divider { height: 0.5px; background: var(--pm-border); margin: 1.5rem 0; }
 
 /* ── Cinematic section swap ──────────────────────────────────────
    Replaces the old instant display:none/'' toggle. The outgoing
@@ -491,11 +529,11 @@ canvas { display: block; }
     <div class="pm-two">
       <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">Not a chatbot avatar</div>
-        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--text-secondary);">It does not represent a conversational agent. It represents the user's entire MAIE collaboration — their identity, their work, their history.</div>
+        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--pm-text-secondary);">It does not represent a conversational agent. It represents the user's entire MAIE collaboration — their identity, their work, their history.</div>
       </div>
       <div class="pm-card pm-reveal" style="--i:1;">
         <div class="pm-card-label">Not a mascot</div>
-        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--text-secondary);">The Pixie is a real-time data visualization. Every animation, every echo, every particle response encodes live information from the agent pipeline.</div>
+        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--pm-text-secondary);">The Pixie is a real-time data visualization. Every animation, every echo, every particle response encodes live information from the agent pipeline.</div>
       </div>
     </div>
     <div class="pm-divider"></div>
@@ -503,15 +541,15 @@ canvas { display: block; }
     <div class="pm-three">
       <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">A workflow mirror</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Energy, animation speed, and ring behavior change in real time as agent plans move through planning → execution → completion.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Energy, animation speed, and ring behavior change in real time as agent plans move through planning → execution → completion.</div>
       </div>
       <div class="pm-card pm-reveal" style="--i:1;">
         <div class="pm-card-label">A reputation record</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Achievement echoes orbit the canvas permanently. The longer a creator works on MAIE, the richer their Pixie's constellation becomes.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Achievement echoes orbit the canvas permanently. The longer a creator works on MAIE, the richer their Pixie's constellation becomes.</div>
       </div>
       <div class="pm-card pm-reveal" style="--i:2;">
         <div class="pm-card-label">A personal identity</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Archetype, theme, name, and marketplace skins make every Pixie distinct. No two users see the same companion.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Archetype, theme, name, and marketplace skins make every Pixie distinct. No two users see the same companion.</div>
       </div>
     </div>
   </div>
@@ -535,9 +573,9 @@ canvas { display: block; }
         <div class="pm-orb-wrap pm-orb--workflow" style="max-width:104px;">
           <canvas id="c-wf" class="pm-orb pm-orb--workflow" width="128" height="128" aria-label="Pixie reflecting workflow phase" role="img"></canvas>
         </div>
-        <div id="wf-phase-label" style="font-size:11px;color:var(--text-muted);margin-top:4px;text-align:center;">idle</div>
-        <div id="wf-progress-outer" style="width:90px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;display:none;">
-          <div id="wf-progress-inner" style="height:100%;background:var(--fill-accent);border-radius:2px;width:0%;transition:width .3s;"></div>
+        <div id="wf-phase-label" style="font-size:11px;color:var(--pm-text-muted);margin-top:4px;text-align:center;">idle</div>
+        <div id="wf-progress-outer" style="width:90px;height:3px;background:var(--pm-border);border-radius:2px;overflow:hidden;margin-top:4px;display:none;">
+          <div id="wf-progress-inner" style="height:100%;background:var(--pm-fill-accent);border-radius:2px;width:0%;transition:width .3s;"></div>
         </div>
       </div>
 
@@ -589,36 +627,36 @@ canvas { display: block; }
     <p class="pm-body">The architecture separates permanence from expression. The innermost layer never changes. Everything outward can be customized, upgraded, or replaced — without touching what matters.</p>
 
     <div class="tier-visual">
-      <div class="tier-block pm-reveal" style="--i:0;background:var(--bg-pro);border:0.5px solid var(--border-pro);">
-        <div class="tier-num" style="color:var(--text-pro);">Tier 1 · permanent</div>
+      <div class="tier-block pm-reveal" style="--i:0;background:var(--pm-bg-pro);border:0.5px solid var(--pm-border-pro);">
+        <div class="tier-num" style="color:var(--pm-text-pro);">Tier 1 · permanent</div>
         <div class="tier-name">UserIdentity</div>
-        <div class="tier-desc" style="color:var(--text-secondary);">Immutable provenance. The glyph seed that stamps every asset the creator publishes. Changing archetype or theme never touches this layer. This is what other creators see when they encounter your work.</div>
+        <div class="tier-desc" style="color:var(--pm-text-secondary);">Immutable provenance. The glyph seed that stamps every asset the creator publishes. Changing archetype or theme never touches this layer. This is what other creators see when they encounter your work.</div>
         <div class="tier-attrs">
-          <span class="tier-attr" style="background:var(--bg-pro);border-color:var(--border-pro);color:var(--text-pro);">identity_id</span>
-          <span class="tier-attr" style="background:var(--bg-pro);border-color:var(--border-pro);color:var(--text-pro);">glyph seed</span>
-          <span class="tier-attr" style="background:var(--bg-pro);border-color:var(--border-pro);color:var(--text-pro);">provenance stamp</span>
+          <span class="tier-attr" style="background:var(--pm-bg-pro);border-color:var(--pm-border-pro);color:var(--pm-text-pro);">identity_id</span>
+          <span class="tier-attr" style="background:var(--pm-bg-pro);border-color:var(--pm-border-pro);color:var(--pm-text-pro);">glyph seed</span>
+          <span class="tier-attr" style="background:var(--pm-bg-pro);border-color:var(--pm-border-pro);color:var(--pm-text-pro);">provenance stamp</span>
         </div>
       </div>
-      <div class="tier-block pm-reveal" style="--i:1;background:var(--bg-accent);border:0.5px solid var(--border-accent);border-top:none;">
-        <div class="tier-num" style="color:var(--text-accent);">Tier 2 · expressive</div>
+      <div class="tier-block pm-reveal" style="--i:1;background:var(--pm-bg-accent);border:0.5px solid var(--pm-border-accent);border-top:none;">
+        <div class="tier-num" style="color:var(--pm-text-accent);">Tier 2 · expressive</div>
         <div class="tier-name">Pixie Companion</div>
-        <div class="tier-desc" style="color:var(--text-secondary);">Personality, appearance, and character. The archetype defines how the Pixie moves and what role it plays. Theme colors and marketplace skins layer on top. Fully replaceable — swapping archetype never affects creator provenance.</div>
+        <div class="tier-desc" style="color:var(--pm-text-secondary);">Personality, appearance, and character. The archetype defines how the Pixie moves and what role it plays. Theme colors and marketplace skins layer on top. Fully replaceable — swapping archetype never affects creator provenance.</div>
         <div class="tier-attrs">
-          <span class="tier-attr" style="background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);">archetype</span>
-          <span class="tier-attr" style="background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);">theme_id</span>
-          <span class="tier-attr" style="background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);">pixie_name</span>
-          <span class="tier-attr" style="background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);">preferences</span>
+          <span class="tier-attr" style="background:var(--pm-bg-accent);border-color:var(--pm-border-accent);color:var(--pm-text-accent);">archetype</span>
+          <span class="tier-attr" style="background:var(--pm-bg-accent);border-color:var(--pm-border-accent);color:var(--pm-text-accent);">theme_id</span>
+          <span class="tier-attr" style="background:var(--pm-bg-accent);border-color:var(--pm-border-accent);color:var(--pm-text-accent);">pixie_name</span>
+          <span class="tier-attr" style="background:var(--pm-bg-accent);border-color:var(--pm-border-accent);color:var(--pm-text-accent);">preferences</span>
         </div>
       </div>
-      <div class="tier-block pm-reveal" style="--i:2;background:var(--bg-success);border:0.5px solid var(--border-success);border-top:none;">
-        <div class="tier-num" style="color:var(--text-success);">Tier 3 · live</div>
+      <div class="tier-block pm-reveal" style="--i:2;background:var(--pm-bg-success);border:0.5px solid var(--pm-border-success);border-top:none;">
+        <div class="tier-num" style="color:var(--pm-text-success);">Tier 3 · live</div>
         <div class="tier-name">Runtime intelligence</div>
-        <div class="tier-desc" style="color:var(--text-secondary);">The Pixie's current emotional and operational state. Phase, mode, progress, and temperament are driven directly by the Agent Workflow Panel in real time. Never persisted — this layer lives only while the agent runs.</div>
+        <div class="tier-desc" style="color:var(--pm-text-secondary);">The Pixie's current emotional and operational state. Phase, mode, progress, and temperament are driven directly by the Agent Workflow Panel in real time. Never persisted — this layer lives only while the agent runs.</div>
         <div class="tier-attrs">
-          <span class="tier-attr" style="background:var(--bg-success);border-color:var(--border-success);color:var(--text-success);">phase</span>
-          <span class="tier-attr" style="background:var(--bg-success);border-color:var(--border-success);color:var(--text-success);">mode</span>
-          <span class="tier-attr" style="background:var(--bg-success);border-color:var(--border-success);color:var(--text-success);">progress %</span>
-          <span class="tier-attr" style="background:var(--bg-success);border-color:var(--border-success);color:var(--text-success);">temperament</span>
+          <span class="tier-attr" style="background:var(--pm-bg-success);border-color:var(--pm-border-success);color:var(--pm-text-success);">phase</span>
+          <span class="tier-attr" style="background:var(--pm-bg-success);border-color:var(--pm-border-success);color:var(--pm-text-success);">mode</span>
+          <span class="tier-attr" style="background:var(--pm-bg-success);border-color:var(--pm-border-success);color:var(--pm-text-success);">progress %</span>
+          <span class="tier-attr" style="background:var(--pm-bg-success);border-color:var(--pm-border-success);color:var(--pm-text-success);">temperament</span>
         </div>
       </div>
     </div>
@@ -634,7 +672,7 @@ canvas { display: block; }
     <div class="pm-row" style="align-items:flex-start;margin-top:1rem;">
       <div class="pm-orb-wrap pm-orb--agents" style="max-width:104px;">
         <canvas id="c-agents" class="pm-orb pm-orb--agents" width="128" height="128" aria-label="Pixie with multi-agent echoes" role="img"></canvas>
-        <div style="font-size:11px;color:var(--text-muted);text-align:center;">user's view</div>
+        <div style="font-size:11px;color:var(--pm-text-muted);text-align:center;">user's view</div>
       </div>
 
       <div class="agent-grid" style="flex:1;min-width:220px;">
@@ -671,7 +709,7 @@ canvas { display: block; }
       </div>
     </div>
 
-    <p class="pm-body" style="margin-top:1rem;">The AgentWorkflowPanel fires <code style="font-size:11px;background:var(--surface-0);padding:1px 5px;border-radius:3px;border:0.5px solid var(--border);">onPhaseChange</code> callbacks. The Pixie receives them and translates directly into canvas behavior — no additional wiring required.</p>
+    <p class="pm-body" style="margin-top:1rem;">The AgentWorkflowPanel fires <code style="font-size:11px;background:var(--pm-surface-0);padding:1px 5px;border-radius:3px;border:0.5px solid var(--pm-border);">onPhaseChange</code> callbacks. The Pixie receives them and translates directly into canvas behavior — no additional wiring required.</p>
   </div>
 </div>
 
@@ -686,50 +724,50 @@ canvas { display: block; }
         <div class="echo-dot" style="background:#38BDF8;"></div>
         <div style="flex:1 1 160px;">
           <div class="echo-label">Documentary trailer published</div>
-          <div style="font-size:11px;color:var(--text-muted);">ACHIEVEMENT_ARTIFACT · 2 days ago</div>
+          <div style="font-size:11px;color:var(--pm-text-muted);">ACHIEVEMENT_ARTIFACT · 2 days ago</div>
         </div>
         <div>
           <div class="echo-resonance"><div class="echo-res-fill" style="width:90%;background:#38BDF8;"></div></div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.9</div>
+          <div style="font-size:10px;color:var(--pm-text-muted);margin-top:2px;">resonance 0.9</div>
         </div>
       </div>
       <div class="echo-item pm-reveal" id="ech-1" style="--i:1;">
         <div class="echo-dot" style="background:#A855F7;"></div>
         <div style="flex:1 1 160px;">
           <div class="echo-label">First marketplace asset approved</div>
-          <div style="font-size:11px;color:var(--text-muted);">LEGACY_ECHO · 14 days ago</div>
+          <div style="font-size:11px;color:var(--pm-text-muted);">LEGACY_ECHO · 14 days ago</div>
         </div>
         <div>
           <div class="echo-resonance"><div class="echo-res-fill" style="width:75%;background:#A855F7;"></div></div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.75</div>
+          <div style="font-size:10px;color:var(--pm-text-muted);margin-top:2px;">resonance 0.75</div>
         </div>
       </div>
       <div class="echo-item pm-reveal" id="ech-2" style="--i:2;">
         <div class="echo-dot" style="background:#10B981;"></div>
         <div style="flex:1 1 160px;">
           <div class="echo-label">50 productions completed</div>
-          <div style="font-size:11px;color:var(--text-muted);">ACHIEVEMENT_ARTIFACT · 1 month ago</div>
+          <div style="font-size:11px;color:var(--pm-text-muted);">ACHIEVEMENT_ARTIFACT · 1 month ago</div>
         </div>
         <div>
           <div class="echo-resonance"><div class="echo-res-fill" style="width:60%;background:#10B981;"></div></div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.6</div>
+          <div style="font-size:10px;color:var(--pm-text-muted);margin-top:2px;">resonance 0.6</div>
         </div>
       </div>
       <div class="echo-item pm-reveal" id="ech-3" style="--i:3;">
         <div class="echo-dot" style="background:#F59E0B;"></div>
         <div style="flex:1 1 160px;">
           <div class="echo-label">Mentorship milestone reached</div>
-          <div style="font-size:11px;color:var(--text-muted);">LEGACY_ECHO · 3 months ago</div>
+          <div style="font-size:11px;color:var(--pm-text-muted);">LEGACY_ECHO · 3 months ago</div>
         </div>
         <div>
           <div class="echo-resonance"><div class="echo-res-fill" style="width:50%;background:#F59E0B;"></div></div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">resonance 0.5</div>
+          <div style="font-size:10px;color:var(--pm-text-muted);margin-top:2px;">resonance 0.5</div>
         </div>
       </div>
     </div>
 
-    <div style="margin-top:1rem;padding:.875rem;background:var(--surface-0);border-radius:10px;border:0.5px solid var(--border);">
-      <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
+    <div style="margin-top:1rem;padding:.875rem;background:var(--pm-surface-0);border-radius:10px;border:0.5px solid var(--pm-border);">
+      <div style="font-size:12px;color:var(--pm-text-secondary);line-height:1.6;">
         Fresher echoes pulse faster and orbit closer in. As months pass, each one drifts outward and slows — a quiet visual cue that this is history, not today's work. Higher resonance echoes are larger and brighter. The orbit tells the full story of a creator's MAIE career.
       </div>
     </div>
@@ -776,11 +814,11 @@ canvas { display: block; }
     <div class="pm-two" style="margin-top:1rem;">
       <div class="pm-card">
         <div class="pm-card-label">Asset ownership gate</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Every equippable asset is validated server-side before any DB write. Users can only equip items they own. The API returns 403 on unowned attempts — not a client-side check.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Every equippable asset is validated server-side before any DB write. Users can only equip items they own. The API returns 403 on unowned attempts — not a client-side check.</div>
       </div>
       <div class="pm-card">
         <div class="pm-card-label">Skin compositing</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.55;">Skin images fade in over ~40 frames, clipped to the user's chosen core shape. Procedural gradient layers render beneath, so the skin reads as texture rather than a flat overlay.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Skin images fade in over ~40 frames, clipped to the user's chosen core shape. Procedural gradient layers render beneath, so the skin reads as texture rather than a flat overlay.</div>
       </div>
     </div>
   </div>

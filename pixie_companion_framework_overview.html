@@ -160,9 +160,9 @@
     cursor: pointer;
     transition: background .12s, border-color .12s, color .12s;
   }
-  .pc-phase:hover { 
-    background: var(--pc-surface-1); 
-    border-color: var(--pc-border-strong); 
+  .pc-phase:hover {
+    background: var(--pc-surface-1);
+    border-color: var(--pc-border-strong);
   }
   .pc-phase.pc-active {
     background: var(--pc-bg-accent); border-color: var(--pc-border-accent);
@@ -188,20 +188,16 @@
   #live-pixie-canvas {
     display: block;
     /*
-      This canvas duplicates maie-pixie.js's renderer independently
-      rather than calling MAIE.makePixie() (kept separate because the
-      per-archetype animation modes — wave/pulse/neural/static — and
-      the neural particle-connection lines aren't in the shared
-      engine's API; migrating would mean extending that API first,
-      which is a real follow-up worth doing, not a drop-in swap).
-      Because it's a duplicate, it never inherited v2.1's "stage bigger
-      than performer" fix: the glow gradient's radius can reach ~90px
-      at peak "executing" energy against a 130px-diameter bitmap,
-      hard-clipping ~25px of falloff into a visible square edge. Fixed
-      the same way v2.1 did — bitmap (SZ/CX/CY in the script below) is
-      now 200px, giving the glow room to fade to fully transparent
-      before the edge, while this rule holds the *display* size at the
-      original 130px so the hero layout doesn't shift.
+      v2.2: migrated onto the shared MAIE.makePixie() engine — the
+      "per-archetype animation modes aren't in the shared API" gap that
+      previously justified a local duplicate renderer here is closed
+      (maie-pixie.js v2.2 added `animation`/`connReach`/`wobbleScale`/
+      `speedScale` specifically for this gallery's five archetypes).
+      The 200px-bitmap / 130px-display split below is unchanged and
+      still matters: it's the v2.1 "stage bigger than performer" fix
+      (performerScale turned down, glowReach turned up in the JS call),
+      giving the glow room to fall off before the bitmap edge instead
+      of hard-clipping.
     */
     width: 130px;
     height: 130px;
@@ -402,42 +398,40 @@
 
 </div>
 
+<script src="maie-pixie.js"></script>
 <script>
 (function() {
   /* ── DATA ─────────────────────────────────────── */
+  // These map directly onto MAIE.makePixie()'s options (v2.2 added
+  // `animation`, `connReach`, `wobbleScale`, `speedScale` specifically
+  // to absorb this gallery's five archetypes into the shared engine).
+  // performerScale/glowReach are shared across all five rather than
+  // per-archetype — they're about the canvas's own stage geometry
+  // (200px bitmap / 130px display, same "stage vs performer" fix used
+  // elsewhere), not about what makes an archetype feel distinct.
   const ARCHETYPES = [
-    { id:'archivist',   label:'Archivist',   role:'curator',  animation:'orbit',  shape:'circle',  density:'normal', rings:2, speed:1.0, wobble:0.8, conn:45, breathe:1.2 },
-    { id:'artisan',     label:'Artisan',     role:'creator',  animation:'wave',   shape:'diamond', density:'dense',  rings:2, speed:1.3, wobble:1.4, conn:55, breathe:1.8 },
-    { id:'navigator',   label:'Navigator',   role:'director', animation:'pulse',  shape:'shield',  density:'normal', rings:3, speed:0.9, wobble:1.0, conn:40, breathe:2.2 },
-    { id:'oracle',      label:'Oracle',      role:'analyst',  animation:'neural', shape:'hexagon', density:'dense',  rings:3, speed:0.7, wobble:1.8, conn:70, breathe:0.8 },
-    { id:'forgekeeper', label:'Forgekeeper', role:'builder',  animation:'static', shape:'hexagon', density:'sparse', rings:1, speed:0.3, wobble:0.4, conn:30, breathe:0.5 },
+    { id:'archivist',   label:'Archivist',   role:'curator',  animation:'orbit',  shape:'circle',  rings:2, particles:8,  speedScale:1.0, wobbleScale:1.0, breathe:1.2 },
+    { id:'artisan',     label:'Artisan',     role:'creator',  animation:'wave',   shape:'diamond', rings:2, particles:11, speedScale:1.3, wobbleScale:1.4, breathe:1.8 },
+    { id:'navigator',   label:'Navigator',   role:'director', animation:'pulse',  shape:'shield',  rings:3, particles:8,  speedScale:0.9, wobbleScale:1.0, breathe:2.2 },
+    { id:'oracle',      label:'Oracle',      role:'analyst',  animation:'neural', shape:'hexagon', rings:3, particles:11, speedScale:0.7, wobbleScale:1.8, breathe:0.8, connReach:0.54 },
+    { id:'forgekeeper', label:'Forgekeeper', role:'builder',  animation:'static', shape:'hexagon', rings:1, particles:5,  speedScale:0.3, wobbleScale:0.4, breathe:0.5 },
   ];
 
-  const THEMES = {
-    ember:    { core:'#A52A2A', ring:'#C24E4E', glow:'rgba(167,65,51,0.32)', particle:'#FFB400', accent:'#FF8C42' },
-    arctic:   { core:'#0369A1', ring:'#38BDF8', glow:'rgba(3,105,161,0.32)', particle:'#BAE6FD', accent:'#7DD3FC' },
-    prism:    { core:'#7E22CE', ring:'#A855F7', glow:'rgba(126,34,206,0.32)', particle:'#22D3EE', accent:'#D946EF' },
-    solar:    { core:'#B45309', ring:'#F59E0B', glow:'rgba(180,83,9,0.32)', particle:'#FDE68A', accent:'#FBBF24' },
-    void:     { core:'#1E293B', ring:'#64748B', glow:'rgba(30,41,59,0.32)', particle:'#F1F5F9', accent:'#94A3B8' },
-    neon:     { core:'#0D0D0D', ring:'#39FF14', glow:'rgba(57,255,20,0.22)', particle:'#39FF14', accent:'#00FFFF' },
-    rose:     { core:'#881337', ring:'#F43F5E', glow:'rgba(244,63,94,0.28)', particle:'#FCA5A5', accent:'#FB7185' },
-    forest:   { core:'#14532D', ring:'#22C55E', glow:'rgba(34,197,94,0.25)', particle:'#BBF7D0', accent:'#4ADE80' },
-    plasma:   { core:'#2E1065', ring:'#7C3AED', glow:'rgba(124,58,237,0.30)', particle:'#E879F9', accent:'#A855F7' },
-    gold:     { core:'#713F12', ring:'#EAB308', glow:'rgba(234,179,8,0.28)', particle:'#FEF08A', accent:'#FACC15' },
-    midnight: { core:'#0F172A', ring:'#334155', glow:'rgba(15,23,42,0.45)', particle:'#94A3B8', accent:'#38BDF8' },
-    copper:   { core:'#7C2D12', ring:'#EA580C', glow:'rgba(234,88,12,0.28)', particle:'#FED7AA', accent:'#FB923C' },
-    ice:      { core:'#E0F2FE', ring:'#BAE6FD', glow:'rgba(186,230,253,0.35)', particle:'#0369A1', accent:'#0EA5E9' },
-  };
+  // Simulated reputation echoes for the demo — resonance/createdAt map
+  // directly onto MAIE.makePixie()'s echo schema (maturity = age in
+  // days, capped at 1, so these read as "0.9/0.3/0.7 fully matured").
+  const REPUTATION_ECHOES = [
+    { color:'#38BDF8', resonance:0.9,  createdAt: Date.now() - 0.9 * 86400000 },
+    { color:'#A855F7', resonance:0.6,  createdAt: Date.now() - 0.3 * 86400000 },
+    { color:'#10B981', resonance:0.75, createdAt: Date.now() - 0.7 * 86400000 },
+  ];
 
   /* ── STATE ─────────────────────────────────────── */
   let currentArchetypeIdx = 0;
   let currentThemeId = 'prism';
   let currentPhase = 'idle';
   let progressVal = 0;
-  let animId = null;
-  let particles = [];
-  let t = 0;
-  let mouseX = 100, mouseY = 100;
+  let pixie = null;
 
   /* ── ARCH GRID ─────────────────────────────────── */
   const archColors = ['#8B5CF6','#F59E0B','#0EA5E9','#10B981','#F97316'];
@@ -458,14 +452,17 @@
       document.querySelectorAll('.pc-arch-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       currentArchetypeIdx = i;
-      initParticles();
+      rebuildPixie();
     });
     grid.appendChild(card);
   });
 
   /* ── THEME ROW ─────────────────────────────────── */
+  // Reads MAIE.THEMES directly rather than keeping a second local color
+  // list — one less place for the palette to drift out of sync.
   const themeRow = document.getElementById('theme-row');
-  Object.entries(THEMES).forEach(([id, th]) => {
+  const allThemes = (window.MAIE && window.MAIE.THEMES) ? window.MAIE.THEMES : {};
+  Object.entries(allThemes).forEach(([id, th]) => {
     const dot = document.createElement('div');
     dot.className = 'pc-theme-dot' + (id===currentThemeId?' on':'');
     dot.style.background = th.ring;
@@ -474,6 +471,7 @@
       document.querySelectorAll('.pc-theme-dot').forEach(d => d.classList.remove('on'));
       dot.classList.add('on');
       currentThemeId = id;
+      if (pixie) pixie.setTheme(id);
     });
     themeRow.appendChild(dot);
   });
@@ -486,6 +484,7 @@
     
     currentPhase = phase;
     progressVal = 0;
+    if (pixie) { pixie.setPhase(phase); pixie.setProgress(0); }
 
     // 1. Sync the Hero Buttons
     document.querySelectorAll('.pc-phase-btn').forEach(b => {
@@ -500,6 +499,7 @@
       let p = 0;
       const tick = setInterval(() => {
         p += 2; progressVal = Math.min(p, 100);
+        if (pixie) pixie.setProgress(progressVal);
         if (p >= 100) clearInterval(tick);
       }, 80);
     }
@@ -534,199 +534,41 @@
   // Initialize default state
   highlightPhase('idle');
 
-  /* ── CANVAS SETUP ─────────────────────────────── */
-  const canvas = document.getElementById('live-pixie-canvas');
-  const ctx = canvas.getContext('2d');
-  // SZ/CX/CY define the bitmap "stage" (200px, up from 130px) — bigger
-  // than the "performer" (core/particles/glow, whose absolute pixel
-  // sizes are unchanged below) so the glow gradient has room to fall
-  // off to transparent before the canvas edge, instead of hard-clipping.
-  // #live-pixie-canvas's CSS width/height hold the on-screen size at
-  // the original 130px, so this is invisible except as fixed clipping.
-  const SZ = 200, CX = 100, CY = 100;
-
-  canvas.addEventListener('mousemove', e => {
-    const r = canvas.getBoundingClientRect();
-    mouseX = e.clientX - r.left;
-    mouseY = e.clientY - r.top;
-  });
-  canvas.addEventListener('mouseleave', () => { mouseX = CX; mouseY = CY; });
-
-  function hexToRgb(hex) {
-    const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return r ? [parseInt(r[1],16), parseInt(r[2],16), parseInt(r[3],16)] : [200,200,200];
-  }
-
-  /* ── PARTICLES ─────────────────────────────────── */
-  function initParticles() {
+  /* ── PIXIE INSTANCE ──────────────────────────────
+     Was ~190 lines of hand-copied canvas/particle/glow code duplicating
+     maie-pixie.js. Now this gallery just calls the shared engine like
+     every other consumer — the whole point of that file being "single
+     source of truth." rebuildPixie() disposes and recreates the
+     instance on archetype change (shape/rings/animation aren't
+     mutable post-creation); theme changes use the cheaper
+     pixie.setTheme() instead since the palette alone doesn't require
+     tearing down the particle system. */
+  function rebuildPixie() {
+    if (pixie) pixie.stop();
     const arch = ARCHETYPES[currentArchetypeIdx];
-    const densityCount = arch.density === 'sparse' ? 5 : arch.density === 'dense' ? 11 : 8;
-    particles = [];
-    const ringCount = arch.rings;
-    for (let ri = 0; ri < ringCount; ri++) {
-      const baseR = 24 + ri * 12;
-      for (let pi = 0; pi < densityCount; pi++) {
-        particles.push({
-          angle: (pi / densityCount) * Math.PI * 2 + (ri * 0.5),
-          radius: baseR,
-          baseRadius: baseR,
-          speed: (0.008 + Math.random() * 0.006) * arch.speed * (ri === 0 ? 1.3 : 1),
-          size: 1.2 + Math.random() * 0.8,
-          opacity: 0.5 + Math.random() * 0.45,
-          hueShift: (Math.random() - 0.5) * 30,
-          phase: Math.random() * Math.PI * 2,
-          wobble: 0.5 + Math.random() * 1.5,
-        });
-      }
-    }
-  }
-  initParticles();
-
-  /* ── SHAPE PATH ─────────────────────────────────── */
-  function buildCorePath(shape, cx, cy, r) {
-    ctx.beginPath();
-    switch(shape) {
-      case 'hexagon':
-        for (let i=0;i<6;i++) {
-          const a=(i/6)*Math.PI*2-Math.PI/6;
-          const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
-          i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-        }
-        ctx.closePath(); break;
-      case 'diamond':
-        ctx.moveTo(cx,cy-r); ctx.lineTo(cx+r*0.8,cy);
-        ctx.lineTo(cx,cy+r); ctx.lineTo(cx-r*0.8,cy);
-        ctx.closePath(); break;
-      case 'shield':
-        ctx.moveTo(cx,cy-r);
-        ctx.quadraticCurveTo(cx+r,cy-r*0.6,cx+r,cy);
-        ctx.quadraticCurveTo(cx+r,cy+r*0.4,cx,cy+r);
-        ctx.quadraticCurveTo(cx-r,cy+r*0.4,cx-r,cy);
-        ctx.quadraticCurveTo(cx-r,cy-r*0.6,cx,cy-r);
-        ctx.closePath(); break;
-      default:
-        ctx.arc(cx,cy,r,0,Math.PI*2);
-    }
-  }
-
-  /* ── ANIMATE ────────────────────────────────────── */
-  function animate() {
-    t += 0.016;
-    const arch = ARCHETYPES[currentArchetypeIdx];
-    const theme = THEMES[currentThemeId] || THEMES.prism;
-
-    const phaseEn = currentPhase==='executing' ? 1.2+(progressVal/100)*0.8
-                  : currentPhase==='planning' ? 1.1
-                  : currentPhase==='completed' ? 1.3
-                  : currentPhase==='failed' ? 0.5
-                  : 0.85;
-    const modeEn = currentPhase==='executing'||currentPhase==='completed' ? 1.2
-                 : currentPhase==='idle' ? 0.8 : 1.0;
-
-    const dx = (mouseX - CX) * 0.04;
-    const dy = (mouseY - CY) * 0.04;
-    const nx = CX + dx, ny = CY + dy;
-
-    ctx.clearRect(0,0,SZ,SZ);
-
-    // Glow
-    const [cR,cG,cB] = hexToRgb(theme.ring);
-    const glowR = 28 + Math.sin(t*arch.breathe)*3 + phaseEn*5;
-    const grd = ctx.createRadialGradient(nx,ny,0,nx,ny,glowR*2.2);
-    grd.addColorStop(0, `rgba(${cR},${cG},${cB},${0.22*modeEn})`);
-    grd.addColorStop(0.5, `rgba(${cR},${cG},${cB},${0.08*modeEn})`);
-    grd.addColorStop(1, `rgba(${cR},${cG},${cB},0)`);
-    ctx.fillStyle = grd;
-    ctx.beginPath(); ctx.arc(nx,ny,glowR*2.2,0,Math.PI*2); ctx.fill();
-
-    // Core
-    const coreR = 11 + Math.sin(t*arch.breathe)*1.5*phaseEn;
-    const shape = arch.shape;
-    buildCorePath(shape, nx, ny, coreR);
-    const coreGrd = ctx.createRadialGradient(nx,ny,0,nx,ny,coreR);
-    coreGrd.addColorStop(0,`rgba(${cR},${cG},${cB},0.95)`);
-    coreGrd.addColorStop(0.6,`rgba(${cR},${cG},${cB},0.7)`);
-    coreGrd.addColorStop(1,`rgba(${cR},${cG},${cB},0.3)`);
-    ctx.fillStyle = coreGrd;
-    ctx.fill();
-
-    // Progress ring
-    if (currentPhase==='executing' && progressVal>0) {
-      const pr=coreR+14, sa=-Math.PI/2, ea=sa+(progressVal/100)*Math.PI*2;
-      ctx.strokeStyle=`rgba(${cR},${cG},${cB},0.5)`; ctx.lineWidth=1.5; ctx.lineCap='round';
-      ctx.beginPath(); ctx.arc(nx,ny,pr,sa,ea); ctx.stroke();
-      ctx.strokeStyle=`rgba(255,255,255,0.05)`; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.arc(nx,ny,pr,0,Math.PI*2); ctx.stroke();
-    }
-
-    // Particles
-    const animation = arch.animation;
-    particles.forEach((p,i) => {
-      const wF = arch.wobble;
-      if (animation==='static') { p.angle += p.speed*0.1; }
-      else if (animation==='wave') { p.angle+=p.speed; p.radius=p.baseRadius+Math.sin(t*1.5+p.phase)*7+phaseEn*4; }
-      else if (animation==='pulse') { p.angle+=p.speed; p.radius=p.baseRadius+Math.sin(t*2.0)*5+phaseEn*6; }
-      else if (animation==='neural') { p.angle+=p.speed*0.6; p.radius=p.baseRadius+Math.sin(t*p.wobble*wF+p.phase)*7+phaseEn*10; }
-      else { p.angle+=p.speed*(1+phaseEn*0.5); const wo=Math.sin(t*p.wobble*wF+p.phase)*4; p.radius+=(p.baseRadius+wo-p.radius)*0.05; }
-
-      const px=nx+Math.cos(p.angle)*p.radius, py=ny+Math.sin(p.angle)*p.radius;
-      ctx.save(); ctx.globalAlpha=p.opacity*(0.6+phaseEn*0.3)*modeEn;
-      const pG = ctx.createRadialGradient(px,py,0,px,py,p.size*2.5);
-      pG.addColorStop(0,`rgba(${cR},${cG},${cB},0.9)`);
-      pG.addColorStop(1,`rgba(${cR},${cG},${cB},0)`);
-      ctx.fillStyle=pG; ctx.beginPath(); ctx.arc(px,py,p.size*2.5,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle=`rgba(${cR},${cG},${cB},0.95)`;
-      ctx.beginPath(); ctx.arc(px,py,p.size*0.5,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      if (animation==='neural' && i%3===0) {
-        const next = particles[(i+1)%particles.length];
-        const npx=nx+Math.cos(next.angle)*next.radius, npy=ny+Math.sin(next.angle)*next.radius;
-        const lD=Math.sqrt((px-npx)**2+(py-npy)**2);
-        if (lD<arch.conn) {
-          ctx.strokeStyle=`rgba(${cR},${cG},${cB},${(1-lD/arch.conn)*0.12})`;
-          ctx.lineWidth=0.4; ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(npx,npy); ctx.stroke();
-        }
-      }
+    if (!window.MAIE || !window.MAIE.makePixie) return;
+    pixie = window.MAIE.makePixie('live-pixie-canvas', currentThemeId, {
+      rings: arch.rings,
+      particles: arch.particles,
+      shape: arch.shape,
+      animation: arch.animation,
+      breathe: arch.breathe,
+      speedScale: arch.speedScale,
+      wobbleScale: arch.wobbleScale,
+      connReach: arch.connReach || 0.35,
+      // performerScale/glowReach are about this canvas's own stage
+      // geometry (200px bitmap behind a 130px display box via CSS —
+      // the v2.1 "stage vs performer" pattern), not about archetype
+      // identity, so they're shared across all five rather than
+      // per-archetype.
+      performerScale: 0.55,
+      glowReach: 2.6,
+      echoes: REPUTATION_ECHOES,
     });
-
-    // Rings
-    const ringCount = arch.rings;
-    const rPhase = (t*(currentPhase==='executing'?1.2:0.8))%(Math.PI*2);
-    const rAlpha = Math.sin(rPhase)*0.5+0.5;
-    for (let r=0;r<ringCount;r++) {
-      const rSz=36+r*11+rAlpha*(8-r*2)+phaseEn*(10-r*2);
-      ctx.strokeStyle=`rgba(${cR},${cG},${cB},${0.06*rAlpha*modeEn/(r+1)})`;
-      ctx.lineWidth=0.8; ctx.beginPath(); ctx.arc(nx,ny,rSz,0,Math.PI*2); ctx.stroke();
-    }
-
-    // Echo marks (simulated)
-    const echoes = [
-      { color:'#38BDF8', r:0.9, age:0.9 },
-      { color:'#A855F7', r:0.6, age:0.3 },
-      { color:'#10B981', r:0.75, age:0.7 },
-    ];
-    const baseEchoR = 36+(ringCount-1)*11+28;
-    echoes.forEach((echo,i) => {
-      const angle = ((i/echoes.length)*Math.PI*2)-Math.PI/2;
-      const orbitR = baseEchoR + echo.age*10;
-      const recency = 1-echo.age;
-      const pulseSpeed = 0.35+recency*0.5;
-      const pulse = Math.sin(t*pulseSpeed+i)*0.3+0.7;
-      const ex = nx+Math.cos(angle)*orbitR, ey = ny+Math.sin(angle)*orbitR;
-      const [er,eg,eb] = hexToRgb(echo.color);
-      const dotR = 2+echo.r*1.5;
-      const eG = ctx.createRadialGradient(ex,ey,0,ex,ey,dotR*3);
-      eG.addColorStop(0,`rgba(${er},${eg},${eb},${(0.3+echo.r*0.3)*pulse})`);
-      eG.addColorStop(1,`rgba(${er},${eg},${eb},0)`);
-      ctx.fillStyle=eG; ctx.beginPath(); ctx.arc(ex,ey,dotR*3,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle=`rgba(${er},${eg},${eb},${0.85*pulse})`;
-      ctx.beginPath(); ctx.arc(ex,ey,dotR,0,Math.PI*2); ctx.fill();
-    });
-
-    animId = requestAnimationFrame(animate);
+    pixie.setPhase(currentPhase);
+    pixie.setProgress(progressVal);
   }
 
-  animate();
+  rebuildPixie();
 })();
 </script>
