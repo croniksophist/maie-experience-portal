@@ -36,18 +36,31 @@
 .pm {
   font-family: var(--pm-font-sans);
   color: var(--pm-text-primary);
-  max-width: 1180px;
-  margin: 0 auto;
+  width: 100%;
   /* Anchors the dark canvas under the transparent card overlays below —
      without it the browser's white default shows through wherever a
      .pm-section doesn't set its own background (most of them don't;
      they rely on --pm-surface-* tints over a dark page underneath). */
   background: var(--pm-bg);
+  /* v5 — was max-width: 1180px + margin: 0 auto, which capped and
+     centered the module, leaving dead white gutters on anything wider
+     than 1180px when this file is opened directly as a standalone
+     page. That contradicted its own design goal of working as "a
+     full-bleed page" (see file header). Dropped the cap entirely —
+     the fluid padding below is now the only gutter, so the module
+     fills whatever it's dropped into instead of floating in the
+     middle of it. Fluidity down to a narrow rail/phone is unaffected;
+     only the wide-viewport behavior changes. */
+  padding: clamp(1rem, 3vw, 3rem);
   /* Lets every rule below key off the module's own rendered width
      rather than the page viewport — the module stays fluid whether
      it's dropped into a full page or a narrow side rail. */
   container-type: inline-size;
   container-name: pm;
+
+  /* SMART MIN-HEIGHT FIX */
+  display: grid;
+  align-items: start;
 
   /* This module owns its own theme, unconditionally — same call made
      on the dashboard overview and companion gallery files, for the
@@ -91,6 +104,21 @@
   --pm-text-success:   #4ade80;
 
   --pm-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* v4 — fluid spacing scale. Previously every gap/margin in this file
+     was a fixed px/rem value, so section rhythm didn't taper on very
+     narrow rails the way type and grids already did. Centralizing the
+     scale here means one clamp to tune instead of two dozen scattered
+     literals, and keeps this file's approach to fluidity consistent
+     with the fluid-token pattern used on the companion gallery file. */
+  --pm-gap-sm: clamp(6px, 1.2cqi, 10px);
+  --pm-gap-md: clamp(10px, 2cqi, 16px);
+  --pm-gap-lg: clamp(1rem, 3cqi, 1.5rem);
+}
+
+#section-intro {
+  /* Pins the intro header to the first row of the grid */
+  grid-area: 1 / 1;
 }
 
 .sr-only {
@@ -104,9 +132,8 @@
 
 .pm-section {
   border-radius: 16px;
-  padding: 1.5rem;
   padding: clamp(1.15rem, 4.5cqi, 2rem);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--pm-gap-lg);
   border: 0.5px solid var(--pm-border);
   background: var(--pm-surface-1);
   position: relative;
@@ -128,7 +155,6 @@
 }
 
 .pm-title {
-  font-size: 20px;
   font-size: clamp(17px, 3.6cqi, 20px);
   font-weight: 500;
   margin: 0 0 .4rem;
@@ -174,7 +200,7 @@
 }
 .step-nav {
   display: flex;
-  gap: 6px;
+  gap: var(--pm-gap-sm);
   margin-bottom: 1rem;
   width: max-content;
   min-width: 100%;
@@ -200,8 +226,8 @@
 /* ── Fluid grids — auto-fit/minmax replaces fixed column counts, so
    these reflow continuously with container width instead of snapping
    at a couple of hardcoded breakpoints. ── */
-.pm-two   { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 1rem; }
-.pm-three { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 1rem; }
+.pm-two   { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--pm-gap-md); margin-top: 1rem; }
+.pm-three { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--pm-gap-sm); margin-top: 1rem; }
 
 .pm-card {
   background: var(--pm-surface-2);
@@ -257,7 +283,7 @@ canvas { display: block; }
 .wf-container {
   display: grid;
   grid-template-columns: minmax(96px, 130px) minmax(150px, 220px) minmax(220px, 1.6fr);
-  gap: 1.5rem;
+  gap: var(--pm-gap-lg);
   align-items: start;
   margin-top: 1rem;
 }
@@ -306,11 +332,38 @@ canvas { display: block; }
   border: 0.5px solid var(--pm-border);
   border-radius: 12px;
   padding: 1rem;
-  min-height: 140px;
+  /* Grid, not flow: every .wfd-panel below shares this one cell, so
+     the box is always sized to the tallest stage's content. Stepping
+     through stages (or autoplay) never changes this box's height,
+     which is what was causing the module — and the page beneath it —
+     to reflow on every stage change. */
+  display: grid;
   opacity: 1; transform: translateY(0); filter: blur(0);
   transition: opacity .35s var(--pm-ease-cinematic), transform .35s var(--pm-ease-cinematic), filter .35s var(--pm-ease-cinematic);
 }
 .wf-detail.pm-swap { opacity: 0; transform: translateY(6px); filter: blur(3px); }
+
+.wfd-panel {
+  grid-area: 1 / 1;
+  /* No explicit visibility:visible here — that would override the
+     inherited hidden state whenever this panel's ancestor tab
+     (.pm-view[hidden]) is itself hidden, since `visibility` inherits.
+     That was the bug: the neutral "Select a stage" panel forced
+     itself back to visible and bled through into whichever tab was
+     actually active, since every .pm-view shares the same grid cell.
+     Leaving this unset lets it correctly inherit "hidden" from a
+     hidden ancestor, and default to "visible" otherwise. */
+}
+.wfd-panel[hidden] {
+  /* Override the UA default of display:none for [hidden] — a hidden
+     panel must stay a grid item (just invisible) so it keeps
+     contributing to the shared cell's height. Same pattern .pm-view
+     uses for section tabs; that rule had the same display:none gap
+     and is fixed to match, below. */
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
+}
 
 .wf-detail-title { font-size: 14px; font-weight: 500; margin: 0 0 .3rem; }
 .wf-detail-body { font-size: 13px; color: var(--pm-text-secondary); line-height: 1.6; margin: 0 0 .75rem; }
@@ -351,7 +404,7 @@ canvas { display: block; }
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 8px;
+  gap: var(--pm-gap-sm);
   margin-top: 1rem;
 }
 
@@ -388,7 +441,7 @@ canvas { display: block; }
 
 .market-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 8px; margin-top: 1rem;
+  gap: var(--pm-gap-sm); margin-top: 1rem;
 }
 .market-item {
   display: flex; align-items: center; gap: 10px;
@@ -421,7 +474,7 @@ canvas { display: block; }
   border: 0.5px solid; font-family: var(--font-mono);
 }
 
-.pm-divider { height: 0.5px; background: var(--pm-border); margin: 1.5rem 0; }
+.pm-divider { height: 0.5px; background: var(--pm-border); margin: var(--pm-gap-lg) 0; }
 
 /* ── Cinematic section swap ──────────────────────────────────────
    Replaces the old instant display:none/'' toggle. The outgoing
@@ -429,10 +482,27 @@ canvas { display: block; }
    state and settles in — same choreography language as the
    dashboard's detail panel. ── */
 .pm-view {
+  grid-area: 2 / 1; /* Forces all tabs to stack in the exact same grid cell */
+  visibility: visible;
+  pointer-events: auto;
   opacity: 1; transform: translateY(0); filter: blur(0);
   transition: opacity .38s var(--pm-ease-cinematic), transform .38s var(--pm-ease-cinematic), filter .38s var(--pm-ease-cinematic);
 }
-.pm-view[hidden] { display: none; }
+.pm-view[hidden] { 
+  /* The comment below described the intent, but nothing here actually
+     overrode the UA stylesheet's own [hidden] { display: none } rule —
+     author-origin CSS beats UA CSS regardless of specificity, but only
+     for properties it actually declares. Since `display` was never
+     redeclared here, hidden sections silently fell back to
+     display:none and dropped out of the grid instead of staying as
+     invisible sizing contributors. display:block (blockified into a
+     grid item automatically, since .pm is display:grid) closes that
+     gap, so every tab now permanently reserves its own height and the
+     module no longer resizes when switching tabs. */
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
+}
 .pm-view.pm-exit { opacity: 0; transform: translateY(-6px); filter: blur(3px); }
 .pm-view.pm-enter { opacity: 0; transform: translateY(10px); filter: blur(5px); }
 
@@ -449,7 +519,14 @@ canvas { display: block; }
    Primary responsiveness lives here, keyed to the module's own
    rendered width via @container — correct whether the module sits
    in a full-bleed page or a narrow rail. A @media fallback below
-   covers browsers without container query support. ═══════════════ */
+   covers browsers without container query support. v4 adds one
+   more step (960px) so the workflow grid backs off before it gets
+   cramped, instead of jumping straight from 3-column to 1-column
+   at 820px. ═══════════════ */
+@container pm (max-width: 960px) {
+  .wf-container { grid-template-columns: minmax(84px, 110px) 1fr; }
+  .wf-right { grid-column: 1 / -1; }
+}
 @container pm (max-width: 820px) {
   .wf-container { grid-template-columns: 1fr; }
   .wf-left { flex-direction: row; justify-content: center; }
@@ -470,6 +547,10 @@ canvas { display: block; }
 /* Fallback for browsers without container query support (source order
    matters: these come first so @container rules above win when
    supported, since both carry equal specificity). */
+@media (max-width: 960px) {
+  .wf-container { grid-template-columns: minmax(84px, 110px) 1fr; }
+  .wf-right { grid-column: 1 / -1; }
+}
 @media (max-width: 820px) {
   .wf-container { grid-template-columns: 1fr; }
   .wf-left { flex-direction: row; justify-content: center; }
@@ -609,11 +690,63 @@ canvas { display: block; }
       </div>
 
       <div class="wf-detail" id="wf-detail">
-        <div class="wf-detail-title" id="wfd-title">Select a stage</div>
-        <div class="wf-detail-body" id="wfd-body">Click any workflow stage to see how the Pixie responds and what the agent pipeline is doing.</div>
-        <div class="wf-tasks" id="wfd-tasks"></div>
-        <div class="wf-progress-wrap" id="wfd-prog" style="display:none;">
-          <div class="wf-progress-fill" id="wfd-prog-fill" style="width:0%"></div>
+        <div class="wfd-panel" id="wfd-panel-neutral">
+          <div class="wf-detail-title">Select a stage</div>
+          <div class="wf-detail-body">Click any workflow stage to see how the Pixie responds and what the agent pipeline is doing.</div>
+        </div>
+        <div class="wfd-panel" id="wfd-panel-0" data-stage="0" hidden>
+          <div class="wf-detail-title">The Pixie becomes attentive</div>
+          <div class="wf-detail-body">The agent receives the goal and begins constructing a WorkflowPlan. Risk level is assessed. Steps are sequenced. The Pixie's animation energy rises — particles accelerate, rings pulse faster.</div>
+          <div class="wf-tasks">
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Goal received: "Generate a documentary trailer"</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Analyzing available tools</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Assessing risk level</span></div>
+            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>Constructing step sequence</span></div>
+          </div>
+        </div>
+        <div class="wfd-panel" id="wfd-panel-1" data-stage="1" hidden>
+          <div class="wf-detail-title">The Pixie waits, attentive</div>
+          <div class="wf-detail-body">The plan requires human approval before execution. The Pixie enters a calm, attentive state — present but unhurried. The risk indicator and step summary surface for the user.</div>
+          <div class="wf-tasks">
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Plan ready: 6 steps, medium risk</span></div>
+            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>Requires approval before execution</span></div>
+            <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>Waiting for human confirmation</span></div>
+          </div>
+        </div>
+        <div class="wfd-panel" id="wfd-panel-2" data-stage="2" hidden>
+          <div class="wf-detail-title">Energy peaks — progress ring fills</div>
+          <div class="wf-detail-body">Approval granted. The agent pipeline activates. Six specialized agents begin their work in coordinated sequence. The Pixie's progress ring expands frame by frame as work completes.</div>
+          <div class="wf-tasks">
+            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>analyze_image — scene detection running</span></div>
+            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>transcribe_audio — audio processing</span></div>
+            <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>generate_caption — AI captioning</span></div>
+            <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>extract_entities — NER extraction</span></div>
+            <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>generate_output — trailer assembly</span></div>
+          </div>
+          <div class="wf-progress-wrap"><div class="wf-progress-fill" style="width:62%"></div></div>
+        </div>
+        <div class="wfd-panel" id="wfd-panel-3" data-stage="3" hidden>
+          <div class="wf-detail-title">Watching the work land</div>
+          <div class="wf-detail-body">Individual steps complete. Files are produced. The Pixie's energy holds steady — it knows more work is coming. Progress updates flow from the Celery task queue through the WebSocket to the canvas.</div>
+          <div class="wf-tasks">
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Scene analysis complete</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Audio transcription complete</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Captions generated — 47 segments</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Entity extraction complete</span></div>
+            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>Assembling final output...</span></div>
+          </div>
+          <div class="wf-progress-wrap"><div class="wf-progress-fill" style="width:88%"></div></div>
+        </div>
+        <div class="wfd-panel" id="wfd-panel-4" data-stage="4" hidden>
+          <div class="wf-detail-title">The Pixie celebrates — then rests</div>
+          <div class="wf-detail-body">All steps completed. The Pixie bursts with energy for 2.2 seconds (celebrating temperament), then cools back to ambient. The achievement echo is minted and joins the permanent orbit — visible every future session.</div>
+          <div class="wf-tasks">
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Documentary trailer produced</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>ACHIEVEMENT_ARTIFACT minted</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Echo added to permanent orbit</span></div>
+            <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Session complete</span></div>
+          </div>
+          <div class="wf-progress-wrap"><div class="wf-progress-fill" style="width:100%"></div></div>
         </div>
       </div>
     </div>
@@ -935,69 +1068,19 @@ canvas { display: block; }
     switchSection(sec);
   });
 
-  /* ── Workflow lifecycle demo ──────────────────────────────────── */
+  /* ── Workflow lifecycle demo ────────────────────────────────────
+     Stage copy (title/body/task list) now lives directly in the five
+     .wfd-panel elements in the HTML, not here — this array only keeps
+     the fields JS still drives dynamically: the canvas phase/progress,
+     the phase label, the small in-progress indicator by the canvas,
+     and the completion echo. Avoids keeping the same copy in two
+     places that can drift out of sync. ──────────────────────────── */
   var WORKFLOW_STAGES = [
-    {
-      id: 'planning', name: 'Planning',
-      title: 'The Pixie becomes attentive',
-      body: 'The agent receives the goal and begins constructing a WorkflowPlan. Risk level is assessed. Steps are sequenced. The Pixie\'s animation energy rises — particles accelerate, rings pulse faster.',
-      tasks: [
-        { text: 'Goal received: "Generate a documentary trailer"', state: 'done' },
-        { text: 'Analyzing available tools', state: 'done' },
-        { text: 'Assessing risk level', state: 'done' },
-        { text: 'Constructing step sequence', state: 'active' },
-      ],
-      phase: 'planning', progress: 0,
-    },
-    {
-      id: 'approval', name: 'Approval',
-      title: 'The Pixie waits, attentive',
-      body: 'The plan requires human approval before execution. The Pixie enters a calm, attentive state — present but unhurried. The risk indicator and step summary surface for the user.',
-      tasks: [
-        { text: 'Plan ready: 6 steps, medium risk', state: 'done' },
-        { text: 'Requires approval before execution', state: 'active' },
-        { text: 'Waiting for human confirmation', state: '' },
-      ],
-      phase: 'review', progress: 0,
-    },
-    {
-      id: 'executing', name: 'Execution',
-      title: 'Energy peaks — progress ring fills',
-      body: 'Approval granted. The agent pipeline activates. Six specialized agents begin their work in coordinated sequence. The Pixie\'s progress ring expands frame by frame as work completes.',
-      tasks: [
-        { text: 'analyze_image — scene detection running', state: 'active' },
-        { text: 'transcribe_audio — audio processing', state: 'active' },
-        { text: 'generate_caption — AI captioning', state: '' },
-        { text: 'extract_entities — NER extraction', state: '' },
-        { text: 'generate_output — trailer assembly', state: '' },
-      ],
-      phase: 'executing', progress: 62, autoProgress: true,
-    },
-    {
-      id: 'monitoring', name: 'Monitoring',
-      title: 'Watching the work land',
-      body: 'Individual steps complete. Files are produced. The Pixie\'s energy holds steady — it knows more work is coming. Progress updates flow from the Celery task queue through the WebSocket to the canvas.',
-      tasks: [
-        { text: 'Scene analysis complete', state: 'done' },
-        { text: 'Audio transcription complete', state: 'done' },
-        { text: 'Captions generated — 47 segments', state: 'done' },
-        { text: 'Entity extraction complete', state: 'done' },
-        { text: 'Assembling final output...', state: 'active' },
-      ],
-      phase: 'executing', progress: 88, autoProgress: false,
-    },
-    {
-      id: 'completion', name: 'Completion',
-      title: 'The Pixie celebrates — then rests',
-      body: 'All steps completed. The Pixie bursts with energy for 2.2 seconds (celebrating temperament), then cools back to ambient. The achievement echo is minted and joins the permanent orbit — visible every future session.',
-      tasks: [
-        { text: 'Documentary trailer produced', state: 'done' },
-        { text: 'ACHIEVEMENT_ARTIFACT minted', state: 'done' },
-        { text: 'Echo added to permanent orbit', state: 'done' },
-        { text: 'Session complete', state: 'done' },
-      ],
-      phase: 'completed', progress: 100,
-    },
+    { id: 'planning',   name: 'Planning',   phase: 'planning',  progress: 0 },
+    { id: 'approval',   name: 'Approval',   phase: 'review',    progress: 0 },
+    { id: 'executing',  name: 'Execution',  phase: 'executing', progress: 62 },
+    { id: 'monitoring', name: 'Monitoring', phase: 'executing', progress: 88 },
+    { id: 'completion', name: 'Completion', phase: 'completed', progress: 100 },
   ];
 
   var currentStageIdx = -1;
@@ -1005,19 +1088,11 @@ canvas { display: block; }
   var autoPlaying = false;
   var STAGE_SWAP_MS = 180;
 
-  function paintStage(stage) {
-    document.getElementById('wfd-title').textContent = stage.title;
-    document.getElementById('wfd-body').textContent = stage.body;
-
-    var tasksEl = document.getElementById('wfd-tasks');
-    tasksEl.innerHTML = '';
-    stage.tasks.forEach(function (task) {
-      var el = document.createElement('div');
-      el.className = 'wf-task' + (task.state === 'done' ? ' done' : task.state === 'active' ? ' active' : '');
-      var icon = task.state === 'done' ? 'ti-check' : task.state === 'active' ? 'ti-loader-2' : 'ti-circle';
-      el.innerHTML = '<i class="ti ' + icon + ' wf-task-icon" aria-hidden="true"></i><span></span>';
-      el.querySelector('span').textContent = task.text;
-      tasksEl.appendChild(el);
+  function paintStage(stage, idx) {
+    var neutral = document.getElementById('wfd-panel-neutral');
+    if (neutral) neutral.hidden = true;
+    document.querySelectorAll('.wfd-panel[data-stage]').forEach(function (el, i) {
+      el.hidden = (i !== idx);
     });
 
     if (pWf) {
@@ -1034,15 +1109,6 @@ canvas { display: block; }
       progInner.style.width = Math.round(stage.progress) + '%';
     } else {
       progOuter.style.display = 'none';
-    }
-
-    var progEl = document.getElementById('wfd-prog');
-    var progFill = document.getElementById('wfd-prog-fill');
-    if (stage.progress > 0) {
-      progEl.style.display = 'block';
-      progFill.style.width = Math.round(stage.progress) + '%';
-    } else {
-      progEl.style.display = 'none';
     }
 
     if (stage.id === 'completion' && pWf) {
@@ -1065,12 +1131,12 @@ canvas { display: block; }
 
     var detail = document.getElementById('wf-detail');
     if (prefersReducedMotion) {
-      paintStage(stage);
+      paintStage(stage, idx);
       return;
     }
     detail.classList.add('pm-swap');
     setTimeout(function () {
-      paintStage(stage);
+      paintStage(stage, idx);
       requestAnimationFrame(function () { detail.classList.remove('pm-swap'); });
     }, STAGE_SWAP_MS);
   }
