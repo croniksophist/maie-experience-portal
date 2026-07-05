@@ -575,7 +575,7 @@ canvas { display: block; }
 </style>
 
 <div class="pm" role="main">
-<h2 class="sr-only">MAIE Pixie Companion — interactive product experience module for stakeholder presentation</h2>
+<h2 class="sr-only">MAIE Pixie Companion — an interactive walkthrough for stakeholders</h2>
 
 <div id="section-intro" class="pm-section pm-dark">
   <div class="pm-row" style="align-items:center;">
@@ -584,20 +584,20 @@ canvas { display: block; }
     </div>
     <div style="flex:1;min-width:220px;">
       <div class="pm-eyebrow">MAIE · Product Experience Module</div>
-      <h3 class="pm-title">The intelligence has a face.</h3>
-      <p class="pm-body">Most AI platforms expose their work through progress bars, logs, and status codes. MAIE does something different. Every agent plan, every reasoning step, every achievement — all of it flows through a single living presence the user will come to know as their own.</p>
-      <p class="pm-quote">"The Agent Workflow determines what is happening. The Pixie communicates what is happening."</p>
+      <h3 class="pm-title">Meet the presence that grows alongside your work.</h3>
+      <p class="pm-body">Most platforms expose their work through progress bars, logs, and status codes. MAIE does something different. Every decision, every step, every achievement — all of it flows through a single living presence the creator comes to know as their own.</p>
+      <p class="pm-quote">"The workflow decides what happens next. The Pixie is how it feels to watch it happen."</p>
     </div>
   </div>
   <div style="margin-top:1.25rem;">
     <div class="pm-nav-scroll">
       <div class="step-nav" id="section-nav">
         <button class="step-pill active" data-sec="intro">Introduction</button>
-        <button class="step-pill" data-sec="workflow">Live workflow</button>
-        <button class="step-pill" data-sec="tiers">Identity layers</button>
-        <button class="step-pill" data-sec="agents">Agent constellation</button>
-        <button class="step-pill" data-sec="reputation">Reputation</button>
-        <button class="step-pill" data-sec="market">Marketplace</button>
+        <button class="step-pill" data-sec="workflow">See It In Action</button>
+        <button class="step-pill" data-sec="tiers">Meet Your Companion</button>
+        <button class="step-pill" data-sec="agents">Who's Helping Behind the Scenes</button>
+        <button class="step-pill" data-sec="reputation">Your Creative Mark</button>
+        <button class="step-pill" data-sec="market">Expand Your Workspace</button>
       </div>
     </div>
   </div>
@@ -610,11 +610,11 @@ canvas { display: block; }
     <div class="pm-two">
       <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">Not a chatbot avatar</div>
-        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--pm-text-secondary);">It does not represent a conversational agent. It represents the user's entire MAIE collaboration — their identity, their work, their history.</div>
+        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--pm-text-secondary);">It isn't a chatbot. It represents the creator's entire MAIE collaboration — their identity, their work, their history.</div>
       </div>
       <div class="pm-card pm-reveal" style="--i:1;">
         <div class="pm-card-label">Not a mascot</div>
-        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--pm-text-secondary);">The Pixie is a real-time data visualization. Every animation, every echo, every particle response encodes live information from the agent pipeline.</div>
+        <div class="pm-card-value" style="font-size:13px;font-weight:400;color:var(--pm-text-secondary);">The Pixie is a living readout, not decoration. Every animation, every echo, every particle response encodes real information about the work happening behind the scenes.</div>
       </div>
     </div>
     <div class="pm-divider"></div>
@@ -622,7 +622,7 @@ canvas { display: block; }
     <div class="pm-three">
       <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">A workflow mirror</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Energy, animation speed, and ring behavior change in real time as agent plans move through planning → execution → completion.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Energy, animation speed, and ring behavior shift in real time as work moves from planning to completion.</div>
       </div>
       <div class="pm-card pm-reveal" style="--i:1;">
         <div class="pm-card-label">A reputation record</div>
@@ -630,7 +630,7 @@ canvas { display: block; }
       </div>
       <div class="pm-card pm-reveal" style="--i:2;">
         <div class="pm-card-label">A personal identity</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Archetype, theme, name, and marketplace skins make every Pixie distinct. No two users see the same companion.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Archetype, theme, name, and marketplace skins make every Pixie distinct — no two creators see the same companion.</div>
       </div>
     </div>
   </div>
@@ -639,13 +639,13 @@ canvas { display: block; }
 <div id="sec-workflow" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Scenario · "Generate a documentary trailer"</div>
-    <h3 class="pm-title" style="font-size:16px;">Watch a complete agent lifecycle</h3>
-    <p class="pm-body" style="margin-bottom:1rem;">Step through each phase of the workflow. The Pixie canvas on the left mirrors every state change — the same connection your users will experience live in MAIE.</p>
+    <h3 class="pm-title" style="font-size:16px;">Watch a full project come to life</h3>
+    <p class="pm-body" style="margin-bottom:1rem;">Step through each phase of the journey. The Pixie canvas on the left mirrors every change — the same connection your creators will experience live in MAIE.</p>
 
     <div style="display:flex;justify-content:flex-start;margin-bottom:.75rem;">
       <button class="wf-auto-btn" id="wf-auto-btn" onclick="MAIEPixieModule.toggleAutoPlay()">
         <i class="ti ti-player-play" aria-hidden="true" style="font-size:14px;" id="wf-play-icon"></i>
-        <span id="wf-auto-label">Run full demo</span>
+        <span id="wf-auto-label">Play full demo</span>
       </button>
     </div>
 
@@ -674,7 +674,7 @@ canvas { display: block; }
           <div class="wf-connector"></div>
           <div class="wf-stage" data-stage="2" onclick="MAIEPixieModule.selectStage(2)">
             <div class="wf-stage-dot"></div>
-            <span class="wf-stage-name">Execution</span>
+            <span class="wf-stage-name">In Progress</span>
           </div>
           <div class="wf-connector"></div>
           <div class="wf-stage" data-stage="3" onclick="MAIEPixieModule.selectStage(3)">
@@ -692,11 +692,11 @@ canvas { display: block; }
       <div class="wf-detail" id="wf-detail">
         <div class="wfd-panel" id="wfd-panel-neutral">
           <div class="wf-detail-title">Select a stage</div>
-          <div class="wf-detail-body">Click any workflow stage to see how the Pixie responds and what the agent pipeline is doing.</div>
+          <div class="wf-detail-body">Click any workflow stage to see how the Pixie responds and what's happening behind the scenes.</div>
         </div>
         <div class="wfd-panel" id="wfd-panel-0" data-stage="0" hidden>
           <div class="wf-detail-title">The Pixie becomes attentive</div>
-          <div class="wf-detail-body">The agent receives the goal and begins constructing a WorkflowPlan. Risk level is assessed. Steps are sequenced. The Pixie's animation energy rises — particles accelerate, rings pulse faster.</div>
+          <div class="wf-detail-body">MAIE quietly organizes the work ahead — sequencing steps and weighing what's involved before anything begins. The Pixie's animation energy rises as it happens — particles accelerate, rings pulse faster.</div>
           <div class="wf-tasks">
             <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Goal received: "Generate a documentary trailer"</span></div>
             <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Analyzing available tools</span></div>
@@ -706,20 +706,20 @@ canvas { display: block; }
         </div>
         <div class="wfd-panel" id="wfd-panel-1" data-stage="1" hidden>
           <div class="wf-detail-title">The Pixie waits, attentive</div>
-          <div class="wf-detail-body">The plan requires human approval before execution. The Pixie enters a calm, attentive state — present but unhurried. The risk indicator and step summary surface for the user.</div>
+          <div class="wf-detail-body">The plan is ready and waiting on your go-ahead. The Pixie enters a calm, attentive state — present but unhurried. A quick summary of what's involved surfaces so the creator can decide with confidence.</div>
           <div class="wf-tasks">
             <div class="wf-task done"><i class="ti ti-check wf-task-icon" aria-hidden="true"></i><span>Plan ready: 6 steps, medium risk</span></div>
-            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>Requires approval before execution</span></div>
+            <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>Waiting on approval to begin</span></div>
             <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>Waiting for human confirmation</span></div>
           </div>
         </div>
         <div class="wfd-panel" id="wfd-panel-2" data-stage="2" hidden>
           <div class="wf-detail-title">Energy peaks — progress ring fills</div>
-          <div class="wf-detail-body">Approval granted. The agent pipeline activates. Six specialized agents begin their work in coordinated sequence. The Pixie's progress ring expands frame by frame as work completes.</div>
+          <div class="wf-detail-body">Approval granted — your workspace comes to life. Six specialists begin their work in coordinated sequence. The Pixie's progress ring expands frame by frame as the work completes.</div>
           <div class="wf-tasks">
             <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>analyze_image — scene detection running</span></div>
             <div class="wf-task active"><i class="ti ti-loader-2 wf-task-icon" aria-hidden="true"></i><span>transcribe_audio — audio processing</span></div>
-            <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>generate_caption — AI captioning</span></div>
+            <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>generate_caption — caption generation</span></div>
             <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>extract_entities — NER extraction</span></div>
             <div class="wf-task"><i class="ti ti-circle wf-task-icon" aria-hidden="true"></i><span>generate_output — trailer assembly</span></div>
           </div>
@@ -784,7 +784,7 @@ canvas { display: block; }
       <div class="tier-block pm-reveal" style="--i:2;background:var(--pm-bg-success);border:0.5px solid var(--pm-border-success);border-top:none;">
         <div class="tier-num" style="color:var(--pm-text-success);">Tier 3 · live</div>
         <div class="tier-name">Runtime intelligence</div>
-        <div class="tier-desc" style="color:var(--pm-text-secondary);">The Pixie's current emotional and operational state. Phase, mode, progress, and temperament are driven directly by the Agent Workflow Panel in real time. Never persisted — this layer lives only while the agent runs.</div>
+        <div class="tier-desc" style="color:var(--pm-text-secondary);">The Pixie's current emotional and operational state. Phase, mode, progress, and temperament are driven directly by the Agent Workflow Panel in real time. Never persisted — this layer only exists while that work is actually happening.</div>
         <div class="tier-attrs">
           <span class="tier-attr" style="background:var(--pm-bg-success);border-color:var(--pm-border-success);color:var(--pm-text-success);">phase</span>
           <span class="tier-attr" style="background:var(--pm-bg-success);border-color:var(--pm-border-success);color:var(--pm-text-success);">mode</span>
@@ -799,8 +799,8 @@ canvas { display: block; }
 <div id="sec-agents" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Behind the canvas</div>
-    <h3 class="pm-title" style="font-size:16px;">Six agents. One Pixie.</h3>
-    <p class="pm-body">While the user sees one living companion, a constellation of specialized agents works beneath it. The Pixie is the single point of human contact for a coordinated multi-agent pipeline.</p>
+    <h3 class="pm-title" style="font-size:16px;">Six specialists. One Pixie.</h3>
+    <p class="pm-body">While the creator sees one living companion, a constellation of specialists works together beneath it. The Pixie is the single point of contact for all of that coordinated work.</p>
 
     <div class="pm-row" style="align-items:flex-start;margin-top:1rem;">
       <div class="pm-orb-wrap pm-orb--agents" style="max-width:104px;">
@@ -835,7 +835,7 @@ canvas { display: block; }
           <div class="agent-node-status">captions</div>
         </div>
         <div class="agent-node" id="ag-5">
-          <div class="agent-node-name">Output gen.</div>
+          <div class="agent-node-name">Output</div>
           <div class="agent-node-role" style="font-size:11px;"></div>
           <div class="agent-node-status">assembles</div>
         </div>
@@ -947,7 +947,7 @@ canvas { display: block; }
     <div class="pm-two" style="margin-top:1rem;">
       <div class="pm-card">
         <div class="pm-card-label">Asset ownership gate</div>
-        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Every equippable asset is validated server-side before any DB write. Users can only equip items they own. The API returns 403 on unowned attempts — not a client-side check.</div>
+        <div class="pm-card-value" style="font-size:12px;font-weight:400;color:var(--pm-text-secondary);line-height:1.55;">Every equippable asset is validated server-side before any DB write. Creators can only equip items they own. The API returns 403 on unowned attempts — not a client-side check.</div>
       </div>
       <div class="pm-card">
         <div class="pm-card-label">Skin compositing</div>
@@ -1078,7 +1078,7 @@ canvas { display: block; }
   var WORKFLOW_STAGES = [
     { id: 'planning',   name: 'Planning',   phase: 'planning',  progress: 0 },
     { id: 'approval',   name: 'Approval',   phase: 'review',    progress: 0 },
-    { id: 'executing',  name: 'Execution',  phase: 'executing', progress: 62 },
+    { id: 'executing',  name: 'In Progress', phase: 'executing', progress: 62 },
     { id: 'monitoring', name: 'Monitoring', phase: 'executing', progress: 88 },
     { id: 'completion', name: 'Completion', phase: 'completed', progress: 100 },
   ];

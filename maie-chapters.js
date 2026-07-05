@@ -35,7 +35,7 @@ window.MAIE_CHAPTERS = [
   header: {
     eyebrow: 'Chapter 02 · Industry Challenges',
     title: 'The Gap',
-    subtitle: 'AI media capabilities have matured. The tooling to orchestrate them has not. Creative teams do that work by hand.',
+    subtitle: 'Media intelligence has matured. The tools to bring it all together haven\'t. Creative teams still do that work by hand.',
   },
   body: [
     { type: 'cardGrid', columns: 2, marginBottom: '1.5rem', cards: [
@@ -48,9 +48,9 @@ window.MAIE_CHAPTERS = [
       quote: 'MAIE is built around a different premise: that the unit of work in modern media production is not a <strong>tool</strong>, but a <strong>goal</strong>.',
       source: 'Product Overview · §1' },
     { type: 'cardGrid', columns: 3, marginTop: '1.5rem', cards: [
-      { eyebrow: "What's matured", title: 'AI capabilities',
+      { eyebrow: "What's matured", title: 'Media Understanding',
         body: 'Scene segmentation, visual captioning, transcription, similarity search — genuinely useful, broadly available, scattered across disconnected APIs.' },
-      { eyebrow: "What hasn't", title: 'Orchestration',
+      { eyebrow: "What hasn't", title: 'Creative Flow',
         body: 'Creative teams glue together uploads, model calls, and exports by hand. Every workflow is a bespoke manual process that cannot be shared, sold, or replayed.' },
       { eyebrow: 'The deeper gap', title: 'Creative identity',
         body: 'No platform treats the creator as a persistent entity whose reputation, history, and output have value that compounds over time. Every session starts fresh.' },
@@ -78,12 +78,12 @@ window.MAIE_CHAPTERS = [
   header: {
     eyebrow: 'Chapter 04 · Workspace & Production Environment',
     title: 'The Workspace',
-    subtitle: 'The production hub a user returns to — not a landing page they pass through. Projects, media, AI tools, and activity all unified in a single screen.',
+    subtitle: 'The production hub a creator returns to — not a landing page they pass through. Projects, media, tools, and activity all unified in a single screen.',
   },
   body: [
     { type: 'cardGrid', columns: 3, label: 'Three views — three questions', marginBottom: '1.5rem', cards: [
       { eyebrow: 'Workspace', title: '"What am I working on?"',
-        body: 'Recent projects, upload surface, marketplace assets, and one-click launchers into every AI tool. The view returning users land in.' },
+        body: 'Recent projects, upload surface, marketplace assets, and one-click launchers into every tool. The view returning users land in.' },
       { eyebrow: 'Tools', title: '"I know what I want to do."',
         body: 'Agent, Scene Detection, Metadata, Transcription, Image Analysis, Recommendations, and Asset Management — organized as tabs, directly accessible.' },
       { eyebrow: 'Analytics', title: '"Is anything stuck?"',
@@ -131,7 +131,7 @@ window.MAIE_CHAPTERS = [
   header: {
     eyebrow: 'Chapter 05 · Agent Intelligence & Workflow',
     title: 'From Goal to Outcome',
-    subtitle: 'The center of the MAIE experience is not a feature tab — it is a conversation. The agent converts a natural-language intent into a concrete, inspectable, executable plan.',
+    subtitle: 'The center of the MAIE experience is not a feature tab — it is a conversation. The agent turns a natural-language goal into a concrete, inspectable plan, then carries it out.',
   },
   scenes: [
     {
@@ -139,15 +139,15 @@ window.MAIE_CHAPTERS = [
       body: [
         { type: 'thesis',
           quote: 'The unit of work in modern media production is not a tool, but a <strong>goal</strong>. A producer states what they want. The agent figures out which capabilities to invoke, in what sequence — and presents a single coherent outcome.' },
-        { type: 'flowSteps', label: 'How a plan executes', steps: [
+        { type: 'flowSteps', label: 'How a plan comes together', steps: [
           { label: 'Goal', desc: 'Natural language input. One text field.',
             color: 'rgba(165,42,42,0.1)', border: 'var(--border-brand)', textColor: 'var(--primary-light)' },
           { label: 'Plan', desc: 'Ordered steps. Risk classification. Inspectable before anything runs.' },
-          { label: 'Execute', desc: 'Step-by-step. Live progress. Partial success handled.',
+          { label: 'In Motion', desc: 'Step-by-step. Live progress. Partial success handled.',
             color: 'rgba(34,197,94,0.07)', border: 'rgba(34,197,94,0.25)', textColor: 'rgba(34,197,94,0.8)' },
         ]},
         { type: 'calloutBox', tone: 'warn', label: 'Why this matters',
-          body: 'Most AI agent demos optimize for the moment a model produces an impressive-looking action. MAIE optimizes for the moment after that — for whether a producer would actually trust the system with their footage, their client\'s files, or a batch of a hundred images. <span style="color:var(--text-1);font-weight:500;">Risk-gated approval is what makes that trust possible.</span> The agent can move fast on the safe, common case, and slow down exactly where a human should be in the loop.' },
+          body: 'Most flashy product demos optimize for the moment a system produces an impressive-looking action. MAIE optimizes for the moment after that — for whether a producer would actually trust the system with their footage, their client\'s files, or a batch of a hundred images. <span style="color:var(--text-1);font-weight:500;">Risk-gated approval is what makes that trust possible.</span> The agent can move fast on the safe, common case, and slow down exactly where a human should be in the loop.' },
       ],
     },
     {
@@ -170,7 +170,7 @@ window.MAIE_CHAPTERS = [
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Metadata Enrichment</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">AI vision analysis — captions, object tags, color palettes, brightness signals, people-presence detection — powering every search and filter surface.</div></div>
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Transcription</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">Audio and video to structured, searchable text. Foundation for captioning, content repurposing, and agent steps that reason about what was said.</div></div>
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Image Analysis</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">Object recognition, classification, and visual characteristics as a standalone workflow for teams working primarily with still imagery.</div></div>
-            <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Recommendations</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">AI-generated suggestions personalized to recent activity. Each one resolved to a concrete next action — not an inert observation.</div></div>
+            <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Recommendations</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">Personalized suggestions based on recent activity. Each one resolved to a concrete next action — not an inert observation.</div></div>
             <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.25rem;">Asset Management</div><div style="font-size:0.72rem;color:var(--text-3);line-height:1.5;">Create, review, and publish marketplace assets. Status lifecycle from PENDING_APPROVAL to ACTIVE — the publish pipeline the agent feeds into.</div></div>
           </div>
         </div>` },
@@ -195,14 +195,14 @@ window.MAIE_CHAPTERS = [
   header: {
     eyebrow: 'Chapter 06 · Living Identity',
     title: 'Identity is Infrastructure',
-    subtitle: 'A living creative presence that mirrors workflow state, accumulates reputation history, and carries creator provenance across every context — not a feature, the foundation.',
+    subtitle: 'A living creative presence that mirrors what\'s happening in real time, accumulates reputation history, and carries creator provenance across every context — not a feature, the foundation.',
   },
   scenes: [
     {
       // Scene A — The architecture: why identity has three layers
       body: [
         { type: 'thesis', source: 'Product Overview · §3',
-          quote: 'The agent is represented in the interface by an animated companion — the Pixie — that visibly shifts state as work progresses: <strong>idle</strong> while waiting, <strong>active</strong> while planning, <strong>progressing</strong> through execution. Giving that work a visible, continuously-updating presence is what makes "the agent is working" feel concrete and trustworthy rather than abstract.' },
+          quote: 'The agent is represented in the interface by an animated companion — the Pixie — that visibly shifts state as work progresses: <strong>idle</strong> while waiting, <strong>active</strong> while planning, <strong>progressing</strong> through completion. Giving that work a visible, continuously-updating presence is what makes "the agent is working" feel concrete and trustworthy rather than abstract.' },
         { type: 'tierStack', label: 'Three-tier identity architecture', tiers: [
           { tierLabel: 'Tier 1 · Permanent', title: 'UserIdentity',
             body: 'Immutable provenance. The glyph seed that stamps every asset the creator publishes. Changing archetype or theme never touches this layer — it is what other creators encounter when they find your work in the marketplace.',
@@ -267,7 +267,7 @@ window.MAIE_CHAPTERS = [
   header: {
     eyebrow: 'Chapter 07 · Marketplace & Ecosystem',
     title: 'Doing the Work is Building the Product',
-    subtitle: 'A platform-native token economy sits underneath a creator marketplace — giving every completed workflow a potential second life as a sellable asset.',
+    subtitle: 'A platform-native token economy sits underneath a creator marketplace — giving every completed project a potential second life as a sellable asset.',
   },
   body: [
     { type: 'thesis',
@@ -281,7 +281,7 @@ window.MAIE_CHAPTERS = [
     { type: 'raw', html: `<div style="margin-top:1.5rem;">
       <div class="card-eyebrow" style="margin-bottom:0.75rem;">What's for sale</div>
       <div class="raw-grid raw-grid--3 raw-grid--gap-sm">
-        <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">⬡</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Workflow blueprints</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">Reusable agent plan sequences tuned for specific kinds of footage.</div></div>
+        <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">⬡</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Creative blueprints</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">Reusable agent plan sequences tuned for specific kinds of footage.</div></div>
         <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">◎</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Identity themes</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">Full animation + shape + palette bundles for the Pixie companion.</div></div>
         <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">◈</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Agent skins</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">AGENT_SKIN images composited onto the Pixie canvas, validated server-side.</div></div>
         <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;"><div style="font-size:1rem;margin-bottom:0.4rem;">◇</div><div style="font-size:0.78rem;font-weight:600;color:var(--text-1);margin-bottom:0.2rem;">Scene data packets</div><div style="font-size:0.71rem;color:var(--text-3);line-height:1.5;">Processed scene analysis outputs packaged as sellable datasets.</div></div>
@@ -291,7 +291,7 @@ window.MAIE_CHAPTERS = [
     </div>` },
     { type: 'cardGrid', columns: 2, marginTop: '1.5rem', cards: [
       { eyebrow: 'Tiered access', title: 'Monetization inside the core loop',
-        body: 'Exporting agent work to the marketplace is gated by account tier. Casual users get full access to every AI tool. Marketplace participation — turning personal workflows into income — is part of what a more invested membership tier unlocks.' },
+        body: 'Exporting agent work to the marketplace is gated by account tier. Casual users get full access to every tool. Marketplace participation — turning personal workflows into income — is part of what a more invested membership tier unlocks.' },
       { eyebrow: 'No login required to browse', title: 'Conversion by design',
         body: 'Marketplace pricing information is deliberately public and unauthenticated. A prospective user\'s first encounter with the platform\'s economic layer is never a login wall. Every new user also begins with a starting token balance at account creation.' },
     ]},
@@ -415,9 +415,9 @@ window.MAIE_CHAPTERS = [
   body: [
     { type: 'timeline', label: 'Platform direction', items: [
       { horizon: 'Now', title: 'Full platform in production',
-        desc: 'Agent pipeline, Pixie identity system, marketplace, token economy, multi-tenant architecture, scene detection, transcription, metadata enrichment, Image Hub, Community connectors.' },
+        desc: 'The Agent, Pixie identity system, marketplace, token economy, multi-tenant architecture, scene detection, transcription, metadata enrichment, Image Hub, Community connectors.' },
       { horizon: 'Near term', title: 'Deeper visual intelligence',
-        desc: 'The scene-detection pipeline is already wired to layer on automatic captioning and visual-similarity clustering wherever the underlying vision services are available. Turning this on is a configuration change, not a re-architecture.' },
+        desc: 'The scene-detection system is already wired to layer on automatic captioning and visual-similarity clustering wherever the underlying vision services are available. Turning this on is a configuration change, not a re-architecture.' },
       { horizon: 'Mid term', title: 'Larger, more liquid marketplace', horizonColor: 'rgba(255,180,0,0.7)',
         desc: 'The plug-in asset-type system and tier-gated export model are built to support categories well beyond the ones live today — a genuine library of reusable, purchasable production workflows.' },
       { horizon: 'Mid term', title: 'Multi-Pixie collaboration', horizonColor: 'rgba(255,180,0,0.7)',
@@ -449,7 +449,7 @@ window.MAIE_CHAPTERS = [
   body: [
     { type: 'cardGrid', columns: 3, label: 'Revenue streams', cards: [
       { eyebrow: 'Subscriptions', title: 'Tiered membership',
-        body: 'Casual users get full AI tool access. Marketplace participation — turning personal workflows into income — is part of what a more invested tier unlocks.' },
+        body: 'Casual users get full tool access. Marketplace participation — turning personal workflows into income — is part of what a more invested tier unlocks.' },
       { eyebrow: 'Marketplace commission', title: '20% platform share',
         body: 'Every asset sale retains a platform commission while crediting an 80% revenue share to the creator. Volume scales with the size and activity of the creator base, not headcount.' },
       { eyebrow: 'Enterprise & licensing', title: 'Multi-tenant from day one',
@@ -482,7 +482,7 @@ window.MAIE_CHAPTERS = [
   audienceTags: ['executive', 'technical', 'product'],
   header: {
     eyebrow: 'Chapter 12 · Call to Action',
-    title: 'Help Build the Operating System for AI-Powered Media Production',
+    title: 'Help Build the Creative Operating System for Media Production',
     subtitle: 'This document has stayed inside the boundary of what MAIE is and how it works. The platform, on its own terms, is the case.',
   },
   body: [
