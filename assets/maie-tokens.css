@@ -1,0 +1,60 @@
+/* ═══════════════════════════════════════════════════════════════════
+   MAIE-TOKENS.CSS — single source of truth for the portal.
+   Canonicalized 2026-07-20: pitch/index.html's palette (--primary:
+   #A52A2A) was chosen as the brand red. dashboard, index, and the
+   shared nav previously carried an unreconciled #8a2e22 under their
+   own --du-* / --mnav-* / --brand prefixes — those have been updated
+   in place to match. If a color needs to change again, change it here
+   ONLY; every page links this file before its own inline <style>, so
+   local blocks should reference these vars instead of re-declaring hex.
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --primary:        #A52A2A;
+  --primary-light:  #C24E4E;
+  --primary-dark:   #772E25;
+  --primary-glow:   rgba(165,42,42,0.32);
+  --accent:         #FFB400;
+
+  --bg:             #09090B;
+  --bg-alt:         #0C0D10;
+  --surface:        #111318;
+  --surface-raised: rgba(255,255,255,0.025);
+  --surface-card:   #161820;
+
+  --border:         rgba(255,255,255,0.07);
+  --border-strong:  rgba(255,255,255,0.13);
+  --border-brand:   rgba(165,42,42,0.35);
+
+  --text-1:         rgba(232,230,227,0.94);
+  --text-2:         rgba(232,230,227,0.60);
+  --text-3:         rgba(232,230,227,0.38);
+  --text-4:         rgba(232,230,227,0.22);
+
+  --font-display:   'Bebas Neue', sans-serif;
+  --font-ui:        'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:      'JetBrains Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+  --ease:      cubic-bezier(0.4,0,0.2,1);
+  --spring:    cubic-bezier(0.34,1.56,0.64,1);
+  /* Reserved for scene-level cinematic moments only (pitch's curtain,
+     module enter, staggered reveals) — NOT for buttons/hovers/nav,
+     which should stay on --ease. Do not apply globally. */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Shared global nav (--mnav-*) ──────────────────────────────────
+     Aliased to the canonical brand vars above so the nav can never
+     drift out of sync with the rest of the system again. Values that
+     are nav-specific (translucency, near-white text tone) stay literal. */
+  --mnav-bg:          rgba(16, 12, 11, 0.72);
+  --mnav-border:      rgba(255,255,255,0.08);
+  --mnav-text:        #f0e9e4;
+  --mnav-muted:       #9a8f88;
+  --mnav-brand:       var(--primary);
+  --mnav-brand-light: var(--primary-light);
+  --mnav-amber:       #d6a13c;
+  --mnav-font:        var(--font-ui);
+  --mnav-height:      60px;
+}

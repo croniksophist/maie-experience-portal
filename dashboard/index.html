@@ -7,6 +7,7 @@
 <title>MAIE — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/maie-tokens.css">
 </head>
 <body data-nav="dashboard">
 <style>
@@ -16,7 +17,7 @@
     --du-border: rgba(255,255,255,0.08);
     --du-text: #f0e9e4;
     --du-muted: #9a8f88;
-    --du-brand: #8a2e22;       
+    --du-brand: #A52A2A;       
     --du-brand-light: #c24e4e; 
     --du-amber: #d6a13c;
     --du-blue: #4d7ea8;
@@ -26,7 +27,7 @@
     --du-text-accent:    var(--du-brand-light);
     --du-surface-1:      rgba(255,255,255,0.025);
     --du-surface-0:      rgba(255,255,255,0.015);
-    --du-bg-accent:      rgba(138,46,34,0.14);
+    --du-bg-accent:      rgba(165,42,42,0.14);
     --du-border-accent:  rgba(194,78,78,0.4);
     --du-font-sans:      'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
@@ -78,7 +79,7 @@
     content:'';
     position:absolute;
     inset:0;
-    background: radial-gradient(ellipse 55% 70% at 8% 30%, rgba(138,46,34,0.20) 0%, transparent 65%),
+    background: radial-gradient(ellipse 55% 70% at 8% 30%, rgba(165,42,42,0.20) 0%, transparent 65%),
                 radial-gradient(ellipse 45% 55% at 95% 85%, rgba(77,126,168,0.10) 0%, transparent 60%);
     pointer-events:none;
   }
@@ -122,7 +123,7 @@
     background: rgba(255,255,255,0.032); border:1px solid rgba(255,255,255,0.058); border-radius:6px;
     padding:8px; transition: border-color .2s, background .2s, transform .2s;
   }
-  .du-cockpit-tile.on { border-color: rgba(138,46,34,0.5); background: rgba(138,46,34,0.14); transform: translateY(-1px); }
+  .du-cockpit-tile.on { border-color: rgba(165,42,42,0.5); background: rgba(165,42,42,0.14); transform: translateY(-1px); }
   .du-cockpit-tile-label { font-family: var(--font-mono, monospace); font-size:7px; letter-spacing:.06em; text-transform:uppercase; color:rgba(232,230,227,0.34); }
   .du-cockpit-tile-val { font-family: var(--font-mono, monospace); font-size:12px; font-weight:600; color:rgba(232,230,227,0.85); margin-top:3px; }
   .du-cockpit-nucleus {
@@ -140,7 +141,7 @@
   .du-cockpit-rail-item { height:8px; border-radius:4px; background:rgba(255,255,255,0.06); transition: background .2s; }
   .du-cockpit-rail-item.on { background: var(--du-green); box-shadow: 0 0 5px rgba(91,154,111,.5); }
   .du-cockpit-sheet {
-    height: 0; background: rgba(255,255,255,0.025); border-top: 1px solid rgba(138,46,34,0.4);
+    height: 0; background: rgba(255,255,255,0.025); border-top: 1px solid rgba(165,42,42,0.4);
     overflow:hidden; transition: height .35s cubic-bezier(.4,0,.2,1);
     display:flex; align-items:center; justify-content:center;
   }
@@ -304,15 +305,7 @@
 
 <style>
   :root {
-    --mnav-bg:      rgba(16, 12, 11, 0.72);
-    --mnav-border:  rgba(255,255,255,0.08);
-    --mnav-text:    #f0e9e4;
-    --mnav-muted:   #9a8f88;
-    --mnav-brand:   #8a2e22;
-    --mnav-brand-light: #c24e4e;
-    --mnav-amber:   #d6a13c;
-    --mnav-font:    'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mnav-height:  60px;
+    /* --mnav-* tokens now come from /assets/maie-tokens.css (single source of truth) */
   }
 
   .mnav {
@@ -369,7 +362,7 @@
   .mnav-link:hover { color: var(--mnav-text); background: rgba(255,255,255,0.05); }
   .mnav-link.active {
     color: var(--mnav-text);
-    background: rgba(138,46,34,0.18);
+    background: rgba(165,42,42,0.18);
     box-shadow: inset 0 0 0 1px rgba(194,78,78,0.35);
   }
   .mnav-link.active svg { opacity: 1; color: var(--mnav-brand-light); }
@@ -658,7 +651,7 @@
         headline: 'The Conversational Core',
         body: 'A single multi-line text field converts plain-language goals into inspectable, risk-gated multi-step plans. Before a single operation runs, the user sees every step. Risk classification determines whether the plan auto-approves or holds for sign-off. Live execution streams results step by step — partial success is preserved if any step fails. Completed plans export directly as marketplace assets.',
         attrs: ['Goal input', 'Plan generation', 'Risk gating', 'Step-by-step execution', 'Partial-success recovery', 'Marketplace export'],
-        color: 'rgba(138,46,34,0.14)', border: 'rgba(138,46,34,0.35)',
+        color: 'rgba(165,42,42,0.14)', border: 'rgba(165,42,42,0.35)',
       }
     },
     projects: {
@@ -718,7 +711,7 @@
         headline: 'Next Steps, Not Generic Upsells',
         body: 'Each recommendation is keyword-matched to the single most relevant tool or destination — scene language routes to Scene Detection, metadata language routes to Metadata Enrichment, marketplace language routes to Asset Management. Every suggestion carries exactly one correctly-targeted Launch action. No dead-end descriptions. No navigation required. The recommendation layer reads the user\'s project count and usage history; its suggestions are not the same for a new user and a user with 50 processed projects.',
         attrs: ['Personalised to usage history', 'Keyword-to-tool matching', 'One Launch action per recommendation', 'Scene · Metadata · Marketplace routing', 'Project-count aware'],
-        color: 'rgba(138,46,34,0.10)', border: 'rgba(138,46,34,0.28)',
+        color: 'rgba(165,42,42,0.10)', border: 'rgba(165,42,42,0.28)',
       }
     },
     utility: {
@@ -728,7 +721,7 @@
         headline: 'The On-Demand Contextual Layer',
         body: 'The Utility Panel slides up from the bottom of any page — 64px collapsed rail with a hover-pulse expand affordance, 80vh fully expanded. Six built-in pages: About, Features, Help & Support (with a live backend health fetch), Dashboard Guide, Token History (full paginated ledger), and System Status (live service meters with the same dot-pulse language used across the entire platform). Each page shares a single unified —mu-* design token system, so the panel chrome and every page inside it read as one instrument, not six disconnected tools.',
         attrs: ['Slide-up from any page', '64px → 80vh', 'Live /health/live fetch in Help', 'System Status live meters', 'Token History paginated ledger', 'Unified —mu-* token system'],
-        color: 'rgba(138,46,34,0.12)', border: 'rgba(138,46,34,0.35)',
+        color: 'rgba(165,42,42,0.12)', border: 'rgba(165,42,42,0.35)',
       }
     },
   };
@@ -747,7 +740,7 @@
     { label: 'Low — auto-approved',          color: 'var(--du-green)' },
     { label: 'Medium — review required',     color: 'var(--du-amber)' },
     { label: 'High — step-by-step sign-off', color: '#b05c3a' },
-    { label: 'Critical — full halt',         color: '#8a2e22' },
+    { label: 'Critical — full halt',         color: '#A52A2A' },
   ];
 
   // Compact tab content for the hero's view-tab strip — replaces the old

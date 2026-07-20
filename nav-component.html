@@ -6,22 +6,20 @@
   <style>), and the <nav> markup as the first child of <body>. Works as
   a drop-in for dashboard/index.html and pitch/index.html.
 
-  Do NOT paste this into pixie/index.html or pixie-framework/index.html.
-  Those two are embed-only component fragments (no page chrome of their
-  own by design — see the EMBED_MODE pattern used in experience-module),
-  not top-level pages that should own a nav bar.
+  UPDATE (2026-07-20): pixie/index.html and pixie-framework/index.html
+  now DO carry this nav and full page chrome, same as pitch/dashboard —
+  this was originally an embed-only fragment pattern, but the decision
+  has been made to give all four modules the same top-level chrome.
+  experience-module/index.html's EMBED_MODE pattern is unaffected.
 
   TOKENS
-  Locked to its own --mnav-* values rather than chaining to a host
-  token set, the same call already made in pixie/index.html and
-  pixie-framework/index.html: there's no single real global.css across
-  this codebase to chain to (dashboard uses --du-*, pitch uses
-  unprefixed --primary/--bg/etc with a different accent, root
-  index.html uses another unprefixed set). The color values below are
-  the ones dashboard and root index.html already agree on byte-for-byte
-  (#100c0b / #8a2e22 / #d6a13c), so the nav reads as the same system on
-  every page it's dropped into without requiring a token migration
-  across four files first.
+  --mnav-* now come from /assets/maie-tokens.css, which every host page
+  links in <head> before its own inline <style>. That file is the
+  single source of truth: --primary is canonically #A52A2A (pitch's
+  original value). dashboard's --du-brand, root index.html's --brand,
+  and this nav's --mnav-brand previously carried an unreconciled
+  #8a2e22 — all have been updated to match #A52A2A. Do not
+  re-introduce a hardcoded hex here; reference the token file instead.
 
   ACTIVE STATE
   Set data-nav="dashboard|experience|companion|pitch|framework" on
@@ -30,15 +28,7 @@
 -->
 <style>
   :root {
-    --mnav-bg:      rgba(16, 12, 11, 0.72);
-    --mnav-border:  rgba(255,255,255,0.08);
-    --mnav-text:    #f0e9e4;
-    --mnav-muted:   #9a8f88;
-    --mnav-brand:   #8a2e22;
-    --mnav-brand-light: #c24e4e;
-    --mnav-amber:   #d6a13c;
-    --mnav-font:    'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mnav-height:  60px;
+    /* --mnav-* tokens now come from /assets/maie-tokens.css (single source of truth) */
   }
 
   .mnav {
@@ -95,7 +85,7 @@
   .mnav-link:hover { color: var(--mnav-text); background: rgba(255,255,255,0.05); }
   .mnav-link.active {
     color: var(--mnav-text);
-    background: rgba(138,46,34,0.18);
+    background: rgba(165,42,42,0.18);
     box-shadow: inset 0 0 0 1px rgba(194,78,78,0.35);
   }
   .mnav-link.active svg { opacity: 1; color: var(--mnav-brand-light); }
