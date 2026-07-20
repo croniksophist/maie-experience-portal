@@ -253,8 +253,8 @@ body {
 .content {
   /* Viewport stage: exactly fills the grid cell below the topbar. */
   overflow: hidden;
-  height: calc(100vh - 52px); /* fallback */
-  height: calc(100dvh - 52px);
+  height: calc(100vh - var(--mnav-height, 60px) - 52px); /* fallback */
+  height: calc(100dvh - var(--mnav-height, 60px) - 52px);
   position: relative;
 }
 
@@ -268,8 +268,8 @@ body {
   display: none;
   position: absolute;
   inset: 0;
-  height: calc(100vh - 52px); /* fallback */
-  height: calc(100dvh - 52px);
+  height: calc(100vh - var(--mnav-height, 60px) - 52px); /* fallback */
+  height: calc(100dvh - var(--mnav-height, 60px) - 52px);
   flex-direction: column;
   overflow: hidden; /* outer clip is hard */
 }
