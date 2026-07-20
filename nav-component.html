@@ -66,6 +66,7 @@
     flex-shrink: 0;
   }
   .mnav-brand svg { display: block; }
+  .mnav-logo { width: 34px; height: auto; flex-shrink: 0; }
   .mnav-brand-word {
     font-size: 15px;
     font-weight: 600;
@@ -146,9 +147,14 @@
 
 <nav class="mnav" aria-label="MAIE global navigation">
   <a class="mnav-brand" href="/index.html">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="22" height="22" rx="6" stroke="var(--mnav-brand-light)" stroke-width="1.5"/>
-      <path d="M7 16V8l5 5 5-5v8" stroke="var(--mnav-amber)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <svg class="mnav-logo" viewBox="0 0 92 56" fill="none" stroke="#A52A2A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M 2,32 L 7,14 L 12,46 L 18,10 L 24,40
+               C 29,20 33,20 33,30 C 33,40 39,40 41,28
+               L 46,44 L 50,20 L 54,38
+               C 58,26 63,26 63,34 C 63,40 68,38 70,32
+               Q 73,29 76,32 T 84,32"/>
+      <circle cx="86" cy="32" r="3" fill="#FFD166" stroke="none"/>
+      <circle cx="86" cy="32" r="6.5" fill="none" stroke="#FFD166" stroke-width="1" opacity="0.4"/>
     </svg>
     <span class="mnav-brand-word">MAIE</span>
   </a>
