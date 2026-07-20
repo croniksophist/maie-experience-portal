@@ -1,1 +1,249 @@
-<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=maie_experience_portal_full.html"></head></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAIE — Product Experience Hub</title>
+<meta name="description" content="MAIE product experience modules — pitch, dashboard, and companion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #100c0b;
+    --surface: #18120f;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0e9e4;
+    --muted: #9a8f88;
+    --brand: #8a2e22;
+    --brand-light: #c24e4e;
+    --amber: #d6a13c;
+    --blue: #4d7ea8;
+    --green: #5b9a6f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ambient glow field — echoes the Pixie companion presence used across
+     the other modules, kept quiet here since this page's job is wayfinding */
+  .glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-1 { width: 420px; height: 420px; top: -120px; right: -80px; background: radial-gradient(circle, rgba(138,46,34,0.35), transparent 70%); }
+  .glow-2 { width: 320px; height: 320px; bottom: -100px; left: -60px; background: radial-gradient(circle, rgba(77,126,168,0.18), transparent 70%); }
+
+  header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+  }
+  .wordmark span { color: var(--brand-light); }
+
+  .eyebrow-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 88px 32px 120px;
+  }
+
+  .hero-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--brand-light);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6.5vw, 76px);
+    line-height: 0.98;
+    letter-spacing: 0.01em;
+    max-width: 16ch;
+    margin-bottom: 28px;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 52ch;
+    margin-bottom: 64px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    header { padding: 22px 24px; }
+    main { padding: 56px 20px 80px; }
+  }
+
+  .card {
+    background: var(--bg);
+    padding: 40px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 0.25s ease;
+    position: relative;
+  }
+
+  .card:hover { background: var(--surface); }
+  .card:focus-visible { outline: 2px solid var(--brand-light); outline-offset: -2px; }
+
+  .card-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--kicker-color, var(--muted));
+  }
+  .card-kicker::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--kicker-color, var(--muted));
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 0.01em;
+  }
+
+  .card-desc {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 38ch;
+  }
+
+  .card-arrow {
+    margin-top: auto;
+    padding-top: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.2s ease;
+  }
+  .card:hover .card-arrow { gap: 10px; }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px 56px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .card-arrow { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<header>
+  <div class="wordmark">MAIE <span>|</span> PRODUCT EXPERIENCE</div>
+  <div class="eyebrow-tag">portal.joinmaie.com</div>
+</header>
+
+<main>
+  <div class="hero-kicker">Product Experience Hub</div>
+  <h1>Four ways in. One production memory layer.</h1>
+  <p class="hero-sub">
+    Each module stands on its own — pick the one that matches who you're talking to,
+    not a chapter order to work through top to bottom.
+  </p>
+
+  <div class="grid">
+    <a class="card" href="/pitch/" style="--kicker-color: var(--brand-light);">
+      <div class="card-kicker">Pitch Deck · 12 Chapters</div>
+      <div class="card-title">The Full Walkthrough</div>
+      <p class="card-desc">Vision, industry challenges, architecture, roadmap, and business model — the complete narrative.</p>
+      <div class="card-arrow">Enter the pitch →</div>
+    </a>
+
+    <a class="card" href="/dashboard/" style="--kicker-color: var(--blue);">
+      <div class="card-kicker">Product Overview</div>
+      <div class="card-title">The Workspace</div>
+      <p class="card-desc">What a creator actually sees — the dashboard, the tools, the day-to-day of the platform.</p>
+      <div class="card-arrow">See the dashboard →</div>
+    </a>
+
+    <a class="card" href="/pixie/" style="--kicker-color: var(--amber);">
+      <div class="card-kicker">Product Experience</div>
+      <div class="card-title">Meet Pixie</div>
+      <p class="card-desc">The companion, on its own terms — how it looks, moves, and responds inside a workspace.</p>
+      <div class="card-arrow">Meet Pixie →</div>
+    </a>
+
+    <a class="card" href="/pixie-framework/" style="--kicker-color: var(--green);">
+      <div class="card-kicker">System Overview</div>
+      <div class="card-title">How Pixie Works</div>
+      <p class="card-desc">The framework underneath the companion — archetypes, reputation echo, and how it learns.</p>
+      <div class="card-arrow">See the framework →</div>
+    </a>
+  </div>
+</main>
+
+<footer>
+  MAIE — a Midwest Media Alliance production tool
+</footer>
+
+</body>
+</html>
