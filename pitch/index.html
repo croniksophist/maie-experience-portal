@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
+<script src="/assets/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAIE — Product Experience</title>
@@ -14,29 +15,15 @@
 <style>
 
 /* ═══════════════════════════════════════════════════════
-   DESIGN TOKENS — mirrors MAIE global.css + mu-tokens.css
+   DESIGN TOKENS
+   --primary/--bg/--surface/--border/--text-*/--font-* etc. now come
+   solely from /assets/maie-tokens.css (:root + [data-theme="light"]) —
+   this used to redeclare them as hardcoded dark-only hex, which
+   silently overrode tokens.css and made the theme toggle a no-op on
+   this page (same-specificity, later-in-cascade local :root always
+   won). Only pitch-specific, non-brand tokens live here now.
    ═══════════════════════════════════════════════════════ */
 :root {
-  --primary:        #A52A2A;
-  --primary-light:  #C24E4E;
-  --primary-dark:   #772E25;
-  --primary-glow:   rgba(165,42,42,0.32);
-  --accent:         #FFB400;
-  --bg:             #09090B;
-  --bg-alt:         #0C0D10;
-  --surface:        #111318;
-  --surface-raised: rgba(255,255,255,0.025);
-  --surface-card:   #161820;
-  --border:         rgba(255,255,255,0.07);
-  --border-strong:  rgba(255,255,255,0.13);
-  --border-brand:   rgba(165,42,42,0.35);
-  --text-1:         rgba(232,230,227,0.94);
-  --text-2:         rgba(232,230,227,0.60);
-  --text-3:         rgba(232,230,227,0.38);
-  --text-4:         rgba(232,230,227,0.22);
-  --font-display:   'Bebas Neue', sans-serif;
-  --font-ui:        'DM Sans', sans-serif;
-  --font-mono:      'JetBrains Mono', monospace;
   --radius-sm: 6px;
   --radius:    10px;
   --radius-lg: 16px;
@@ -56,6 +43,7 @@
      media query below, not unconditionally. */
   --stage-max-width: 1680px;
 }
+
 
 /* ═══════════════════════════════════════════════════════
    RESET + BASE
@@ -1574,6 +1562,12 @@ body {
 
   <div class="mnav-right">
     <span class="mnav-context" id="mnav-context"></span>
+    <button class="mnav-theme-toggle" id="mnav-theme-toggle" type="button">
+      <span class="mnav-theme-track">
+        <span class="mnav-theme-thumb" id="mnav-theme-thumb"></span>
+      </span>
+      <span class="mnav-theme-label" id="mnav-theme-label"></span>
+    </button>
     <button class="mnav-toggle" id="mnav-toggle" aria-label="Open menu" aria-expanded="false">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
@@ -1593,6 +1587,35 @@ body {
       if (ctx) ctx.textContent = label;
     }
   });
+
+  var SUN_ICON  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+  var MOON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>';
+
+  var themeBtn = document.getElementById('mnav-theme-toggle');
+  var themeThumb = document.getElementById('mnav-theme-thumb');
+  var themeLabel = document.getElementById('mnav-theme-label');
+
+  function renderTheme() {
+    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    if (themeThumb) themeThumb.innerHTML = isDark ? MOON_ICON : SUN_ICON;
+    if (themeLabel) themeLabel.textContent = isDark ? 'Dark' : 'Light';
+    if (themeBtn) {
+      var next = isDark ? 'light' : 'dark';
+      themeBtn.setAttribute('aria-label', 'Switch to ' + next + ' mode');
+      themeBtn.setAttribute('title', 'Switch to ' + next + ' mode');
+    }
+  }
+  renderTheme();
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      var next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('maie-theme', next); } catch (e) {}
+      renderTheme();
+    });
+  }
 
   var toggle = document.getElementById('mnav-toggle');
   var overlay = document.getElementById('mnav-overlay');

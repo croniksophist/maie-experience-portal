@@ -58,3 +58,115 @@
   --mnav-font:        var(--font-ui);
   --mnav-height:      60px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE — set via data-theme="light" on <html>
+   Written by assets/theme-init.js (seed, pre-paint) and the nav
+   toggle's click handler (localStorage key: "maie-theme").
+   Mirrors the two-block pattern in the MAIE app's global.css.
+   ═══════════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --primary:        #772E25;
+  --primary-light:  #A52A2A;
+  --primary-dark:   #5C1F18;
+  --primary-glow:   rgba(119,46,37,0.18);
+  --accent:         #B8860B;
+
+  --bg:             #EDEEF1;
+  --bg-alt:         #F0F2F5;
+  --surface:        #FFFFFF;
+  --surface-raised: rgba(0,0,0,0.02);
+  --surface-card:   #FFFFFF;
+
+  --border:         rgba(0,0,0,0.09);
+  --border-strong:  rgba(0,0,0,0.15);
+  --border-brand:   rgba(119,46,37,0.22);
+
+  --text-1:         rgba(17,19,24,0.94);
+  --text-2:         rgba(17,19,24,0.62);
+  --text-3:         rgba(17,19,24,0.40);
+  --text-4:         rgba(17,19,24,0.24);
+
+  --mnav-bg:          rgba(255, 255, 255, 0.82);
+  --mnav-border:      rgba(0,0,0,0.08);
+  --mnav-text:        #1A1410;
+  --mnav-muted:       #6b625c;
+  --mnav-amber:       #9c7420;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THEME TOGGLE — shared control, same look as the app's ThemeToggle.tsx
+   (Sun/Moon pill switch). Vanilla markup lives in nav-component.html;
+   this is the only place its styles are defined so every host page
+   that links this file gets it for free.
+   ═══════════════════════════════════════════════════════════════════ */
+.mnav-theme-toggle {
+  display:          inline-flex;
+  align-items:      center;
+  gap:              8px;
+  cursor:           pointer;
+  user-select:      none;
+  background:       none;
+  border:           none;
+  padding:          0;
+  margin-left:      4px;
+}
+
+.mnav-theme-track {
+  position:     relative;
+  width:        40px;
+  height:       22px;
+  border-radius:100px;
+  border:       1px solid transparent;
+  transition:   background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  flex-shrink:  0;
+}
+[data-theme="dark"] .mnav-theme-track {
+  background:  rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+[data-theme="light"] .mnav-theme-track {
+  background:  rgba(165, 42, 42, 0.12);
+  border-color: rgba(165, 42, 42, 0.3);
+  box-shadow:  0 0 0 1px rgba(165, 42, 42, 0.12);
+}
+
+.mnav-theme-thumb {
+  position:       absolute;
+  top:            2px;
+  width:          16px;
+  height:         16px;
+  border-radius:  50%;
+  transition:     left 0.22s cubic-bezier(0.4, 0, 0.2, 1), background 0.22s ease, box-shadow 0.22s ease;
+  display:        flex;
+  align-items:    center;
+  justify-content:center;
+}
+.mnav-theme-thumb svg { width: 10px; height: 10px; display: block; }
+[data-theme="dark"] .mnav-theme-thumb {
+  left:       2px;
+  background: rgba(232, 230, 227, 0.45);
+  box-shadow: none;
+  color:      #1a1a1a;
+}
+[data-theme="light"] .mnav-theme-thumb {
+  left:       20px;
+  background: #A52A2A;
+  box-shadow: 0 1px 6px rgba(165, 42, 42, 0.45);
+  color:      #fff;
+}
+
+.mnav-theme-label {
+  font-family:    var(--font-mono);
+  font-size:      10.5px;
+  font-weight:    500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:     color 0.22s ease;
+}
+[data-theme="dark"] .mnav-theme-label  { color: rgba(232, 230, 227, 0.38); }
+[data-theme="light"] .mnav-theme-label { color: rgba(165, 42, 42, 0.75); }
+
+@media (max-width: 720px) {
+  .mnav-theme-toggle { margin-left: 0; }
+}
