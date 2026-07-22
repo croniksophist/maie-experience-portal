@@ -299,30 +299,29 @@
   display: grid;
   align-items: start;
 
-  /* This module owns its own theme, unconditionally — same call made
-     on the dashboard overview and companion gallery files, for the
-     same reason: every one of these was written against host tokens
-     (--text-primary, --surface-1, --bg-accent, --border-accent,
-     --font-sans, --font-voice, and — only here, same as the tier cards
-     on the companion file — the completely undefined --bg-pro/
-     --border-pro/--text-pro/--bg-success/--border-success/
-     --text-success) that don't exist anywhere in the real global.css.
-     Locked to --pm-* directly rather than chained: there's no real
-     host to chain to, and this is presentation collateral, not an
-     in-app fragment. */
-  --pm-bg:             #0b0b10;
-  --pm-text-primary:   #f1ede8;
-  --pm-text-secondary: rgba(241,237,232,0.66);
-  --pm-text-muted:     rgba(241,237,232,0.42);
-  --pm-border:         rgba(255,255,255,0.08);
-  --pm-border-strong:  rgba(255,255,255,0.18);
+  /* This block used to lock every value here unconditionally, on the
+     rationale that there was "no real host to chain to." That was true
+     when this was an embed-only fragment, but nav-component.html's
+     2026-07-20 update gave this page the same top-level chrome (incl.
+     the theme toggle) as dashboard/pitch — so it now has a real host:
+     /assets/maie-tokens.css. Structural tokens alias to it below. The
+     tier-card accent colors (pro/accent/success) still have no
+     canonical counterpart, so they stay page-specific — their light-
+     mode variants are set in the [data-theme="light"] .pm block below,
+     which needs the extra specificity to win over this one. */
+  --pm-bg:             var(--bg);
+  --pm-text-primary:   var(--text-1);
+  --pm-text-secondary: var(--text-2);
+  --pm-text-muted:     var(--text-3);
+  --pm-border:         var(--border);
+  --pm-border-strong:  var(--border-strong);
   --pm-surface-0:      rgba(255,255,255,0.02);
-  --pm-surface-1:      rgba(255,255,255,0.035);
+  --pm-surface-1:      var(--surface-raised);
   --pm-surface-2:      rgba(255,255,255,0.055);
   --pm-fill-accent:    #A855F7;
   --pm-fill-success:   #22C55E;
-  --pm-font-sans:      'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --pm-font-voice:     'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --pm-font-sans:      var(--font-ui);
+  --pm-font-voice:     var(--font-ui);
 
   /* Tier-card accents — same semantics and same values as the
      companion gallery's Three-Tier Architecture cards, so the two
@@ -340,7 +339,7 @@
   --pm-border-success: rgba(34,197,94,0.28);
   --pm-text-success:   #4ade80;
 
-  --pm-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+  --pm-ease-cinematic: var(--ease-cinematic);
 
   /* v4 — fluid spacing scale. Previously every gap/margin in this file
      was a fixed px/rem value, so section rhythm didn't taper on very
@@ -351,6 +350,23 @@
   --pm-gap-sm: clamp(6px, 1.2cqi, 10px);
   --pm-gap-md: clamp(10px, 2cqi, 16px);
   --pm-gap-lg: clamp(1rem, 3cqi, 1.5rem);
+}
+
+[data-theme="light"] .pm {
+  --pm-surface-0:      rgba(0,0,0,0.02);
+  --pm-surface-2:      rgba(0,0,0,0.055);
+  --pm-fill-accent:    #7e22ce;
+  --pm-fill-success:   #15803d;
+
+  --pm-bg-pro:         rgba(2,132,199,0.08);
+  --pm-border-pro:     rgba(2,132,199,0.25);
+  --pm-text-pro:       #0369a1;
+  --pm-bg-accent:      rgba(147,51,234,0.10);
+  --pm-border-accent:  rgba(147,51,234,0.28);
+  --pm-text-accent:    #7e22ce;
+  --pm-bg-success:     rgba(22,163,74,0.08);
+  --pm-border-success: rgba(22,163,74,0.25);
+  --pm-text-success:   #15803d;
 }
 
 #section-intro {

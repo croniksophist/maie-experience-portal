@@ -11,27 +11,37 @@
 </head>
 <body data-nav="dashboard">
 <style>
+  /* --du-* used to redeclare hardcoded dark-only hex here, which silently
+     overrode /assets/maie-tokens.css and made the theme toggle a no-op on
+     this page (same bug pitch/index.html had — see maie-tokens.css header).
+     These now alias to the canonical vars so light mode reaches the whole
+     page, not just the nav. --du-amber/--du-blue/--du-green stay literal:
+     they're page-specific status-chip colors with no canonical counterpart,
+     same as the semantic accent colors left literal in pitch's chapter data. */
   :root {
-    --du-bg: #100c0b;
-    --du-surface: #18120f;
-    --du-border: rgba(255,255,255,0.08);
-    --du-text: #f0e9e4;
-    --du-muted: #9a8f88;
-    --du-brand: #A52A2A;       
-    --du-brand-light: #c24e4e; 
+    --du-bg:              var(--bg);
+    --du-surface:         var(--surface);
+    --du-border:          var(--border);
+    --du-text:            var(--text-1);
+    --du-muted:           var(--text-3);
+    --du-brand:           var(--primary);
+    --du-brand-light:     var(--primary-light);
     --du-amber: #d6a13c;
     --du-blue: #4d7ea8;
     --du-green: #5b9a6f;
 
-    --du-text-secondary: rgba(240,233,228,0.65);
+    --du-text-secondary: var(--text-2);
     --du-text-accent:    var(--du-brand-light);
-    --du-surface-1:      rgba(255,255,255,0.025);
+    --du-surface-1:      var(--surface-raised);
     --du-surface-0:      rgba(255,255,255,0.015);
-    --du-bg-accent:      rgba(165,42,42,0.14);
-    --du-border-accent:  rgba(194,78,78,0.4);
-    --du-font-sans:      'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --du-bg-accent:      var(--primary-glow);
+    --du-border-accent:  var(--border-brand);
+    --du-font-sans:      var(--font-ui);
 
-    --du-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+    --du-ease-cinematic: var(--ease-cinematic);
+  }
+  [data-theme="light"] {
+    --du-surface-0: rgba(0,0,0,0.015);
   }
   body {
     margin: 0;

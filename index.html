@@ -11,13 +11,19 @@
 <link rel="stylesheet" href="/assets/maie-tokens.css">
 <style>
   :root {
-    --bg: #100c0b;
-    --surface: #18120f;
-    --border: rgba(255,255,255,0.08);
-    --text: #f0e9e4;
-    --muted: #9a8f88;
-    --brand: #A52A2A;
-    --brand-light: #c24e4e;
+    /* --bg/--surface/--border used to be redeclared here as hardcoded
+       dark-only hex, which — at equal specificity, later in the cascade
+       than the linked stylesheet — silently overrode the theme-aware
+       versions in /assets/maie-tokens.css and made the toggle a no-op
+       on this page (same bug pitch/dashboard/pixie-framework had). They
+       now come solely from maie-tokens.css. --text/--muted/--brand* don't
+       share a name with a canonical token, so they stay as aliases;
+       --amber/--blue/--green are page-specific status colors with no
+       canonical counterpart. */
+    --text: var(--text-1);
+    --muted: var(--text-3);
+    --brand: var(--primary);
+    --brand-light: var(--primary-light);
     --amber: #d6a13c;
     --blue: #4d7ea8;
     --green: #5b9a6f;
