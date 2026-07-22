@@ -185,7 +185,8 @@
 
   /* 5th, full-width row: points outward to the main site / waitlist,
      rather than into another module like the four cards above it. */
-  .cta-card { grid-column: 1 / -1; }
+  .cta-card { grid-column: 1 / -1; align-items: center; text-align: center; }
+  .cta-card .card-kicker { justify-content: center; }
   .cta-card .card-desc { max-width: 64ch; }
   .cta-card .card-desc a {
     color: var(--brand-light);
