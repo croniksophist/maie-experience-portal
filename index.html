@@ -183,6 +183,18 @@
   }
   .card:hover .card-arrow { gap: 10px; }
 
+  /* 5th, full-width row: points outward to the main site / waitlist,
+     rather than into another module like the four cards above it. */
+  .cta-card { grid-column: 1 / -1; }
+  .cta-card .card-desc { max-width: 64ch; }
+  .cta-card .card-desc a {
+    color: var(--brand-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .cta-card .card-desc a:hover { color: var(--text); }
+  .cta-card a:focus-visible { outline: 2px solid var(--brand-light); outline-offset: 2px; }
+
   footer {
     position: relative;
     z-index: 1;
@@ -246,6 +258,18 @@
       <p class="card-desc">The framework underneath the companion — archetypes, reputation echo, and how it learns.</p>
       <div class="card-arrow">See the framework →</div>
     </a>
+
+    <div class="card cta-card" style="--kicker-color: var(--brand-light);">
+      <div class="card-kicker">Beyond This Hub</div>
+      <div class="card-title">See where this fits into the bigger picture.</div>
+      <p class="card-desc">
+        This hub is the guided tour through the product itself. For the full story, pricing, and everything
+        else MAIE offers, head to our main site — or if you're not ready to dive in yet,
+        <a href="https://waitlist.joinmaie.com">join the waitlist</a> instead. You can always find your way
+        back to the <a href="/">portal home</a> from here.
+      </p>
+      <a class="card-arrow" href="https://joinmaie.com" target="_blank" rel="noopener">Visit joinmaie.com →</a>
+    </div>
   </div>
 </main>
 
