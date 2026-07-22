@@ -56,6 +56,19 @@
  * `connReach` (fraction of canvas width, default 0.35) sets how close
  * two particles must be before `'neural'` draws a line between them —
  * only read when animation is `'neural'`.
+ *
+ * ── v2.3: light/dark theme awareness ────────────────────────────
+ * Every effect here was tuned against a near-black canvas: the
+ * progress-ring rim highlight was a literal `rgba(255,255,255,...)`,
+ * and the ambient glow/particle/ring/neural-line alphas were all low
+ * enough to read as a soft glow on dark but wash out to near-
+ * invisible on a light one. draw() now reads `data-theme` off
+ * `<html>` every frame (cheap, and gives free live reactivity to the
+ * site's theme toggle with no event wiring) and scales those specific
+ * effects up — or, for the literal white rim stroke, switches it to a
+ * dark equivalent outright — when the page is in light mode. Nothing
+ * about a caller's options or the core/ring/particle color themes
+ * changed; only how boldly the ambient effects render.
  */
 
 (function (root) {
@@ -218,6 +231,18 @@
     function draw() {
       t += 0.017;
 
+      /* Read data-theme live, every frame, rather than once at init —
+         draw() already runs on a rAF loop, so this is free reactivity
+         to the user flipping the site's theme toggle mid-animation,
+         with no event wiring needed. Several effects below were tuned
+         only against a near-black canvas (a literal white rim stroke,
+         and glow/ring/connection alphas low enough to read as a soft
+         glow on dark but wash out to near-invisible on a light one) —
+         `lightBoost` scales those up, and the rim stroke switches color
+         outright, when data-theme="light". */
+      const isLight   = document.documentElement.getAttribute('data-theme') === 'light';
+      const lightBoost = isLight ? 1.8 : 1;
+
       const phaseEn =
         phase === 'executing'  ? 1.3 + (progress / 100) * 0.7
       : phase === 'planning'   ? 1.1
@@ -241,8 +266,8 @@
          "stage" canvas, well inside the bitmap edge, so it never clips. */
       const gR  = coreR * 2.4 + Math.sin(t * 1.2) * 3 + phaseEn * 6;
       const grd = ctx.createRadialGradient(nx, ny, 0, nx, ny, gR * opts.glowReach);
-      grd.addColorStop(0,   `rgba(${cR},${cG},${cB},${0.20 * modeEn})`);
-      grd.addColorStop(0.5, `rgba(${cR},${cG},${cB},${0.07 * modeEn})`);
+      grd.addColorStop(0,   `rgba(${cR},${cG},${cB},${0.20 * modeEn * lightBoost})`);
+      grd.addColorStop(0.5, `rgba(${cR},${cG},${cB},${0.07 * modeEn * lightBoost})`);
       grd.addColorStop(1,   `rgba(${cR},${cG},${cB},0)`);
       ctx.fillStyle = grd;
       ctx.beginPath(); ctx.arc(nx, ny, gR * opts.glowReach, 0, Math.PI * 2); ctx.fill();
@@ -264,7 +289,8 @@
         ctx.strokeStyle = `rgba(${cR},${cG},${cB},0.5)`;
         ctx.lineWidth = 1.5; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.arc(nx, ny, pr, sa, ea); ctx.stroke();
-        ctx.strokeStyle = `rgba(255,255,255,0.045)`; ctx.lineWidth = 1.5;
+        ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.045)';
+        ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.arc(nx, ny, pr, 0, Math.PI * 2); ctx.stroke();
       }
 
@@ -297,7 +323,7 @@
         const py = ny + Math.sin(p.angle) * p.radius;
         positions.push(px, py);
         ctx.save();
-        ctx.globalAlpha = p.opacity * 0.8 * modeEn;
+        ctx.globalAlpha = p.opacity * 0.8 * modeEn * lightBoost;
         const pg = ctx.createRadialGradient(px, py, 0, px, py, p.size * 2.5);
         pg.addColorStop(0, `rgba(${cR},${cG},${cB},0.9)`);
         pg.addColorStop(1, `rgba(${cR},${cG},${cB},0)`);
@@ -319,7 +345,7 @@
           const npx = positions[j * 2],    npy = positions[j * 2 + 1];
           const lD = Math.hypot(px - npx, py - npy);
           if (lD < connDist) {
-            ctx.strokeStyle = `rgba(${cR},${cG},${cB},${(1 - lD / connDist) * 0.12})`;
+            ctx.strokeStyle = `rgba(${cR},${cG},${cB},${(1 - lD / connDist) * 0.12 * lightBoost})`;
             ctx.lineWidth = 0.4;
             ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(npx, npy); ctx.stroke();
           }
@@ -332,7 +358,7 @@
       for (let r = 0; r < opts.rings; r++) {
         const rSz = baseRing + r * W * 0.09 * opts.scale
                   + rAl * (W * 0.07) + phaseEn * (W * 0.07);
-        ctx.strokeStyle = `rgba(${cR},${cG},${cB},${0.055 * rAl * modeEn / (r + 1)})`;
+        ctx.strokeStyle = `rgba(${cR},${cG},${cB},${0.055 * rAl * modeEn * lightBoost / (r + 1)})`;
         ctx.lineWidth = 0.8;
         ctx.beginPath(); ctx.arc(nx, ny, rSz, 0, Math.PI * 2); ctx.stroke();
       }
