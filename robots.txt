@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://maietech.github.io/maie-experience-portal/sitemap.xml

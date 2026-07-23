@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="/assets/theme-init.js"></script>
+<script src="../assets/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAIE — Pixie Companion Identity Framework</title>
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon.ico" sizes="any">
-<link rel="icon" href="/assets/favicon-32x32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="/assets/favicon-16x16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="description" content="The Pixie Companion identity framework — a living avatar that mirrors identity, workflow state, and earned reputation across every MAIE archetype.">
+<link rel="canonical" href="https://maietech.github.io/maie-experience-portal/pixie-framework/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MAIE">
+<meta property="og:title" content="MAIE — Pixie Companion Identity Framework">
+<meta property="og:description" content="The Pixie Companion identity framework — a living avatar that mirrors identity, workflow state, and earned reputation across every MAIE archetype.">
+<meta property="og:url" content="https://maietech.github.io/maie-experience-portal/pixie-framework/">
+<meta property="og:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAIE — Pixie Companion Identity Framework">
+<meta name="twitter:description" content="The Pixie Companion identity framework — a living avatar that mirrors identity, workflow state, and earned reputation across every MAIE archetype.">
+<meta name="twitter:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon.ico" sizes="any">
+<link rel="icon" href="../assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/maie-tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/maie-tokens.css">
 <!-- html/body wrapper: .pc-root caps at max-width:1440px and centers
      itself, so on viewports wider than that the page background outside
      the column was falling through to browser-default white. Echoing
@@ -26,6 +39,12 @@
   :root {
     /* --mnav-* tokens now come from /assets/maie-tokens.css (single source of truth) */
   }
+
+  /* Overrides the hardcoded dark anti-flash seed in <head> once this
+     stylesheet loads, so light mode isn't stuck showing a dark backdrop
+     bleeding through behind the fixed nav (same fix/reasoning as
+     pixie/index.html — see its own comment here for the axe-core numbers). */
+  body { background: var(--bg); }
 
   .mnav {
     position: sticky;
@@ -132,7 +151,7 @@
 </style>
 
 <nav class="mnav" aria-label="MAIE global navigation">
-  <a class="mnav-brand" href="/">
+  <a class="mnav-brand" href="../">
     <span class="mnav-brand-word">MAIE</span>
     <svg class="mnav-logo" viewBox="0 0 92 56" fill="none" stroke="#A52A2A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M 2,32 L 7,14 L 12,46 L 18,10 L 24,40
@@ -146,19 +165,19 @@
   </a>
 
   <div class="mnav-links" id="mnav-links">
-    <a class="mnav-link" data-nav="dashboard" href="/dashboard/">
+    <a class="mnav-link" data-nav="dashboard" href="../dashboard/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       Dashboard
     </a>
-    <a class="mnav-link" data-nav="experience" href="/pixie/">
+    <a class="mnav-link" data-nav="experience" href="../pixie/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></svg>
       Experience
     </a>
-    <a class="mnav-link" data-nav="companion" href="/pixie-framework/">
+    <a class="mnav-link" data-nav="companion" href="../pixie-framework/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-4.4-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.6-9.5 9-9.5 9Z"/></svg>
       Companion
     </a>
-    <a class="mnav-link" data-nav="pitch" href="/pitch/">
+    <a class="mnav-link" data-nav="pitch" href="../pitch/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v6h6"/></svg>
       Pitch
     </a>
@@ -233,6 +252,23 @@
     overlay.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', function () { overlay.classList.remove('open'); });
     });
+    // Escape and click-away close the overlay too — axe-core/Playwright's
+    // keyboard walkthrough found only the link-click and re-toggle paths
+    // worked before this, leaving keyboard users with no way to dismiss
+    // the open menu without tabbing through every link first.
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
   }
 })();
 </script>
@@ -276,13 +312,19 @@
     --pc-text-accent:    #7e22ce;
     --pc-bg-accent:      rgba(147,51,234,0.10);
     --pc-border-accent:  rgba(147,51,234,0.28);
+    /* axe-core measured 4.48:1 for --pc-muted against the phase-mode
+       card's tinted background (#e0d7ec) — just under 4.5:1. 0.65 clears
+       5.04:1 there without a visible change against the plain page bg. */
+    --pc-muted:          rgba(17,19,24,0.65);
 
     --pc-bg-pro:         rgba(2,132,199,0.08);
     --pc-border-pro:     rgba(2,132,199,0.25);
     --pc-text-pro:       #0369a1;
     --pc-bg-success:     rgba(22,163,74,0.08);
     --pc-border-success: rgba(22,163,74,0.25);
-    --pc-text-success:   #15803d;
+    /* Darkened from #15803d — measured 3.99:1 against the tier card's
+       tinted background (#dce8e4). #0f6b31 clears 5.27:1. */
+    --pc-text-success:   #0f6b31;
   }
 
   .sr-only {
@@ -458,6 +500,21 @@
     height: 130px;
   }
 
+  /* Static fallback glyph — shown instead of the live canvas when
+     prefers-reduced-motion is set. Same footprint as the canvas
+     (130x130, matching pixie/index.html's .pm-orb-static pattern) so
+     layout never jumps. */
+  .pc-orb-static {
+    width: 130px; height: 130px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 40% 35%, var(--pc-static-core, #8B5CF6) 0%, transparent 72%);
+    opacity: .8;
+  }
+  .pc-orb-static::after {
+    content: ''; width: 30%; height: 30%; border-radius: 50%;
+    background: var(--pc-static-core, #8B5CF6);
+  }
+
   /* Sticky phase selector */
   .pc-phase-sel {
     display:flex; gap:6px; margin-top:.5rem; flex-wrap:wrap;
@@ -546,10 +603,16 @@
       .pc-export-row { grid-template-columns: 1fr; }
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pc-phase-btn, .pc-theme-dot, .pc-arch-card {
+      transition-duration: .01ms !important;
+    }
+  }
 </style>
 
 <div class="pc-root" role="main">
-  <h2 class="sr-only">Pixie Companion Framework — Product Overview for MAIE</h2>
+  <h1 class="sr-only">Pixie Companion Framework — Product Overview for MAIE</h1>
 
   <div class="pc-hero">
     <div class="pc-canvas-wrap">
@@ -557,7 +620,7 @@
     </div>
     <div class="pc-hero-text">
       <div class="pc-tag">MAIE · Identity Framework · Tier 2</div>
-      <h3 class="pc-hero-title">The Pixie Companion</h3>
+      <h2 class="pc-hero-title">The Pixie Companion</h2>
       <p class="pc-hero-sub">A living, responsive avatar that is the face of every user's MAIE experience. Not a decoration — a real-time mirror of identity, workflow state, and earned reputation, fully customizable and portable across contexts.</p>
       <div style="margin-top:1rem;">
         <div class="pc-section-label" style="margin-bottom:.4rem">Live phase →</div>
@@ -665,22 +728,22 @@
   <div class="pc-section-label">Export and portability</div>
   <div class="pc-export-row">
     <div class="pc-export-card">
-      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(/assets/icons/image.svg)" aria-hidden="true"></span></div>
+      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(../assets/icons/image.svg)" aria-hidden="true"></span></div>
       <div class="pc-export-title">PNG snapshot</div>
       <div class="pc-export-desc">Lossless canvas capture at any scale via toDataURL()</div>
     </div>
     <div class="pc-export-card">
-      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(/assets/icons/loop.svg)" aria-hidden="true"></span></div>
+      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(../assets/icons/loop.svg)" aria-hidden="true"></span></div>
       <div class="pc-export-title">Animated SVG</div>
       <div class="pc-export-desc">Procedural SVG with CSS keyframes for embedding anywhere</div>
     </div>
     <div class="pc-export-card">
-      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(/assets/icons/drag.svg)" aria-hidden="true"></span></div>
+      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(../assets/icons/drag.svg)" aria-hidden="true"></span></div>
       <div class="pc-export-title">Drag-and-drop</div>
       <div class="pc-export-desc">Native HTML drag events pipe a PNG blob to any drop target</div>
     </div>
     <div class="pc-export-card">
-      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(/assets/icons/marketplace.svg)" aria-hidden="true"></span></div>
+      <div class="pc-export-icon" aria-hidden="true"><span class="icon-mask" style="--icon-src:url(../assets/icons/marketplace.svg)" aria-hidden="true"></span></div>
       <div class="pc-export-title">Marketplace skins</div>
       <div class="pc-export-desc">AGENT_SKIN assets composite onto canvas, clipped to core shape</div>
     </div>
@@ -709,6 +772,25 @@
 <script src="../assets/maie-pixie.js"></script>
 <script>
 (function() {
+  /* ── REDUCED MOTION ──────────────────────────────
+     Mirrors pixie/index.html's staticFallback pattern: when the
+     visitor prefers reduced motion, the live canvas is swapped for a
+     static, non-animated glyph instead of silently rendering a
+     continuously-orbiting avatar. */
+  const prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  function staticFallback(canvasId, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
+    const glyph = document.createElement('div');
+    glyph.className = 'pc-orb-static';
+    glyph.style.setProperty('--pc-static-core', color);
+    glyph.setAttribute('role', 'img');
+    glyph.setAttribute('aria-label', canvas.getAttribute('aria-label') || 'Pixie companion');
+    canvas.replaceWith(glyph);
+    return glyph;
+  }
+
   /* ── DATA ─────────────────────────────────────── */
   // These map directly onto MAIE.makePixie()'s options (v2.2 added
   // `animation`, `connReach`, `wobbleScale`, `speedScale` specifically
@@ -851,7 +933,13 @@
      mutable post-creation); theme changes use the cheaper
      pixie.setTheme() instead since the palette alone doesn't require
      tearing down the particle system. */
+  let staticGlyph = null;
   function rebuildPixie() {
+    if (prefersReducedMotion) {
+      if (!staticGlyph) staticGlyph = staticFallback('live-pixie-canvas', archColors[currentArchetypeIdx]);
+      else staticGlyph.style.setProperty('--pc-static-core', archColors[currentArchetypeIdx]);
+      return;
+    }
     if (pixie) pixie.stop();
     const arch = ARCHETYPES[currentArchetypeIdx];
     if (!window.MAIE || !window.MAIE.makePixie) return;

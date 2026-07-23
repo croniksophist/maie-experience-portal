@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="/assets/theme-init.js"></script>
+<script src="assets/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAIE — Product Experience Hub</title>
 <meta name="description" content="MAIE product experience modules — pitch, dashboard, and companion.">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon.ico" sizes="any">
-<link rel="icon" href="/assets/favicon-32x32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="/assets/favicon-16x16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="canonical" href="https://maietech.github.io/maie-experience-portal/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MAIE">
+<meta property="og:title" content="MAIE — Product Experience Hub">
+<meta property="og:description" content="MAIE product experience modules — pitch, dashboard, and companion.">
+<meta property="og:url" content="https://maietech.github.io/maie-experience-portal/">
+<meta property="og:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAIE — Product Experience Hub">
+<meta name="twitter:description" content="MAIE product experience modules — pitch, dashboard, and companion.">
+<meta name="twitter:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" href="assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/maie-tokens.css">
+<link rel="stylesheet" href="assets/maie-tokens.css">
 <style>
   :root {
     /* --bg/--surface/--border used to be redeclared here as hardcoded
@@ -32,6 +44,15 @@
     --amber: #d6a13c;
     --blue: #4d7ea8;
     --green: #5b9a6f;
+  }
+
+  /* Card-kicker status colors only cleared 4.5:1 text contrast against
+     the dark --bg — against light mode's --bg (#EDEEF1) they measured
+     2.0-3.72:1 (axe-core). Darker same-hue variants for light mode only. */
+  [data-theme="light"] {
+    --amber: #806124;
+    --blue: #416b8f;
+    --green: #447353;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,6 +102,8 @@
     color: var(--muted);
     text-transform: uppercase;
   }
+
+  .header-right { display: flex; align-items: center; gap: 16px; }
 
   main {
     position: relative;
@@ -223,9 +246,27 @@
 <div class="glow glow-1"></div>
 <div class="glow glow-2"></div>
 
+<!-- DECISION (2026-07-23): the hub keeps its own lightweight header
+     rather than inheriting the full .mnav chrome that dashboard/pitch/
+     pixie/pixie-framework share — it's the directory page, not a module,
+     so module nav-links pointing back into itself would be redundant.
+     The one real gap was functional, not cosmetic: visitors landing
+     here had no way to switch theme without first clicking into a
+     module. Closed by reusing the shared .mnav-theme-* classes/tokens
+     from assets/maie-tokens.css (same markup + logic as
+     nav-component.html's toggle) rather than inventing a second
+     implementation. -->
 <header>
   <div class="wordmark">MAIE <span>|</span> PRODUCT EXPERIENCE</div>
-  <div class="eyebrow-tag">portal.joinmaie.com</div>
+  <div class="header-right">
+    <div class="eyebrow-tag">portal.joinmaie.com</div>
+    <button class="mnav-theme-toggle" id="mnav-theme-toggle" type="button">
+      <span class="mnav-theme-track">
+        <span class="mnav-theme-thumb" id="mnav-theme-thumb"></span>
+      </span>
+      <span class="mnav-theme-label" id="mnav-theme-label"></span>
+    </button>
+  </div>
 </header>
 
 <main>
@@ -237,28 +278,28 @@
   </p>
 
   <div class="grid">
-    <a class="card" href="/pitch/" style="--kicker-color: var(--brand-light);">
+    <a class="card" href="pitch/" style="--kicker-color: var(--brand-light);">
       <div class="card-kicker">Pitch Deck · 12 Chapters</div>
       <div class="card-title">The Full Walkthrough</div>
       <p class="card-desc">Vision, industry challenges, architecture, roadmap, and business model — the complete narrative.</p>
       <div class="card-arrow">Enter the pitch →</div>
     </a>
 
-    <a class="card" href="/dashboard/" style="--kicker-color: var(--blue);">
+    <a class="card" href="dashboard/" style="--kicker-color: var(--blue);">
       <div class="card-kicker">Product Overview</div>
       <div class="card-title">The Workspace</div>
       <p class="card-desc">What a creator actually sees — the dashboard, the tools, the day-to-day of the platform.</p>
       <div class="card-arrow">See the dashboard →</div>
     </a>
 
-    <a class="card" href="/pixie/" style="--kicker-color: var(--amber);">
+    <a class="card" href="pixie/" style="--kicker-color: var(--amber);">
       <div class="card-kicker">Product Experience</div>
       <div class="card-title">Meet Pixie</div>
       <p class="card-desc">The companion, on its own terms — how it looks, moves, and responds inside a workspace.</p>
       <div class="card-arrow">Meet Pixie →</div>
     </a>
 
-    <a class="card" href="/pixie-framework/" style="--kicker-color: var(--green);">
+    <a class="card" href="pixie-framework/" style="--kicker-color: var(--green);">
       <div class="card-kicker">System Overview</div>
       <div class="card-title">How Pixie Works</div>
       <p class="card-desc">The framework underneath the companion — archetypes, reputation echo, and how it learns.</p>
@@ -272,7 +313,7 @@
         This hub is the guided tour through the product itself. For the full story, pricing, and everything
         else MAIE offers, head to our main site — or if you're not ready to dive in yet,
         <a href="https://waitlist.joinmaie.com">join the waitlist</a> instead. You can always find your way
-        back to the <a href="/">portal home</a> from here.
+        back to the <a href="./">portal home</a> from here.
       </p>
       <a class="card-arrow" href="https://joinmaie.com" target="_blank" rel="noopener">Visit joinmaie.com →</a>
     </div>
@@ -282,6 +323,41 @@
 <footer>
   MAIE — a Midwest Media Alliance production tool
 </footer>
+
+<script>
+(function () {
+  // Theme toggle — same markup/logic as nav-component.html's, reused here
+  // since the hub has no other JS on the page that would already own it.
+  var SUN_ICON  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+  var MOON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>';
+
+  var themeBtn = document.getElementById('mnav-theme-toggle');
+  var themeThumb = document.getElementById('mnav-theme-thumb');
+  var themeLabel = document.getElementById('mnav-theme-label');
+
+  function renderTheme() {
+    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    if (themeThumb) themeThumb.innerHTML = isDark ? MOON_ICON : SUN_ICON;
+    if (themeLabel) themeLabel.textContent = isDark ? 'Dark' : 'Light';
+    if (themeBtn) {
+      var next = isDark ? 'light' : 'dark';
+      themeBtn.setAttribute('aria-label', 'Switch to ' + next + ' mode');
+      themeBtn.setAttribute('title', 'Switch to ' + next + ' mode');
+    }
+  }
+  renderTheme();
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      var next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('maie-theme', next); } catch (e) {}
+      renderTheme();
+    });
+  }
+})();
+</script>
 
 </body>
 </html>

@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="/assets/theme-init.js"></script>
+<script src="../assets/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAIE — Pixie Product Experience</title>
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon.ico" sizes="any">
-<link rel="icon" href="/assets/favicon-32x32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="/assets/favicon-16x16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="description" content="An interactive stakeholder walkthrough of the MAIE Pixie companion — the live, responsive avatar behind every user's MAIE experience.">
+<link rel="canonical" href="https://maietech.github.io/maie-experience-portal/pixie/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MAIE">
+<meta property="og:title" content="MAIE — Pixie Product Experience">
+<meta property="og:description" content="An interactive stakeholder walkthrough of the MAIE Pixie companion — the live, responsive avatar behind every user's MAIE experience.">
+<meta property="og:url" content="https://maietech.github.io/maie-experience-portal/pixie/">
+<meta property="og:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAIE — Pixie Product Experience">
+<meta name="twitter:description" content="An interactive stakeholder walkthrough of the MAIE Pixie companion — the live, responsive avatar behind every user's MAIE experience.">
+<meta name="twitter:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon.ico" sizes="any">
+<link rel="icon" href="../assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/maie-tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/maie-tokens.css">
 <!-- html/body wrapper added so this module renders correctly when opened
      directly as a top-level page, not only when embedded in a host that
      already paints the viewport dark. Without this, anything past the
@@ -28,6 +41,13 @@
   :root {
     /* --mnav-* tokens now come from /assets/maie-tokens.css (single source of truth) */
   }
+
+  /* Overrides the hardcoded dark anti-flash seed in <head> (see its own
+     comment) once this stylesheet loads, so light mode isn't stuck
+     showing a dark backdrop behind/around .pm — that dark bleed-through
+     was dropping the fixed nav's text below 4.5:1 in light mode
+     (axe-core measured 3.98:1 on .mnav-link/.mnav-context/.mnav-theme-label). */
+  body { background: var(--bg); }
 
   .mnav {
     position: sticky;
@@ -134,7 +154,7 @@
 </style>
 
 <nav class="mnav" aria-label="MAIE global navigation">
-  <a class="mnav-brand" href="/">
+  <a class="mnav-brand" href="../">
     <span class="mnav-brand-word">MAIE</span>
     <svg class="mnav-logo" viewBox="0 0 92 56" fill="none" stroke="#A52A2A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M 2,32 L 7,14 L 12,46 L 18,10 L 24,40
@@ -148,19 +168,19 @@
   </a>
 
   <div class="mnav-links" id="mnav-links">
-    <a class="mnav-link" data-nav="dashboard" href="/dashboard/">
+    <a class="mnav-link" data-nav="dashboard" href="../dashboard/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       Dashboard
     </a>
-    <a class="mnav-link" data-nav="experience" href="/pixie/">
+    <a class="mnav-link" data-nav="experience" href="../pixie/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></svg>
       Experience
     </a>
-    <a class="mnav-link" data-nav="companion" href="/pixie-framework/">
+    <a class="mnav-link" data-nav="companion" href="../pixie-framework/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-4.4-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.6-9.5 9-9.5 9Z"/></svg>
       Companion
     </a>
-    <a class="mnav-link" data-nav="pitch" href="/pitch/">
+    <a class="mnav-link" data-nav="pitch" href="../pitch/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v6h6"/></svg>
       Pitch
     </a>
@@ -234,6 +254,23 @@
     });
     overlay.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', function () { overlay.classList.remove('open'); });
+    });
+    // Escape and click-away close the overlay too — axe-core/Playwright's
+    // keyboard walkthrough found only the link-click and re-toggle paths
+    // worked before this, leaving keyboard users with no way to dismiss
+    // the open menu without tabbing through every link first.
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
     });
   }
 })();
@@ -420,7 +457,7 @@
 }
 
 .pm-dark .pm-title { color: #ede9ff; }
-.pm-dark .pm-eyebrow { color: #6b6880; }
+.pm-dark .pm-eyebrow { color: #8783a0; }
 .pm-dark .pm-body { color: #9994b2; }
 
 .pm-body {
@@ -480,6 +517,17 @@
 
 .step-pill:hover { border-color: var(--pm-border-strong); color: var(--pm-text-secondary); }
 .step-pill.active { background: var(--bg-pro, rgba(194,78,78,0.14)); border-color: var(--border-pro, rgba(194,78,78,0.4)); color: var(--text-pro, #C24E4E); }
+/* step-pill only ever appears inside #section-intro's .pm-dark container
+   (a permanently-dark "stage" regardless of the portal-wide theme toggle —
+   see .pm-dark's own hardcoded .pm-title/.pm-eyebrow/.pm-body colors above).
+   Its default/hover/active colors above alias theme-following tokens
+   (--pm-text-muted, --pm-text-secondary, the #C24E4E fallback), so in
+   light mode they flip to dark-on-dark and nearly disappear (axe-core
+   measured 1.03:1). These hardcoded, theme-invariant overrides match the
+   pattern already used for this section's other text. */
+.pm-dark .step-pill { color: #8a879e; }
+.pm-dark .step-pill:hover { color: #b3afc6; }
+.pm-dark .step-pill.active { color: #CF6362; }
 
 /* ── Fluid grids — auto-fit/minmax replaces fixed column counts, so
    these reflow continuously with container width instead of snapping
@@ -833,7 +881,7 @@ canvas { display: block; }
 </style>
 
 <div class="pm" role="main">
-<h2 class="sr-only">MAIE Pixie Companion — an interactive walkthrough for stakeholders</h2>
+<h1 class="sr-only">MAIE Pixie Companion — an interactive walkthrough for stakeholders</h1>
 
 <div id="section-intro" class="pm-section pm-dark">
   <div class="pm-row" style="align-items:center;">
@@ -842,7 +890,7 @@ canvas { display: block; }
     </div>
     <div style="flex:1;min-width:220px;">
       <div class="pm-eyebrow">MAIE · Product Experience Module</div>
-      <h3 class="pm-title">Meet the presence that grows alongside your work.</h3>
+      <h2 class="pm-title">Meet the presence that grows alongside your work.</h2>
       <p class="pm-body">Most platforms expose their work through progress bars, logs, and status codes. MAIE does something different. Every decision, every step, every achievement — all of it flows through a single living presence the creator comes to know as their own.</p>
       <p class="pm-quote">"The workflow decides what happens next. The Pixie is how it feels to watch it happen."</p>
     </div>
@@ -864,7 +912,7 @@ canvas { display: block; }
 <div id="sec-intro" class="pm-view">
   <div class="pm-section">
     <div class="pm-eyebrow">The premise</div>
-    <h3 class="pm-title" style="font-size:16px;">What the Pixie is not</h3>
+    <h2 class="pm-title" style="font-size:16px;">What the Pixie is not</h2>
     <div class="pm-two">
       <div class="pm-card pm-reveal" style="--i:0;">
         <div class="pm-card-label">Not a chatbot avatar</div>
@@ -897,7 +945,7 @@ canvas { display: block; }
 <div id="sec-workflow" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Scenario · "Generate a documentary trailer"</div>
-    <h3 class="pm-title" style="font-size:16px;">Watch a full project come to life</h3>
+    <h2 class="pm-title" style="font-size:16px;">Watch a full project come to life</h2>
     <p class="pm-body" style="margin-bottom:1rem;">Step through each phase of the journey. The Pixie canvas on the left mirrors every change — the same connection your creators will experience live in MAIE.</p>
 
     <div style="display:flex;justify-content:flex-start;margin-bottom:.75rem;">
@@ -1014,7 +1062,7 @@ canvas { display: block; }
 <div id="sec-tiers" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Identity architecture</div>
-    <h3 class="pm-title" style="font-size:16px;">Three layers. One presence.</h3>
+    <h2 class="pm-title" style="font-size:16px;">Three layers. One presence.</h2>
     <p class="pm-body">The architecture separates permanence from expression. The innermost layer never changes. Everything outward can be customized, upgraded, or replaced — without touching what matters.</p>
 
     <div class="tier-visual">
@@ -1057,7 +1105,7 @@ canvas { display: block; }
 <div id="sec-agents" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Behind the canvas</div>
-    <h3 class="pm-title" style="font-size:16px;">Six specialists. One Pixie.</h3>
+    <h2 class="pm-title" style="font-size:16px;">Six specialists. One Pixie.</h2>
     <p class="pm-body">While the creator sees one living companion, a constellation of specialists works together beneath it. The Pixie is the single point of contact for all of that coordinated work.</p>
 
     <div class="pm-row" style="align-items:flex-start;margin-top:1rem;">
@@ -1107,7 +1155,7 @@ canvas { display: block; }
 <div id="sec-reputation" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Persistent creative history</div>
-    <h3 class="pm-title" style="font-size:16px;">Work that leaves a mark</h3>
+    <h2 class="pm-title" style="font-size:16px;">Work that leaves a mark</h2>
     <p class="pm-body" style="margin-bottom:.5rem;">Every completed production, published asset, and creative milestone mints a permanent echo. These aren't badges in a drawer — they orbit the Pixie canvas every session, growing the visual record of what the creator has built.</p>
 
     <div class="echo-timeline" id="echo-timeline">
@@ -1168,7 +1216,7 @@ canvas { display: block; }
 <div id="sec-market" class="pm-view" hidden>
   <div class="pm-section">
     <div class="pm-eyebrow">Extending creative identity</div>
-    <h3 class="pm-title" style="font-size:16px;">The marketplace is the Pixie's wardrobe</h3>
+    <h2 class="pm-title" style="font-size:16px;">The marketplace is the Pixie's wardrobe</h2>
     <p class="pm-body" style="margin-bottom:.25rem;">Creators can purchase asset packs that alter their companion's appearance, animation, and feel. This is not monetization for its own sake — it is the mechanism by which experienced creators express their platform identity.</p>
 
     <div class="market-grid">

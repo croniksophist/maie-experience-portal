@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="/assets/theme-init.js"></script>
+<script src="../assets/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAIE — Dashboard</title>
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon.ico" sizes="any">
-<link rel="icon" href="/assets/favicon-32x32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="/assets/favicon-16x16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="description" content="The MAIE cockpit — agent workflow, projects, compute, token balance, and marketplace assets in one live data-readout view.">
+<link rel="canonical" href="https://maietech.github.io/maie-experience-portal/dashboard/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MAIE">
+<meta property="og:title" content="MAIE — Dashboard">
+<meta property="og:description" content="The MAIE cockpit — agent workflow, projects, compute, token balance, and marketplace assets in one live data-readout view.">
+<meta property="og:url" content="https://maietech.github.io/maie-experience-portal/dashboard/">
+<meta property="og:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAIE — Dashboard">
+<meta name="twitter:description" content="The MAIE cockpit — agent workflow, projects, compute, token balance, and marketplace assets in one live data-readout view.">
+<meta name="twitter:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon.ico" sizes="any">
+<link rel="icon" href="../assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/maie-tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/maie-tokens.css">
 </head>
 <body data-nav="dashboard">
 <style>
@@ -28,7 +41,6 @@
     --du-surface:         var(--surface);
     --du-border:          var(--border);
     --du-text:            var(--text-1);
-    --du-muted:           var(--text-3);
     --du-brand:           var(--primary);
     --du-brand-light:     var(--primary-light);
     --du-amber: #d6a13c;
@@ -36,7 +48,14 @@
     --du-green: #5b9a6f;
 
     --du-text-secondary: var(--text-2);
-    --du-text-accent:    var(--du-brand-light);
+    /* --du-text-accent/--du-muted diverge from --du-brand-light/--text-3
+       here (rather than aliasing) because axe-core measured 3.93-4.4:1 for
+       both against --du-bg-accent's actual composited surface (the
+       accent-tinted card/stage backgrounds like .du-active), even though
+       the shared tokens they'd otherwise alias to pass everywhere else on
+       the page. These clear 5.51:1 / 4.86:1 on that surface. */
+    --du-text-accent:    #E08584;
+    --du-muted:          rgba(232,230,227,0.58);
     --du-surface-1:      var(--surface-raised);
     --du-surface-0:      rgba(255,255,255,0.015);
     --du-bg-accent:      var(--primary-glow);
@@ -47,6 +66,12 @@
   }
   [data-theme="light"] {
     --du-surface-0: rgba(0,0,0,0.015);
+    --du-text-accent: #8A2222;
+    --du-muted: rgba(17,19,24,0.70);
+    /* --du-text-secondary also diverges from --text-2 here for the same
+       reason (4.37-4.49:1 measured against the same accent-tinted stage
+       backgrounds); 0.66 clears 4.89-5.03:1. */
+    --du-text-secondary: rgba(17,19,24,0.66);
   }
   body {
     margin: 0;
@@ -437,7 +462,7 @@
 </style>
 
 <nav class="mnav" aria-label="MAIE global navigation">
-  <a class="mnav-brand" href="/">
+  <a class="mnav-brand" href="../">
     <span class="mnav-brand-word">MAIE</span>
     <svg class="mnav-logo" viewBox="0 0 92 56" fill="none" stroke="#A52A2A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M 2,32 L 7,14 L 12,46 L 18,10 L 24,40
@@ -451,19 +476,19 @@
   </a>
 
   <div class="mnav-links" id="mnav-links">
-    <a class="mnav-link" data-nav="dashboard" href="/dashboard/">
+    <a class="mnav-link" data-nav="dashboard" href="../dashboard/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
       Dashboard
     </a>
-    <a class="mnav-link" data-nav="experience" href="/pixie/">
+    <a class="mnav-link" data-nav="experience" href="../pixie/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></svg>
       Experience
     </a>
-    <a class="mnav-link" data-nav="companion" href="/pixie-framework/">
+    <a class="mnav-link" data-nav="companion" href="../pixie-framework/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-4.4-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.6-9.5 9-9.5 9Z"/></svg>
       Companion
     </a>
-    <a class="mnav-link" data-nav="pitch" href="/pitch/">
+    <a class="mnav-link" data-nav="pitch" href="../pitch/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v6h6"/></svg>
       Pitch
     </a>
@@ -538,19 +563,36 @@
     overlay.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', function () { overlay.classList.remove('open'); });
     });
+    // Escape and click-away close the overlay too — axe-core/Playwright's
+    // keyboard walkthrough found only the link-click and re-toggle paths
+    // worked before this, leaving keyboard users with no way to dismiss
+    // the open menu without tabbing through every link first.
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
   }
 })();
 </script>
 
 <div class="du-root" role="main">
-  <h2 class="sr-only">MAIE Dashboard & Utility Panel — Product Overview</h2>
+  <h1 class="sr-only">MAIE Dashboard & Utility Panel — Product Overview</h1>
 
   <!-- ── HERO ─────────────────────────────────────────────────────────── -->
   <div class="du-hero">
     <div class="du-hero-top">
       <div>
         <div class="du-tag">MAIE Framework 2.0 · The Production Cockpit</div>
-        <h3 class="du-hero-title">Dashboard & Utility Panel</h3>
+        <h2 class="du-hero-title">Dashboard & Utility Panel</h2>
         <p class="du-hero-sub">The primary surface every MAIE session returns to. A unified workspace that combines project management, live AI status, agent orchestration, token economy, and an on-demand utility layer — all in one coherent screen built on professional non-linear editing software aesthetics.</p>
         <div style="margin-top:1rem;">
           <div class="du-section-label" style="margin-bottom:.4rem">Click any module to see it in the cockpit →</div>
@@ -637,42 +679,42 @@
   <div class="du-section-label">Dashboard Modules — click to explore</div>
   <div class="du-module-grid" id="du-module-grid">
     <div class="du-module-card active" data-module="agent">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/ai.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/ai.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Agent Workflow</div>
       <div class="du-module-role">Plain-language goal → plan → approval → execution. The primary entry point for multi-step AI work.</div>
     </div>
     <div class="du-module-card" data-module="projects">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/projects.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/projects.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Recent Projects</div>
       <div class="du-module-role">Live carousel of active projects. Single-click access to any project's media, plans, and processing state.</div>
     </div>
     <div class="du-module-card" data-module="processing">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/compute.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/compute.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Processing Status</div>
       <div class="du-module-role">Live tile counts — Pending, Processing, Completed, Failed — across every media file, updated in real time.</div>
     </div>
     <div class="du-module-card" data-module="tokens">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/token.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/token.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Token Balance</div>
       <div class="du-module-role">Current balance, today's transaction count, and last-activity timestamp from the platform's token ledger.</div>
     </div>
     <div class="du-module-card" data-module="marketplace">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/marketplace.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/marketplace.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Marketplace Assets</div>
       <div class="du-module-role">Six most recently active marketplace assets surfaced directly on the dashboard for zero-friction discovery.</div>
     </div>
     <div class="du-module-card" data-module="activity">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/radio.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/radio.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Live Activity Rail</div>
       <div class="du-module-role">Persistent activity panel. Uploads completing, agent plans finishing, assets publishing — in real time, always visible.</div>
     </div>
     <div class="du-module-card" data-module="recommendations">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/idea.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/idea.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">AI Recommendations</div>
       <div class="du-module-role">Personalised next-step suggestions, each resolved to one concrete Launch action and the correct destination.</div>
     </div>
     <div class="du-module-card" data-module="utility">
-      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(/assets/icons/utility.svg)" aria-hidden="true"></span></div>
+      <div class="du-module-icon"><span class="icon-mask" style="--icon-src:url(../assets/icons/utility.svg)" aria-hidden="true"></span></div>
       <div class="du-module-name">Utility Panel</div>
       <div class="du-module-role">Slide-up contextual layer: Help, Features, Projects Guide, Token History, System Status, and the Visual Analysis Tool.</div>
     </div>
@@ -704,7 +746,7 @@
 
   const MODULES = {
     agent: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/ai.svg)" aria-hidden="true"></span>', name: 'Agent Workflow',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/ai.svg)" aria-hidden="true"></span>', name: 'Agent Workflow',
       sideSlot: 0, tiles: [0,1,2], nucleus: true, railItems: [2,4], sheet: false,
       detail: {
         headline: 'The Conversational Core',
@@ -714,7 +756,7 @@
       }
     },
     projects: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/projects.svg)" aria-hidden="true"></span>', name: 'Recent Projects',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/projects.svg)" aria-hidden="true"></span>', name: 'Recent Projects',
       sideSlot: 1, tiles: [0], nucleus: false, railItems: [], sheet: false,
       detail: {
         headline: 'Resumption, Not Discovery',
@@ -724,7 +766,7 @@
       }
     },
     processing: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/compute.svg)" aria-hidden="true"></span>', name: 'Processing Status',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/compute.svg)" aria-hidden="true"></span>', name: 'Processing Status',
       sideSlot: 2, tiles: [0,1], nucleus: false, railItems: [0,1,2,3,4,5], sheet: false,
       detail: {
         headline: 'Operational Transparency at a Glance',
@@ -734,7 +776,7 @@
       }
     },
     tokens: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/token.svg)" aria-hidden="true"></span>', name: 'Token Balance',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/token.svg)" aria-hidden="true"></span>', name: 'Token Balance',
       sideSlot: 3, tiles: [2], nucleus: false, railItems: [6,7], sheet: false,
       detail: {
         headline: 'A Real Economy, Not a Points System',
@@ -744,7 +786,7 @@
       }
     },
     marketplace: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/marketplace.svg)" aria-hidden="true"></span>', name: 'Marketplace Assets',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/marketplace.svg)" aria-hidden="true"></span>', name: 'Marketplace Assets',
       sideSlot: 4, tiles: [], nucleus: false, railItems: [3,5], sheet: false,
       detail: {
         headline: 'Discovery Without a Detour',
@@ -754,7 +796,7 @@
       }
     },
     activity: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/radio.svg)" aria-hidden="true"></span>', name: 'Live Activity Rail',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/radio.svg)" aria-hidden="true"></span>', name: 'Live Activity Rail',
       sideSlot: 5, tiles: [], nucleus: false, railItems: [0,1,2,3,4,5,6,7], sheet: false,
       detail: {
         headline: 'The User Never Wonders if Something Is Happening',
@@ -764,7 +806,7 @@
       }
     },
     recommendations: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/idea.svg)" aria-hidden="true"></span>', name: 'AI Recommendations',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/idea.svg)" aria-hidden="true"></span>', name: 'AI Recommendations',
       sideSlot: 1, tiles: [], nucleus: true, railItems: [], sheet: false,
       detail: {
         headline: 'Next Steps, Not Generic Upsells',
@@ -774,7 +816,7 @@
       }
     },
     utility: {
-      icon: '<span class="icon-mask" style="--icon-src:url(/assets/icons/utility.svg)" aria-hidden="true"></span>', name: 'Utility Panel',
+      icon: '<span class="icon-mask" style="--icon-src:url(../assets/icons/utility.svg)" aria-hidden="true"></span>', name: 'Utility Panel',
       sideSlot: 0, tiles: [], nucleus: false, railItems: [], sheet: true,
       detail: {
         headline: 'The On-Demand Contextual Layer',

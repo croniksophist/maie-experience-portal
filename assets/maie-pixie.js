@@ -169,6 +169,11 @@
     const CX  = W / 2;
     const CY  = H / 2;
 
+    // Defense-in-depth: any consumer that instantiates the engine directly
+    // (without its own static-fallback swap) still gets a single static
+    // frame instead of a looping animation under reduced motion.
+    const prefersReducedMotion = !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
     const opts = Object.assign({
       rings: 2, particles: 8, performerScale: 1.0,
       shape: 'circle', echoes: [], breathe: 1.2, glowReach: 2.2,
@@ -385,7 +390,7 @@
         ctx.beginPath(); ctx.arc(ex, ey, dotR, 0, Math.PI * 2); ctx.fill();
       });
 
-      animId = requestAnimationFrame(draw);
+      if (!prefersReducedMotion) animId = requestAnimationFrame(draw);
     }
 
     draw();

@@ -23,10 +23,29 @@
   ╚══════════════════════════════════════════════════════════════════════════╝
 -->
 <head>
-<script src="/assets/theme-init.js"></script>
+<script src="../assets/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAIE Experience Module</title>
+<meta name="description" content="A reusable MAIE experience module template — vision, problem, approach, and architecture, built on the shared portal design system.">
+<link rel="canonical" href="https://maietech.github.io/maie-experience-portal/experience-module/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MAIE">
+<meta property="og:title" content="MAIE Experience Module">
+<meta property="og:description" content="A reusable MAIE experience module template — vision, problem, approach, and architecture, built on the shared portal design system.">
+<meta property="og:url" content="https://maietech.github.io/maie-experience-portal/experience-module/">
+<meta property="og:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAIE Experience Module">
+<meta name="twitter:description" content="A reusable MAIE experience module template — vision, problem, approach, and architecture, built on the shared portal design system.">
+<meta name="twitter:image" content="https://maietech.github.io/maie-experience-portal/assets/apple-touch-icon.png">
+<meta name="robots" content="index, follow">
+
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon.ico" sizes="any">
+<link rel="icon" href="../assets/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 
 <!-- Fonts — same stack as the portal -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +63,10 @@
 :root {
   /* ── Portal-aligned brand tokens ─────────────────────────────── */
   --primary:          #A52A2A;
-  --primary-light:    #C24E4E;
+  /* Bumped from #C24E4E, same fix as assets/maie-tokens.css — axe-core
+     measured 3.95-4.25:1 for this module's own surfaces (was under
+     4.5:1); #CF6362 clears 4.60-5.32:1. */
+  --primary-light:    #CF6362;
   --primary-dark:     #772E25;
   --primary-glow:     rgba(165,42,42,0.30);
   --accent:           #FFB400;
@@ -64,8 +86,11 @@
   /* ── Text ─────────────────────────────────────────────────────── */
   --text-1:           rgba(232,230,227,0.94);
   --text-2:           rgba(232,230,227,0.60);
-  --text-3:           rgba(232,230,227,0.38);
-  --text-4:           rgba(232,230,227,0.22);
+  /* Same axe-core-driven fix as assets/maie-tokens.css (3.03-3.09:1
+     measured on this module's own surfaces) — 0.54/0.53 clears
+     4.89-5.03:1 / 4.51-4.52:1 across --bg/--surface-1/--surface-2. */
+  --text-3:           rgba(232,230,227,0.54);
+  --text-4:           rgba(232,230,227,0.53);
 
   /* ── Fonts — same as portal ───────────────────────────────────── */
   --font-display:     'Bebas Neue', sans-serif;
@@ -851,9 +876,15 @@ window.renderInteractive = null;
   ];
   const spineNav = document.getElementById('spine-nav');
   SECTIONS.forEach(sec => {
-    const item = el('a', { class:'em-nav-item', href:'#'+sec.id, role:'listitem', 'aria-label':sec.label });
+    // role="listitem" isn't a valid override on <a href> (its implicit
+    // role is "link" — axe-core flags this combination), so the list
+    // semantics live on a wrapping div instead, same pattern as
+    // .em-principle below.
+    const wrap = el('div', { role:'listitem' });
+    const item = el('a', { class:'em-nav-item', href:'#'+sec.id, 'aria-label':sec.label });
     item.innerHTML = `<div class="em-nav-dot"></div><span class="em-nav-label">${sec.label}</span>`;
-    spineNav.appendChild(item);
+    wrap.appendChild(item);
+    spineNav.appendChild(wrap);
   });
 
   /* ── §1 Vision ───────────────────────────────────────────────── */
@@ -861,7 +892,7 @@ window.renderInteractive = null;
   const s1 = el('section', { class:'em-section', id:'s1' });
   s1.innerHTML = `${secHeader('01','Vision')}
     <div class="em-vision-hero">
-      <div class="em-vision-statement">${C.vision.headline}</div>
+      <h1 class="em-vision-statement">${C.vision.headline}</h1>
       <div class="em-vision-sub">${C.vision.sub}</div>
     </div>`;
   container.appendChild(s1);

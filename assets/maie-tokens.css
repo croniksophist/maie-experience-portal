@@ -10,7 +10,12 @@
    ═══════════════════════════════════════════════════════════════════ */
 :root {
   --primary:        #A52A2A;
-  --primary-light:  #C24E4E;
+  /* Bumped from #C24E4E — that value cleared only 3.98-4.26:1 against the
+     portal's actual dark surfaces (measured via axe-core), just under the
+     4.5:1 AA floor for the small text (card kickers, inline links) that
+     uses this token as a foreground color. This clears 4.75-5.32:1 on the
+     same surfaces while keeping the same hue. */
+  --primary-light:  #CF6362;
   --primary-dark:   #772E25;
   --primary-glow:   rgba(165,42,42,0.32);
   --accent:         #FFB400;
@@ -28,8 +33,13 @@
 
   --text-1:         rgba(232,230,227,0.94);
   --text-2:         rgba(232,230,227,0.60);
-  --text-3:         rgba(232,230,227,0.38);
-  --text-4:         rgba(232,230,227,0.22);
+  /* text-3/text-4 raised from 0.38/0.22 — axe-core measured 3.03:1 and
+     1.75:1 against --bg for real (non-decorative) small text using these
+     tokens (hero-sub, card-desc, footer, pitch's nav-item-num). Both now
+     clear 4.5:1 with margin (5.05:1 / 4.52:1) while staying visually
+     fainter than --text-2. */
+  --text-3:         rgba(232,230,227,0.54);
+  --text-4:         rgba(232,230,227,0.50);
 
   --font-display:   'Bebas Neue', sans-serif;
   --font-ui:        'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -86,8 +96,10 @@
 
   --text-1:         rgba(17,19,24,0.94);
   --text-2:         rgba(17,19,24,0.62);
-  --text-3:         rgba(17,19,24,0.40);
-  --text-4:         rgba(17,19,24,0.24);
+  /* Same axe-core-driven fix as the dark block above, recomputed against
+     this theme's --bg (#EDEEF1): both now clear 4.5:1 (4.79:1 / 4.60:1). */
+  --text-3:         rgba(17,19,24,0.61);
+  --text-4:         rgba(17,19,24,0.60);
 
   --mnav-bg:          rgba(255, 255, 255, 0.82);
   --mnav-border:      rgba(0,0,0,0.08);
@@ -166,8 +178,11 @@
   text-transform: uppercase;
   transition:     color 0.22s ease;
 }
-[data-theme="dark"] .mnav-theme-label  { color: rgba(232, 230, 227, 0.38); }
-[data-theme="light"] .mnav-theme-label { color: rgba(165, 42, 42, 0.75); }
+/* Alphas raised from 0.38/0.75 — axe-core measured 3.04:1 (dark, against
+   the nav's composited background) and 4.16:1 (light), both under the
+   4.5:1 AA floor for this 10.5px label. Now 4.78:1 / 5.19:1. */
+[data-theme="dark"] .mnav-theme-label  { color: rgba(232, 230, 227, 0.52); }
+[data-theme="light"] .mnav-theme-label { color: rgba(165, 42, 42, 0.85); }
 
 @media (max-width: 720px) {
   .mnav-theme-toggle { margin-left: 0; }
