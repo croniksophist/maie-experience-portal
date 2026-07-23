@@ -24,6 +24,7 @@
 <link rel="icon" href="assets/favicon-16x16.png" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/maie-tokens.css">
 <style>
@@ -201,6 +202,11 @@
   .card-arrow {
     margin-top: auto;
     padding-top: 18px;
+    /* Bottom padding added — the cta-card's arrow is a standalone <a>
+       (the other four are decorative text inside the whole-card link),
+       and touch-target audit via Playwright measured it at 144x35,
+       under 44px, at 390px width. */
+    padding-bottom: 15px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     color: var(--text);

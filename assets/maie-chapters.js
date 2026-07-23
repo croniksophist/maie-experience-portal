@@ -154,7 +154,7 @@ window.MAIE_CHAPTERS = [
       // Scene B — Execution details + full tool suite
       body: [
         { type: 'cardGrid', columns: 2, cards: [
-          { eyebrow: 'Context awareness', title: 'The agent already knows your project',
+          { eyebrow: 'Context awareness', title: 'The agent already knows the active project',
             body: 'Before a plan is proposed, the agent already understands which project is active, which files belong to it, and which have been verified as healthy. It continuously re-verifies file availability — a file that goes stale is quietly excluded before the user can submit it to a plan that would fail.' },
           { eyebrow: 'Risk classification', title: 'Automatic vs. gated execution',
             body: 'Low-risk plans proceed automatically. Medium, high, or critical risk is held for explicit approval before a single step runs. A batch operation across many files is treated with more caution than a single targeted analysis — the blast radius of a mistake is larger.' },
@@ -195,7 +195,7 @@ window.MAIE_CHAPTERS = [
   header: {
     eyebrow: 'Chapter 06 · Living Identity',
     title: 'Identity is Infrastructure',
-    subtitle: 'A living creative presence that mirrors what\'s happening in real time, accumulates reputation history, and carries creator provenance across every context — not a feature, the foundation.',
+    subtitle: 'A living creative presence that mirrors what\'s happening in real time, accumulates reputation history, and carries creator provenance across every context — not a feature, but the foundation.',
   },
   scenes: [
     {
@@ -205,7 +205,7 @@ window.MAIE_CHAPTERS = [
           quote: 'The agent is represented in the interface by an animated companion — the Pixie — that visibly shifts state as work progresses: <strong>idle</strong> while waiting, <strong>active</strong> while planning, <strong>progressing</strong> through completion. Giving that work a visible, continuously-updating presence is what makes "the agent is working" feel concrete and trustworthy rather than abstract.' },
         { type: 'tierStack', label: 'Three-tier identity architecture', tiers: [
           { tierLabel: 'Tier 1 · Permanent', title: 'UserIdentity',
-            body: 'Immutable provenance. The glyph seed that stamps every asset the creator publishes. Changing archetype or theme never touches this layer — it is what other creators encounter when they find your work in the marketplace.',
+            body: 'Immutable provenance. The glyph seed that stamps every asset the creator publishes. Changing archetype or theme never touches this layer — it is what other creators encounter when they find that creator\'s work in the marketplace.',
             bg: 'rgba(165,42,42,0.1)', border: 'var(--border-brand)', labelColor: 'var(--primary-light)', tagBg: 'rgba(165,42,42,0.1)',
             tags: ['identity_id', 'glyph seed', 'provenance stamp'] },
           { tierLabel: 'Tier 2 · Expressive', title: 'Pixie Companion',
@@ -276,7 +276,7 @@ window.MAIE_CHAPTERS = [
       { eyebrow: 'One source of truth', title: 'Prices that can\'t drift',
         body: 'Every financial value — asset price, creator payout, platform commission — flows from a single environment-configured source. Asset prices are stored as whole-number MAIE Token counts. The dollar value is always computed at display time, never stored as a stale separate figure.' },
       { eyebrow: 'Atomic ledger', title: '80% to the creator',
-        body: 'When a marketplace asset sells, the platform retains its commission and the remainder is credited to the creator — by default, an eighty-percent revenue share. Every balance change is written through a race-condition-safe ledger operation and recorded permanently in an append-only transaction log.' },
+        body: 'When a marketplace asset sells, the platform retains its commission and the remainder is credited to the creator — by default, an 80% revenue share. Every balance change is written through a race-condition-safe ledger operation and recorded permanently in an append-only transaction log.' },
     ]},
     { type: 'raw', html: `<div style="margin-top:1.5rem;">
       <div class="card-eyebrow" style="margin-bottom:0.75rem;">What's for sale</div>
@@ -458,7 +458,7 @@ window.MAIE_CHAPTERS = [
     { type: 'thesis', marginTop: '1.5rem',
       quote: 'Every other piece of the platform — the project and file model, the theming and design-token system, the multi-tenant data architecture, the agent\'s plan-and-approval contract, the token ledger — is infrastructure that gets <strong>more valuable</strong> as more workflows, more connectors, and more marketplace assets are built on top of it.',
       source: 'Product Overview · §8' },
-    { type: 'diffTable', label: 'Why this compounds and a point solution does not', marginTop: '1.5rem',
+    { type: 'diffTable', label: 'Why this compounds and a point-solution does not', marginTop: '1.5rem',
       headers: ['Dimension', 'Point-solution AI tool', 'MAIE'],
       rows: [
         ['Value driver', 'Quality of one model', 'Platform + agent + marketplace + identity'],

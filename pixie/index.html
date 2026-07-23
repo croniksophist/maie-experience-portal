@@ -24,6 +24,7 @@
 <link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/maie-tokens.css">
 <!-- html/body wrapper added so this module renders correctly when opened
@@ -72,6 +73,11 @@
     text-decoration: none;
     color: var(--mnav-text);
     flex-shrink: 0;
+    /* Vertical padding pads the tap target to 44px tall (measured at
+       390px width: was 21-24px) without inflating the visible logo/
+       wordmark -- touch-target audit via Playwright, viewport 390x844. */
+    padding: 12px 0;
+    margin: -12px 0;
   }
   .mnav-brand svg { display: block; }
   .mnav-logo { width: 34px; height: auto; flex-shrink: 0; }
@@ -127,8 +133,8 @@
     background: none;
     border: 1px solid var(--mnav-border);
     border-radius: 8px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     color: var(--mnav-text);
@@ -503,7 +509,9 @@
 
 .step-pill {
   font-size: 11px;
-  padding: 4px 12px;
+  /* Vertical padding bumped from 4px — touch-target audit via
+     Playwright measured as low as 89x24 at 390px, under 44px. */
+  padding: 15px 12px;
   border-radius: 20px;
   border: 0.5px solid var(--pm-border);
   background: transparent;
@@ -574,13 +582,20 @@ canvas { display: block; }
 
 /* Static fallback glyph — shown instead of a live canvas when the
    engine isn't loaded or prefers-reduced-motion is set. Same footprint
-   as the canvas so layout never jumps. */
+   as the canvas so layout never jumps. width:100% alone doesn't work
+   here: .pm-orb-wrap has no width of its own — the canvas (a replaced
+   element) was the only thing giving it a resolvable size, so the
+   variant classes below give the glyph the same explicit width the
+   canvas gets via its own max-width + replaced-element sizing. */
 .pm-orb-static {
   width: 100%; aspect-ratio: 1 / 1; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle at 40% 35%, var(--pm-static-core, #A855F7) 0%, transparent 72%);
   opacity: .8;
 }
+.pm-orb-static.pm-orb--hero     { width: 120px; }
+.pm-orb-static.pm-orb--workflow { width: 104px; }
+.pm-orb-static.pm-orb--agents   { width: 104px; }
 .pm-orb-static::after {
   content: ''; width: 30%; height: 30%; border-radius: 50%;
   background: var(--pm-static-core, #A855F7);
@@ -844,6 +859,7 @@ canvas { display: block; }
   .wf-left { flex-direction: column; }
   .agent-grid { grid-template-columns: repeat(2, 1fr); }
   .pm-orb--hero { max-width: 84px; }
+  .pm-orb-static.pm-orb--hero { width: 84px; }
 }
 @container pm (max-width: 380px) {
   .agent-grid { grid-template-columns: 1fr 1fr; }
@@ -867,6 +883,7 @@ canvas { display: block; }
   .wf-left { flex-direction: column; }
   .agent-grid { grid-template-columns: repeat(2, 1fr); }
   .pm-orb--hero { max-width: 84px; }
+  .pm-orb-static.pm-orb--hero { width: 84px; }
 }
 @media (max-width: 380px) {
   .agent-grid { grid-template-columns: 1fr 1fr; }
@@ -1265,6 +1282,16 @@ canvas { display: block; }
 
 </div>
 
+<!-- This tag was missing entirely — every other page that calls
+     MAIE.makePixie() includes it (dashboard, pitch, pixie-framework,
+     experience-module). Without it, window.MAIE was never defined, so
+     the `engine` check below always failed and every canvas on this
+     page silently fell back to the static glyph for every visitor,
+     regardless of reduced-motion preference — found via a canvas
+     resize audit (getElementById('c-hero') returned null; DOM showed
+     .pm-orb-static instead) rather than any visual difference, since a
+     static screenshot of a live canvas and its fallback look identical. -->
+<script src="../assets/maie-pixie.js"></script>
 <script>
 (function () {
   'use strict';
@@ -1283,9 +1310,15 @@ canvas { display: block; }
   function staticFallback(canvasId, color) {
     var canvas = document.getElementById(canvasId);
     if (!canvas) return;
-    var wrap = canvas.closest('.pm-orb-wrap') || canvas.parentElement;
     var glyph = document.createElement('div');
-    glyph.className = 'pm-orb-static';
+    // Carries over the canvas's own size-variant class (e.g.
+    // pm-orb--hero) so the glyph picks up an explicit width — canvas
+    // is a replaced element and gets an intrinsic auto-size fallback
+    // that .pm-orb-wrap's own auto/flex-basis sizing quietly depends
+    // on; a plain <div> with only width:100% has no such fallback and
+    // was collapsing to 0x0 (found via a canvas-resize audit measuring
+    // getBoundingClientRect on .pm-orb-static across breakpoints).
+    glyph.className = 'pm-orb-static ' + canvas.className.replace('pm-orb', '').trim();
     glyph.style.setProperty('--pm-static-core', color);
     glyph.setAttribute('role', 'img');
     glyph.setAttribute('aria-label', canvas.getAttribute('aria-label') || 'Pixie companion');

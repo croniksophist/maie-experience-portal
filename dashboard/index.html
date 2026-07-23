@@ -24,6 +24,7 @@
 <link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/maie-tokens.css">
 </head>
@@ -237,7 +238,9 @@
   }
   .du-view-tab {
     font-size: 11px; font-weight: 500; letter-spacing: .04em;
-    padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    /* Vertical padding bumped from 6px — touch-target audit via
+       Playwright measured 90x26 at 390px, under the 44px minimum. */
+    padding: 15px 14px; border-radius: 6px; cursor: pointer;
     color: var(--du-muted); background: transparent;
     transition: background .2s var(--du-ease-cinematic), color .2s var(--du-ease-cinematic);
   }
@@ -380,6 +383,11 @@
     text-decoration: none;
     color: var(--mnav-text);
     flex-shrink: 0;
+    /* Vertical padding pads the tap target to 44px tall (measured at
+       390px width: was 21-24px) without inflating the visible logo/
+       wordmark -- touch-target audit via Playwright, viewport 390x844. */
+    padding: 12px 0;
+    margin: -12px 0;
   }
   .mnav-brand svg { display: block; }
   .mnav-logo { width: 34px; height: auto; flex-shrink: 0; }
@@ -435,8 +443,8 @@
     background: none;
     border: 1px solid var(--mnav-border);
     border-radius: 8px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     color: var(--mnav-text);

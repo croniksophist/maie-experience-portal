@@ -54,6 +54,11 @@
     text-decoration: none;
     color: var(--mnav-text);
     flex-shrink: 0;
+    /* Vertical padding pads the tap target to 44px tall (measured at
+       390px width: was 21-24px) without inflating the visible logo/
+       wordmark -- touch-target audit via Playwright, viewport 390x844. */
+    padding: 12px 0;
+    margin: -12px 0;
   }
   .mnav-brand svg { display: block; }
   .mnav-logo { width: 34px; height: auto; flex-shrink: 0; }
@@ -109,8 +114,8 @@
     background: none;
     border: 1px solid var(--mnav-border);
     border-radius: 8px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     color: var(--mnav-text);

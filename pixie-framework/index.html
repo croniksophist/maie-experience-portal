@@ -24,6 +24,7 @@
 <link rel="icon" href="../assets/favicon-16x16.png" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/maie-tokens.css">
 <!-- html/body wrapper: .pc-root caps at max-width:1440px and centers
@@ -69,6 +70,11 @@
     text-decoration: none;
     color: var(--mnav-text);
     flex-shrink: 0;
+    /* Vertical padding pads the tap target to 44px tall (measured at
+       390px width: was 21-24px) without inflating the visible logo/
+       wordmark -- touch-target audit via Playwright, viewport 390x844. */
+    padding: 12px 0;
+    margin: -12px 0;
   }
   .mnav-brand svg { display: block; }
   .mnav-logo { width: 34px; height: auto; flex-shrink: 0; }
@@ -124,8 +130,8 @@
     background: none;
     border: 1px solid var(--mnav-border);
     border-radius: 8px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     color: var(--mnav-text);
@@ -520,7 +526,14 @@
     display:flex; gap:6px; margin-top:.5rem; flex-wrap:wrap;
   }
   .pc-phase-btn {
-    font-size:11px; padding:4px 10px; border-radius:6px;
+    font-size:11px;
+    /* Vertical padding bumped from 4px, min-width added — touch-target
+       audit via Playwright measured as low as 40x24 at 390px (the
+       "idle" label was still only 40px wide after the padding fix
+       alone), both under 44px. */
+    padding:15px 10px; border-radius:6px;
+    min-width: 44px;
+    box-sizing: border-box;
     border: 0.5px solid var(--pc-border); background:transparent;
     color: var(--pc-text-secondary); cursor:pointer; font-family:var(--pc-font-sans);
     transition: background .12s, border-color .12s, color .12s;
@@ -530,11 +543,20 @@
 
   .pc-theme-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:.5rem; }
   .pc-theme-dot {
-    width:20px; height:20px; border-radius:50%; cursor:pointer;
-    border:2px solid transparent; transition:border-color .12s;
+    /* Tap target only — 44x44 so a tightly-packed row of swatches
+       doesn't produce overlapping hit zones. touch-target audit via
+       Playwright measured the previous single-div version at 20x20. */
+    width:44px; height:44px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
     flex-shrink:0;
   }
-  .pc-theme-dot.on { border-color: var(--pc-border-accent); }
+  .pc-theme-swatch {
+    display:block;
+    width:20px; height:20px; border-radius:50%;
+    border:2px solid transparent; transition:border-color .12s;
+  }
+  .pc-theme-swatch.on { border-color: var(--pc-border-accent); }
 
   .pc-two-col { 
     display:grid; grid-template-columns:1fr 1fr; 
@@ -605,7 +627,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .pc-phase-btn, .pc-theme-dot, .pc-arch-card {
+    .pc-phase-btn, .pc-theme-swatch, .pc-arch-card {
       transition-duration: .01ms !important;
     }
   }
@@ -682,13 +704,17 @@
 
   <div class="pc-runtime">
     <div class="pc-section-label" style="margin:0">Workflow phase → animation mode mapping</div>
+    <!-- role/tabindex added after a keyboard-walkthrough audit found
+         this row (and the archetype grid / theme-dot row above)
+         reachable only by mouse — a delegated click handler on
+         .pc-rt-row had no keyboard equivalent. -->
     <div class="pc-rt-row">
-      <div class="pc-phase" id="rt-idle"><div>idle</div><div class="pc-phase-mode">ambient</div></div>
-      <div class="pc-phase" id="rt-planning"><div>planning</div><div class="pc-phase-mode">tools</div></div>
-      <div class="pc-phase" id="rt-review"><div>review</div><div class="pc-phase-mode">tools</div></div>
-      <div class="pc-phase" id="rt-executing"><div>executing</div><div class="pc-phase-mode">active + progress ring</div></div>
-      <div class="pc-phase" id="rt-completed"><div>completed</div><div class="pc-phase-mode">active → ambient</div></div>
-      <div class="pc-phase" id="rt-failed"><div>failed</div><div class="pc-phase-mode">ambient / subdued</div></div>
+      <div class="pc-phase" id="rt-idle" role="button" tabindex="0"><div>idle</div><div class="pc-phase-mode">ambient</div></div>
+      <div class="pc-phase" id="rt-planning" role="button" tabindex="0"><div>planning</div><div class="pc-phase-mode">tools</div></div>
+      <div class="pc-phase" id="rt-review" role="button" tabindex="0"><div>review</div><div class="pc-phase-mode">tools</div></div>
+      <div class="pc-phase" id="rt-executing" role="button" tabindex="0"><div>executing</div><div class="pc-phase-mode">active + progress ring</div></div>
+      <div class="pc-phase" id="rt-completed" role="button" tabindex="0"><div>completed</div><div class="pc-phase-mode">active → ambient</div></div>
+      <div class="pc-phase" id="rt-failed" role="button" tabindex="0"><div>failed</div><div class="pc-phase-mode">ambient / subdued</div></div>
     </div>
   </div>
 
@@ -829,20 +855,32 @@
 
   const grid = document.getElementById('arch-grid');
   ARCHETYPES.forEach((a,i) => {
+    // role/tabindex/keydown added after a keyboard-walkthrough audit
+    // found the whole archetype grid (and the theme-dot row below)
+    // were the only interactive content after the phase buttons with
+    // no way to reach them — Tab was cycling through just 11 stops
+    // (nav + phase buttons) and never advancing further into the page.
     const card = document.createElement('div');
     card.className = 'pc-arch-card' + (i===0?' active':'');
     card.dataset.idx = i;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', a.label + ' — ' + a.role);
     card.innerHTML = `
       <div class="pc-arch-dot" style="background:${archColors[i]}22; color:${archColors[i]}">${archIcons[i]}</div>
       <div class="pc-arch-name">${a.label}</div>
       <div class="pc-arch-role">${a.role}</div>
       <div class="pc-arch-anim">${a.animation} · ${a.shape}</div>
     `;
-    card.addEventListener('click', () => {
+    const selectArchetype = () => {
       document.querySelectorAll('.pc-arch-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       currentArchetypeIdx = i;
       rebuildPixie();
+    };
+    card.addEventListener('click', selectArchetype);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectArchetype(); }
     });
     grid.appendChild(card);
   });
@@ -853,15 +891,30 @@
   const themeRow = document.getElementById('theme-row');
   const allThemes = (window.MAIE && window.MAIE.THEMES) ? window.MAIE.THEMES : {};
   Object.entries(allThemes).forEach(([id, th]) => {
+    // Outer .pc-theme-dot is the 44x44 tap target (touch-target audit
+    // via Playwright measured the old single-div version at 20x20);
+    // the inner .pc-theme-swatch carries the actual 20px visible circle
+    // and its selection ring, so the ring still hugs the swatch instead
+    // of ballooning out to the padded hit area.
     const dot = document.createElement('div');
-    dot.className = 'pc-theme-dot' + (id===currentThemeId?' on':'');
-    dot.style.background = th.ring;
+    dot.className = 'pc-theme-dot';
+    dot.setAttribute('role', 'button');
+    dot.setAttribute('tabindex', '0');
+    dot.setAttribute('aria-label', id + ' theme');
+    const swatch = document.createElement('span');
+    swatch.className = 'pc-theme-swatch' + (id===currentThemeId?' on':'');
+    swatch.style.background = th.ring;
+    dot.appendChild(swatch);
     dot.title = id;
-    dot.addEventListener('click', () => {
-      document.querySelectorAll('.pc-theme-dot').forEach(d => d.classList.remove('on'));
-      dot.classList.add('on');
+    const selectTheme = () => {
+      document.querySelectorAll('.pc-theme-swatch').forEach(d => d.classList.remove('on'));
+      swatch.classList.add('on');
       currentThemeId = id;
       if (pixie) pixie.setTheme(id);
+    };
+    dot.addEventListener('click', selectTheme);
+    dot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTheme(); }
     });
     themeRow.appendChild(dot);
   });
@@ -910,6 +963,15 @@
         // Extract the phase name from the ID (e.g., "rt-planning" -> "planning")
         const phase = phaseCard.id.replace('rt-', '');
         setPhase(phase);
+      }
+    });
+    // Keyboard equivalent for the role="button" tabindex="0" cards above.
+    rtRow.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const phaseCard = e.target.closest('.pc-phase');
+      if (phaseCard) {
+        e.preventDefault();
+        setPhase(phaseCard.id.replace('rt-', ''));
       }
     });
   }

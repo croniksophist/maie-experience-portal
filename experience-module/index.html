@@ -49,6 +49,7 @@
 
 <!-- Fonts — same stack as the portal -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <!-- Shared Pixie engine -->
@@ -461,7 +462,9 @@ html { scroll-behavior: smooth; }
   background:    var(--surface-2);
   border:        0.5px solid var(--border-mid);
   border-radius: var(--radius-sm);
-  padding:       8px 18px;
+  /* Vertical padding bumped from 8px — touch-target audit via
+     Playwright measured as low as 86x38 at 390px, under 44px. */
+  padding:       15px 18px;
   font-size:     12px;
   font-weight:   500;
   color:         var(--text-1);
