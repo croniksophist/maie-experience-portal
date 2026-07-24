@@ -1185,24 +1185,40 @@ body {
   margin-left: 0.75rem;
 }
 .scene-dot {
-  /* Visual dot stays 6px; box-sizing:content-box + padding + a
-     background-clip restricted to that content box grows the actual
-     tap target to 44x44 (was 5-6px — touch-target audit via Playwright,
-     viewport 390x844) without changing what's visually drawn. */
+  /* Grown from a plain 6px tick to a 16px numbered chip so the scene
+     number can be carved into the middle — these are navigation items
+     (jump to a specific scene), not just a progress indicator, and the
+     number makes that legible at a glance. box-sizing:content-box +
+     padding + a background-clip restricted to that content box keeps
+     the 44x44 tap target (touch-target audit via Playwright, viewport
+     390x844) without the hit area itself looking oversized. */
   box-sizing: content-box;
-  width: 6px;
-  height: 6px;
-  padding: 19px;
+  width: 16px;
+  height: 16px;
+  padding: 14px;
   background-clip: content-box;
   border-radius: 50%;
   background: var(--border-strong);
   border: none;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.2s, transform 0.2s, color 0.2s;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  /* Per-state number color, computed against each state's actual resolved
+     fill (border-strong/text-3/primary-light composited over --bg, not
+     the token's own nominal color) — no single fixed color clears 4.5:1
+     against all three, since the default fill is dark-toned in dark mode
+     but light-toned in light mode while hover/active invert that. */
+  color: var(--text-1);
 }
-.scene-dot:hover { background: var(--text-3); transform: scale(1.3); }
-.scene-dot.active { background: var(--primary-light); transform: scale(1.2); }
+.scene-dot:hover { background: var(--text-3); color: var(--bg); transform: scale(1.15); }
+.scene-dot.active { background: var(--primary-light); color: var(--bg); transform: scale(1.1); }
 
 /* ── Renderer-generated grid classes (overridable by media queries) ── */
 .card-grid {
@@ -2400,6 +2416,10 @@ function refreshSceneDots(meta) {
   group.scenes.forEach((sceneId, i) => {
     const dot = document.createElement('button');
     dot.className = 'scene-dot' + (i === meta.sceneIdxInGroup ? ' active' : '');
+    // Visible number carved into the dot itself, not just the aria-label —
+    // makes it legible at a glance that these are numbered nav items, not
+    // decorative ticks.
+    dot.textContent = String(i + 1);
     dot.setAttribute('aria-label', 'Scene ' + (i + 1) + ' of ' + group.scenes.length);
     dot.setAttribute('role', 'tab');
     dot.setAttribute('aria-selected', i === meta.sceneIdxInGroup ? 'true' : 'false');

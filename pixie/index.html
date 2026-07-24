@@ -441,9 +441,15 @@
   overflow: hidden;
 }
 
+/* Was hardcoded to #0b0b10 regardless of theme — the intro section
+   stayed a permanently-dark "stage" even in light mode. Now follows
+   the same theme-aware tokens every other .pm-section already uses;
+   the per-element overrides below that existed only to keep text
+   legible against that forced-dark background are removed in favor
+   of each element's own already-theme-aware base color. */
 .pm-dark {
-  background: #0b0b10;
-  border-color: rgba(255,255,255,0.07);
+  background: var(--pm-bg);
+  border-color: var(--pm-border);
 }
 
 .pm-eyebrow {
@@ -462,10 +468,6 @@
   line-height: 1.25;
 }
 
-.pm-dark .pm-title { color: #ede9ff; }
-.pm-dark .pm-eyebrow { color: #8783a0; }
-.pm-dark .pm-body { color: #9994b2; }
-
 .pm-body {
   font-size: 13px;
   color: var(--pm-text-secondary);
@@ -482,11 +484,6 @@
   padding-left: 1rem;
   margin: 1rem 0 0;
   line-height: 1.6;
-}
-
-.pm-dark .pm-quote {
-  color: #7a77a0;
-  border-left-color: rgba(255,255,255,0.12);
 }
 
 /* ── Section nav — horizontally scrollable so it never wraps into a
@@ -524,18 +521,11 @@
 }
 
 .step-pill:hover { border-color: var(--pm-border-strong); color: var(--pm-text-secondary); }
-.step-pill.active { background: var(--bg-pro, rgba(194,78,78,0.14)); border-color: var(--border-pro, rgba(194,78,78,0.4)); color: var(--text-pro, #C24E4E); }
-/* step-pill only ever appears inside #section-intro's .pm-dark container
-   (a permanently-dark "stage" regardless of the portal-wide theme toggle —
-   see .pm-dark's own hardcoded .pm-title/.pm-eyebrow/.pm-body colors above).
-   Its default/hover/active colors above alias theme-following tokens
-   (--pm-text-muted, --pm-text-secondary, the #C24E4E fallback), so in
-   light mode they flip to dark-on-dark and nearly disappear (axe-core
-   measured 1.03:1). These hardcoded, theme-invariant overrides match the
-   pattern already used for this section's other text. */
-.pm-dark .step-pill { color: #8a879e; }
-.pm-dark .step-pill:hover { color: #b3afc6; }
-.pm-dark .step-pill.active { color: #CF6362; }
+/* Fallback changed from the literal #C24E4E to the theme-aware
+   --primary-light token — #C24E4E was a fixed value tuned only for
+   .pm-dark's old forced-dark background; now that #section-intro
+   follows the theme, the active pill needs a color that follows it too. */
+.step-pill.active { background: var(--bg-pro, rgba(194,78,78,0.14)); border-color: var(--border-pro, rgba(194,78,78,0.4)); color: var(--text-pro, var(--primary-light)); }
 
 /* ── Fluid grids — auto-fit/minmax replaces fixed column counts, so
    these reflow continuously with container width instead of snapping
@@ -550,15 +540,8 @@
   padding: .875rem 1rem;
 }
 
-.pm-dark .pm-card {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.08);
-}
-
 .pm-card-label { font-size: 11px; color: var(--pm-text-muted); margin-bottom: .25rem; font-weight: 500; }
 .pm-card-value { font-size: 14px; font-weight: 500; color: var(--pm-text-primary); }
-.pm-dark .pm-card-label { color: #5a576e; }
-.pm-dark .pm-card-value { color: #dbd8f5; }
 
 .pm-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
